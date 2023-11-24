@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Friend, Post, User, WebSession } from "./app";
+import { Friend, Post, User, WebSession, Tag } from "./app";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -136,6 +136,44 @@ class Routes {
     const fromId = (await User.getUserByUsername(from))._id;
     return await Friend.rejectRequest(fromId, user);
   }
+
+  @Router.post("/tag")
+  async createTag(session: WebSessionDoc, i: string, n:string ){
+    const user = WebSession.getUser(session);
+    const i_id = new ObjectId(i);
+    return await Tag.create(i_id,n);
+  }
+
+  @Router.get("/tag/name/:tagName")
+  async getTagByName(session: WebSessionDoc, tagName: string) {
+      const user = WebSession.getUser(session);
+      // Assuming Tag is a class or module with the getTagByName method
+      return await Tag.getTagByName(tagName);
+  }
+
+  @Router.get("/tag/id/:tagId")
+  async getTagById(session: WebSessionDoc, tagId: string) {
+      const user = WebSession.getUser(session);
+      const objectId = new ObjectId(tagId); // Convert string to ObjectId
+      return await Tag.getTagById(objectId);
+  }
+
+  @Router.get("/tags/item/:itemId")
+  async getTagsByItem(session: WebSessionDoc, itemId: string) {
+      const user = WebSession.getUser(session);
+      const objectId = new ObjectId(itemId); // Convert string to ObjectId
+      return await Tag.getTagsByItemId(objectId);
+  }
+
+  @Router.post("/tag/attach")
+  async attachItemToTag(session: WebSessionDoc, tagId: string, itemId: string) {
+      const user = WebSession.getUser(session);
+      const tagObjectId = new ObjectId(tagId); // Convert string to ObjectId for the tag
+      const itemObjectId = new ObjectId(itemId); // Convert string to ObjectId for the item
+
+      return await Tag.attach(itemObjectId, tagObjectId);
+  }
+
 }
 
 export default getExpressRouter(new Routes());
