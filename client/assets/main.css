@@ -1,8 +1,17 @@
 /* Add some global styles here! */
 
+
+
 :root {
   --red: rgb(208, 67, 12);
-  --base-bg: #f1f3f5;
+  --base-bg: #f1ebef  ;
+  --light-pink: #e5ccf4;
+  --blue-gray: #b7c2c8;
+  --purple: #a080e3;
+  --dark-purple: #5c509c;
+  --deep-purple: #382d72;
+
+  --primary-font: 'Smooch Sans', sans-serif;
 }
 
 button.btn-small {
@@ -29,4 +38,33 @@ a.button {
   justify-content: center;
   align-items: center;
   gap: 1em;
+}
+
+.one-line-input{
+  background-color: var(--base-bg);
+  border: none !important;        
+  outline: none !important;           
+  box-shadow: none !important;  
+  border-radius: 0% !important;
+  height: 5vh;
+}
+
+.primary-button{
+  background-color: var(--purple);
+  border: none;
+  height: 5vh;
+  margin: 0%;
+  padding-left: 20%;
+  padding-right: 20%;
+
+  color: var(--base-bg);
+  font-size: 2.5vh;
+  font-family: 'Smooch Sans', sans-serif;
+}
+
+.link{
+  font-size: 2vh;
+  background-color: var(--light-pink);
+  color: var(--deep-purple);
+  padding: 0;
 }

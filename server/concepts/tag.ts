@@ -20,7 +20,7 @@ export default class TagConcept{
             throw new NotAllowedError("Tag contains invalid characters. Only alphanumeric characters, hyphens, and underscores are allowed.");
         }
 
-        const exist = await this.tags.readOne({name: n, item: [i]});
+        const exist = await this.tags.readOne({name: n});
 
         if(exist){
             const attachResponse = await this.attach(i,exist._id);
@@ -33,7 +33,7 @@ export default class TagConcept{
     }
 
     async attach(i: ObjectId, t: ObjectId){
-        const tag = await this.tags.readOne({t})
+        const tag = await this.tags.readOne({_id:t})
 
         if (!tag) {
             throw new NotFoundError("This tag does not exist");
@@ -77,7 +77,7 @@ export default class TagConcept{
      * @returns list of Tag objects
      */
     async getTagsByItemId(itemId: ObjectId) {
-        const tags = await this.tags.readMany({item: itemId});
+        const tags = await this.tags.readMany({ 'item': { $elemMatch: { $eq: itemId } } });
         return tags;
     }
 

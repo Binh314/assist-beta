@@ -158,14 +158,14 @@ class Routes {
       return await Tag.getTagById(objectId);
   }
 
-  @Router.get("/tags/item/:itemId")
+  @Router.get("/tag/item/:itemId")
   async getTagsByItem(session: WebSessionDoc, itemId: string) {
       const user = WebSession.getUser(session);
       const objectId = new ObjectId(itemId); // Convert string to ObjectId
       return await Tag.getTagsByItemId(objectId);
   }
 
-  @Router.post("/tag/attach")
+  @Router.patch("/tag/attach")
   async attachItemToTag(session: WebSessionDoc, tagId: string, itemId: string) {
       const user = WebSession.getUser(session);
       const tagObjectId = new ObjectId(tagId); // Convert string to ObjectId for the tag

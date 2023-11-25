@@ -5,6 +5,7 @@ import { useUserStore } from "@/stores/user";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
+import RegisterView from "../views/RegisterView.vue";
 import SettingView from "../views/SettingView.vue";
 
 const router = createRouter({
@@ -25,6 +26,18 @@ const router = createRouter({
       path: "/login",
       name: "Login",
       component: LoginView,
+      meta: { requiresAuth: false },
+      beforeEnter: (to, from) => {
+        const { isLoggedIn } = storeToRefs(useUserStore());
+        if (isLoggedIn.value) {
+          return { name: "Settings" };
+        }
+      },
+    },
+    {
+      path: "/register",
+      name: "Register",
+      component: RegisterView,
       meta: { requiresAuth: false },
       beforeEnter: (to, from) => {
         const { isLoggedIn } = storeToRefs(useUserStore());

@@ -54,7 +54,7 @@ onBeforeMount(async () => {
 
 nav {
   padding: 1em 2em;
-  background-color: lightgray;
+  background-color: var(--dark-purple);
   display: flex;
   align-items: center;
 }
@@ -76,7 +76,7 @@ img {
 
 a {
   font-size: large;
-  color: black;
+  color: white;
   text-decoration: none;
 }
 

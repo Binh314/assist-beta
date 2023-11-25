@@ -16,27 +16,41 @@ async function register() {
 </script>
 
 <template>
-  <form class="pure-form pure-form-aligned" @submit.prevent="register">
-    <h3>Register User</h3>
-    <fieldset>
+  <div class = "register-form">
+    <form class="pure-form pure-form-aligned" @submit.prevent="register">
+    <h1>Register User</h1>
+    <fieldset class = "column">
       <div class="pure-control-group">
-        <label for="aligned-name">Username</label>
-        <input v-model.trim="username" type="text" id="aligned-name" placeholder="Username" required />
+        <input  class = "one-line-input" v-model.trim="username" type="text" id="aligned-name" placeholder="Username" required />
       </div>
       <div class="pure-control-group">
-        <label for="aligned-password">Password</label>
-        <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
+        <input  class = "one-line-input"  type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
       </div>
-      <div class="pure-controls">
-        <button type="submit" class="pure-button pure-button-primary">Register</button>
-      </div>
+      <button type="submit" class = "primary-button">Register</button>
+    
     </fieldset>
   </form>
+  </div>
+  
 </template>
 
 <style scoped>
-h3 {
+.register-form {
   display: flex;
   justify-content: center;
+  align-items: center;
+  height: 80vh; /* This makes the container take the full height of the viewport */
 }
+
+form{
+  width: 100%; /* Adjust based on your preference */
+  max-width: 400px; /* Sets a maximum width for the form */
+}
+
+h1 {
+  display: flex;
+  justify-content: center;
+  font-size: 4vh;
+}
+
 </style>
