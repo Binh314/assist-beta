@@ -58,8 +58,16 @@ a.button {
   padding-right: 20%;
 
   color: var(--base-bg);
-  font-size: 2.5vh;
+  font-size: 2vh;
   font-family: 'Smooch Sans', sans-serif;
+}
+
+.ProfilePicture {
+  width: 5vw; 
+  height: 100%;
+  background-size: cover;
+  background-position: top center;
+  border: 1px solid #ccc; /* Optional: adds a border around the image */
 }
 
 .link{
