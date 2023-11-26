@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Friend, Post, User, WebSession, Tag } from "./app";
+import { Friend, Message, Post, Tag, User, WebSession } from "./app";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -138,42 +138,69 @@ class Routes {
   }
 
   @Router.post("/tag")
-  async createTag(session: WebSessionDoc, i: string, n:string ){
+  async createTag(session: WebSessionDoc, i: string, n: string) {
     const user = WebSession.getUser(session);
     const i_id = new ObjectId(i);
-    return await Tag.create(i_id,n);
+    return await Tag.create(i_id, n);
   }
 
   @Router.get("/tag/name/:tagName")
   async getTagByName(session: WebSessionDoc, tagName: string) {
-      const user = WebSession.getUser(session);
-      // Assuming Tag is a class or module with the getTagByName method
-      return await Tag.getTagByName(tagName);
+    const user = WebSession.getUser(session);
+    // Assuming Tag is a class or module with the getTagByName method
+    return await Tag.getTagByName(tagName);
   }
 
   @Router.get("/tag/id/:tagId")
   async getTagById(session: WebSessionDoc, tagId: string) {
-      const user = WebSession.getUser(session);
-      const objectId = new ObjectId(tagId); // Convert string to ObjectId
-      return await Tag.getTagById(objectId);
+    const user = WebSession.getUser(session);
+    const objectId = new ObjectId(tagId); // Convert string to ObjectId
+    return await Tag.getTagById(objectId);
   }
 
   @Router.get("/tag/item/:itemId")
   async getTagsByItem(session: WebSessionDoc, itemId: string) {
-      const user = WebSession.getUser(session);
-      const objectId = new ObjectId(itemId); // Convert string to ObjectId
-      return await Tag.getTagsByItemId(objectId);
+    const user = WebSession.getUser(session);
+    const objectId = new ObjectId(itemId); // Convert string to ObjectId
+    return await Tag.getTagsByItemId(objectId);
   }
 
   @Router.patch("/tag/attach")
   async attachItemToTag(session: WebSessionDoc, tagId: string, itemId: string) {
-      const user = WebSession.getUser(session);
-      const tagObjectId = new ObjectId(tagId); // Convert string to ObjectId for the tag
-      const itemObjectId = new ObjectId(itemId); // Convert string to ObjectId for the item
+    const user = WebSession.getUser(session);
+    const tagObjectId = new ObjectId(tagId); // Convert string to ObjectId for the tag
+    const itemObjectId = new ObjectId(itemId); // Convert string to ObjectId for the item
 
-      return await Tag.attach(itemObjectId, tagObjectId);
+    return await Tag.attach(itemObjectId, tagObjectId);
   }
 
+  // Message
+
+  @Router.post("/message/:otherUser")
+  async sendMessage(session: WebSessionDoc, otherUser: string, text: string, files?: string) {
+    const sender = WebSession.getUser(session);
+    const toId = (await User.getUserByUsername(otherUser))._id;
+    const filesArray = files
+      ? files
+          .split(",")
+          .map((e) => e.trim())
+          .filter((e) => e)
+      : [];
+    return await Message.send(sender, toId, text, filesArray);
+  }
+
+  @Router.get("/message/user/:otherUser")
+  async getMessages(session: WebSessionDoc, otherUser: string) {
+    const user = WebSession.getUser(session);
+    const toId = (await User.getUserByUsername(otherUser))._id;
+    return Responses.messages(await Message.getConversation(user, toId));
+  }
+
+  @Router.get("/message/all")
+  async getAllMessages(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    return Responses.messages(await Message.getMessages({ $or: [{ from: user }, { to: user }] }));
+  }
 }
 
 export default getExpressRouter(new Routes());
