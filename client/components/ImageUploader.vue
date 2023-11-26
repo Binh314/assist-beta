@@ -36,9 +36,9 @@ const uploadImage = () => {
   const file = imageUpload.value as File;
   const imageRef = ref(storage, `auth/${file.name}`);
 
-  uploadBytes(imageRef,imageUpload.value).then((response)=>{
+  uploadBytes(imageRef,imageUpload.value).then((response: any)=>{
     console.log(response)
-    getDownloadURL(ref(storage, response.ref.fullPath)).then((url)=>
+    getDownloadURL(ref(storage, response.ref.fullPath)).then((url: any)=>
     {
       imageSrc.value = url
       emit("update:imageSrc",url)
