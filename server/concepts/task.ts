@@ -12,7 +12,7 @@ export interface TaskDoc extends BaseDoc {
   requester: ObjectId;
   title: string;
   description: string;
-  availability: TimeInterval[];
+  availability: TimeInterval[]; // array of json objects. json has `start` and `end` dates
   files: string[];
   assisters: ObjectId[];
   viewed: ObjectId[];
@@ -58,6 +58,12 @@ export default class TaskConcept {
     return { msg: "Task deleted successfully!" };
   }
 
+  /**
+   * Assister offers to help with task.
+   *
+   * @param assister id of assister
+   * @param _id id of task
+   */
   async offerHelp(assister: ObjectId, _id: ObjectId) {
     await this.isNotRequester(assister, _id);
     await this.isNotAssister(assister, _id);
@@ -71,19 +77,32 @@ export default class TaskConcept {
     return { msg: "Successfully offered help." };
   }
 
+  /**
+   * Marks task as completed.
+   *
+   * @param _id id of task
+   */
   async completeTask(_id: ObjectId) {
     const task = await this.tasks.readOne({ _id });
     if (!task) throw new NotFoundError(`Task ${_id} does not exist!`);
     await this.tasks.updateOne({ _id }, { completed: true });
+    return { msg: "Successfully completed task." };
   }
 
+  /**
+   * Adds viewer to the viewed set.
+   *
+   * @param viewer id of viewer
+   * @param _id id of task
+   */
   async viewTask(viewer: ObjectId, _id: ObjectId) {
     const task = await this.tasks.readOne({ _id });
     if (!task) throw new NotFoundError(`Task ${_id} does not exist!`);
 
     const viewed = task.viewed;
 
-    if (viewed.map((e) => e.toString()).includes(viewer.toString())) {
+    // if viewer has not viewed task yet
+    if (!viewed.map((e) => e.toString()).includes(viewer.toString())) {
       viewed.push(viewer);
       await this.tasks.updateOne({ _id }, { viewed: viewed });
     }
