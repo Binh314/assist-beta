@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Friend, Post, User, WebSession, Tag } from "./app";
+import { Friend, Post, User, WebSession, Tag, Kudo } from "./app";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -174,6 +174,54 @@ class Routes {
       return await Tag.attach(itemObjectId, tagObjectId);
   }
 
+  @Router.post("/kudo")
+  async sendKudo(session: WebSessionDoc, receiver: string, task: string, message: string){
+    const giver = WebSession.getUser(session);
+    const receiverId = new ObjectId(receiver);
+    const taskId = new ObjectId(task);
+    
+    return await Kudo.giveKudos(giver, receiverId, taskId, message);
+  }
+
+  @Router.get("/kudo/task/:task")
+  async getKudoForTask(session: WebSessionDoc, task: string){
+    const user = WebSession.getUser(session);
+    const taskId = new ObjectId(task);
+
+    return await Kudo.getKudoForTask(taskId);
+  }
+
+  @Router.get("/kudo/received/:received")
+  async getReceivedKudosOfUser(session: WebSessionDoc, receiver: string){
+    const user = WebSession.getUser(session);
+    const receiverId = new ObjectId(receiver);
+
+    return await Kudo.getReceivedKudosOfUser(receiverId);
+  }
+
+  @Router.get("/kudo/given/:given")
+  async getGivenKudosOfUser(session: WebSessionDoc, giver: string){
+    const user = WebSession.getUser(session);
+    const giverId = new ObjectId(giver);
+
+    return await Kudo.getGivenKudosOfUser(giverId);
+  }
+
+  @Router.get("/kudo/givenCount/:given")
+  async getGivenKudosCount(session: WebSessionDoc, giver: string){
+    const user = WebSession.getUser(session);
+    const giverId = new ObjectId(giver);
+
+    return await Kudo.getGivenKudosCount(giverId);
+  }
+
+  @Router.get("/kudo/receivedCount/:received")
+  async getReceivedKudosCount(session: WebSessionDoc, receiver: string){
+    const user = WebSession.getUser(session);
+    const receiverId = new ObjectId(receiver);
+
+    return await Kudo.getReceivedKudosCount(receiverId);
+  }
 }
 
 export default getExpressRouter(new Routes());
