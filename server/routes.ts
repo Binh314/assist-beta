@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Friend, Message, Post, Tag, User, WebSession,Kudo } from "./app";
+import { Friend, Kudo, Message, Post, Tag, User, WebSession } from "./app";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -26,9 +26,9 @@ class Routes {
   }
 
   @Router.post("/users")
-  async createUser(session: WebSessionDoc, username: string, password: string) {
+  async createUser(session: WebSessionDoc, username: string, password: string, picture: string) {
     WebSession.isLoggedOut(session);
-    return await User.create(username, password);
+    return await User.create(username, password, picture);
   }
 
   @Router.patch("/users")
@@ -197,16 +197,16 @@ class Routes {
   }
 
   @Router.post("/kudo")
-  async sendKudo(session: WebSessionDoc, receiver: string, task: string, message: string){
+  async sendKudo(session: WebSessionDoc, receiver: string, task: string, message: string) {
     const giver = WebSession.getUser(session);
     const receiverId = new ObjectId(receiver);
     const taskId = new ObjectId(task);
-    
+
     return await Kudo.giveKudos(giver, receiverId, taskId, message);
   }
 
   @Router.get("/kudo/task/:task")
-  async getKudoForTask(session: WebSessionDoc, task: string){
+  async getKudoForTask(session: WebSessionDoc, task: string) {
     const user = WebSession.getUser(session);
     const taskId = new ObjectId(task);
 
@@ -214,7 +214,7 @@ class Routes {
   }
 
   @Router.get("/kudo/received/:received")
-  async getReceivedKudosOfUser(session: WebSessionDoc, receiver: string){
+  async getReceivedKudosOfUser(session: WebSessionDoc, receiver: string) {
     const user = WebSession.getUser(session);
     const receiverId = new ObjectId(receiver);
 
@@ -222,7 +222,7 @@ class Routes {
   }
 
   @Router.get("/kudo/given/:given")
-  async getGivenKudosOfUser(session: WebSessionDoc, giver: string){
+  async getGivenKudosOfUser(session: WebSessionDoc, giver: string) {
     const user = WebSession.getUser(session);
     const giverId = new ObjectId(giver);
 
@@ -230,7 +230,7 @@ class Routes {
   }
 
   @Router.get("/kudo/givenCount/:given")
-  async getGivenKudosCount(session: WebSessionDoc, giver: string){
+  async getGivenKudosCount(session: WebSessionDoc, giver: string) {
     const user = WebSession.getUser(session);
     const giverId = new ObjectId(giver);
 
@@ -238,17 +238,18 @@ class Routes {
   }
 
   @Router.get("/kudo/receivedCount/:received")
-  async getReceivedKudosCount(session: WebSessionDoc, receiver: string){
+  async getReceivedKudosCount(session: WebSessionDoc, receiver: string) {
     const user = WebSession.getUser(session);
     const receiverId = new ObjectId(receiver);
 
-    return await Kudo.getReceivedKudosCount(receiverId);}
+    return await Kudo.getReceivedKudosCount(receiverId);
+  }
 
   @Router.get("/message/all")
   async getAllMessages(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     return Responses.messages(await Message.getMessages({ $or: [{ from: user }, { to: user }] }));
-  
-}}
+  }
+}
 
 export default getExpressRouter(new Routes());

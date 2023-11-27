@@ -10,16 +10,15 @@ const profile = ref("");
 const { createUser, loginUser, updateSession } = useUserStore();
 
 async function register() {
-  await createUser(username.value, password.value);
+  await createUser(username.value, password.value, profile.value);
   await loginUser(username.value, password.value);
   void updateSession();
   void router.push({ name: "Home" });
 }
 
-async function handleImageUpload(url:string){
+async function handleImageUpload(url: string) {
   profile.value = url;
 }
-
 </script>
 
 <template>
@@ -28,7 +27,7 @@ async function handleImageUpload(url:string){
       <h1>Register User</h1>
       <div class="form-content">
         <div class="image-uploader-wrapper">
-          <ImageUploader @update:imageSrc="(url) => handleImageUpload(url)"/>
+          <ImageUploader @update:imageSrc="(url) => handleImageUpload(url)" />
         </div>
         <fieldset class="column">
           <div class="pure-control-group">
