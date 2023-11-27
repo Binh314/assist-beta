@@ -22,7 +22,7 @@ export interface TaskDoc extends BaseDoc {
 export default class TaskConcept {
   public readonly tasks = new DocCollection<TaskDoc>("Tasks");
 
-  async create(requester: ObjectId, title: string, description: string, availability: TimeInterval[], files: string[] = []) {
+  async create(requester: ObjectId, title: string, description: string, availability: TimeInterval[] = [], files: string[] = []) {
     const _id = await this.tasks.createOne({
       requester,
       title,
@@ -82,7 +82,7 @@ export default class TaskConcept {
    *
    * @param _id id of task
    */
-  async completeTask(_id: ObjectId) {
+  async complete(_id: ObjectId) {
     const task = await this.tasks.readOne({ _id });
     if (!task) throw new NotFoundError(`Task ${_id} does not exist!`);
     await this.tasks.updateOne({ _id }, { completed: true });
@@ -95,7 +95,7 @@ export default class TaskConcept {
    * @param viewer id of viewer
    * @param _id id of task
    */
-  async viewTask(viewer: ObjectId, _id: ObjectId) {
+  async view(viewer: ObjectId, _id: ObjectId) {
     const task = await this.tasks.readOne({ _id });
     if (!task) throw new NotFoundError(`Task ${_id} does not exist!`);
 
