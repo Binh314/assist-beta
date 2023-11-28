@@ -313,6 +313,10 @@ class Routes {
    */
   @Router.post("/tasks")
   async createTask(session: WebSessionDoc, title: string, description: string, availability: Record<string, string>[], tags: string[], files?: string[]) {
+    console.log(title);
+    console.log(description);
+    console.log(availability);
+    console.log(tags);
     const user = WebSession.getUser(session);
 
     const avail = [];
