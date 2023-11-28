@@ -33,9 +33,6 @@ const createTask = async (title: string, description: string, availability: Reco
   emptyForm();
 };
 
-function updateTags(tags: string[]) {
-  // idk if this needs to be here for tags input to work
-}
 
 function addAvailability(startDate: string, endDate: string) {
   if (Date.parse(startDate) > Date.parse(endDate)) {
@@ -82,7 +79,7 @@ const emptyForm = () => {
       <!-- <font-awesome-icon icon="tags" size="lg" class="icon" /> -->
       Tags
     </label>
-    <TagsInput id="tagsInput" :initTags="tags" @updateTags="updateTags"/>
+    <TagsInput id="tagsInput" :initTags="tags" />
 
     <label for="availInput">Availability</label>
     <div id="availInput">
