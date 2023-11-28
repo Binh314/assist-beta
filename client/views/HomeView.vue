@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import PostListComponent from "@/components/Post/PostListComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 
@@ -8,17 +7,47 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 
 <template>
   <main>
-    <h1>Home Page</h1>
     <section>
       <h1 v-if="isLoggedIn">Welcome {{ currentUsername }}!</h1>
-      <h1 v-else>Please login!</h1>
+      <div class="content">
+        <img src="@/assets/images/temp_logo.png" />
+        <div class="text">^ placeholder image (replace with screenshot of part of app or maybe storyboard to give a sense of how the app works); insert blurb on aims of Assist</div>
+        <img class="icon" src="@/assets/images/scroll_down.png" />
+      </div>
     </section>
-    <PostListComponent />
   </main>
 </template>
 
 <style scoped>
 h1 {
   text-align: center;
+}
+
+.content {
+  display: block;
+  margin-top: 3em;
+  text-align: center;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+img {
+  max-width: 40%;
+}
+
+.text {
+  margin-top: 0.5em;
+  margin-left: 30%;
+  width: 40%;
+  text-align: center;
+}
+
+.icon {
+  width: 5%;
+}
+
+.icon:hover {
+  cursor: pointer;
 }
 </style>
