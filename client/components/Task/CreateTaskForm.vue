@@ -1,30 +1,32 @@
 <script setup lang="ts">
 import TagsInput from "@/components/Tag/TagsInput.vue";
-import { formatDate, formatDatepick, formatTaskDate, formatTime, toDateString } from "@/utils/formatDate";
+import { formatDatepick, formatTimepick, toDateString } from "@/utils/formatDate";
 import { ref } from "vue";
-import { useToastStore } from "../../stores/toast";
 import { fetchy } from "../../utils/fetchy";
 
 
 const title = ref("");
 const location = ref("");
 const description = ref("");
-const startTime = ref(formatDatepick(new Date()))
-const endTime = ref(formatDatepick(new Date()))
+const deadlineDate = ref(formatDatepick(new Date()))
+const deadlineTime = ref(formatTimepick(new Date()))
 const availability = ref<Array<Record<string, string>>>([]);
 const tags = ref<Array<string>>(['',]);
 const files = ref<Array<string>>(['',]);
 const emit = defineEmits(["refreshTasks"]);
 
-const createTask = async (title: string, description: string, availability: Record<string, string>[] = [], ts: string[], fs: string[] = []) => {
+const createTask = async (title: string, description: string, deadlineDate: string, deadlineTime: string, ts: string[], fs: string[] = []) => {
   try {
 
     // filter out empty strings
     const tags = ts.filter(e=>e);
     const files = fs.filter(e=>e);
 
+    const deadline = toDateString(deadlineDate + " " + deadlineTime);
+    console.log(deadline)
+
     await fetchy("/api/tasks", "POST", {
-      body: { title, description, availability, tags, files },
+      body: { title, description, deadline, tags, files },
     });
   } catch (_) {
     return;
@@ -34,26 +36,12 @@ const createTask = async (title: string, description: string, availability: Reco
 };
 
 
-function addAvailability(startDate: string, endDate: string) {
-  if (Date.parse(startDate) > Date.parse(endDate)) {
-      useToastStore().showToast({ message: "End time needs to be later than start time.", style: "error" });
-      return;
-    }
-    
-    const startTime = toDateString(startDate);
-    const endTime = toDateString(endDate);
-
-    availability.value.push({start: startTime, end: endTime});
-}
-
-
 const emptyForm = () => {
   title.value = "";
   location.value = "";
   description.value = "";
-  startTime.value = formatDatepick(new Date());
-  endTime.value = formatDatepick(new Date());
-  availability.value = [];
+  deadlineDate.value = formatDatepick(new Date());
+  deadlineTime.value = formatTimepick(new Date());
   tags.value.length = 0;
   files.value.length = 0;
 };
@@ -66,14 +54,14 @@ const emptyForm = () => {
   https://stackoverflow.com/questions/31070479/prevent-form-submitting-when-pressing-enter-from-a-text-input-using-vue-js -->
 
 <template>
-  <form @submit.prevent="createTask(title, description, availability, tags, files)">
+  <form @submit.prevent="createTask(title, description, deadlineDate, deadlineTime, tags, files)">
     <label for="title"> Title </label>
     <input id="title" v-model="title" placeholder="task title" required @keypress.enter.prevent autocomplete="off"/> 
 
     <label for="description">
       Description
     </label>
-    <textarea id="description" v-model="description" placeholder="description of task"> </textarea>
+    <textarea id="description" v-model="description" placeholder="task description"> </textarea>
 
     <label for="tagsInput">
       <!-- <font-awesome-icon icon="tags" size="lg" class="icon" /> -->
@@ -81,28 +69,16 @@ const emptyForm = () => {
     </label>
     <TagsInput id="tagsInput" :initTags="tags" />
 
-    <label for="availInput">Availability</label>
-    <div id="availInput">
-      <label for="startTime"> 
-        <!-- <font-awesome-icon :icon="['fas', 'calendar']" size="lg" class="icon" />  -->
-        Start Time
-      </label>
-      <input type="datetime-local" v-model="startTime" id="startTime" name="start-time" required @keypress.enter.prevent autocomplete="off"/>
-      <label for="endTime"> 
-        <!-- <font-awesome-icon :icon="['fas', 'calendar']" size="lg" class="icon" />  -->
-        End Time
-      </label>
-      <input type="datetime-local" v-model="endTime" id="endTime" name="end-time" required @keypress.enter.prevent autocomplete="off"/>
-      <button @click.prevent="addAvailability(startTime, endTime)">Add Availability</button>
-    </div>
-    <div v-for="interval in availability">
-    <p class = "time" v-if="formatDate(new Date(interval.start)).split(', ')[0] === formatDate(new Date(interval.end)).split(', ')[0]">
-    <font-awesome-icon :icon="['fas', 'calendar']" size="lg" class="icon" /> {{ formatTaskDate(new Date(interval.start)) }} &ndash;  {{ formatTime(new Date(interval.end)) }}
-    </p>
-    <p class = "time" v-else>
-      <font-awesome-icon :icon="['fas', 'calendar']" size="lg" class="icon" /> {{ formatTaskDate(new Date(interval.start)) }} &ndash;  {{ formatTaskDate(new Date(interval.end)) }}
-    </p>
-    </div>
+    <label for="startTime"> 
+      <!-- <font-awesome-icon :icon="['fas', 'calendar']" size="lg" class="icon" />  -->
+      Deadline Date
+    </label>
+    <input type="date" v-model="deadlineDate" id="deadlineDate" name="deadline-date" required @keypress.enter.prevent autocomplete="off"/>
+    <label for="endTime"> 
+      Deadline Time
+    </label>
+    <input type="time" v-model="deadlineTime" id="deadlineTime" name="deadline-time" required @keypress.enter.prevent autocomplete="off"/>
+
     
     <br>
     <menu>

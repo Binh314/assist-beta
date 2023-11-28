@@ -10,4 +10,5 @@ export const formatDateShort = (date: Date): string => moment(date).format("MMM 
 export const formatTaskDate = (date: Date): string => moment(date).format("MMMM Do YYYY, h:mm a");
 export const formatTime = (date: Date): string => moment(date).format("h:mm a");
 export const toDateString = (date: string): string => moment(date).utc().toDate().toString();
-export const formatDatepick = (date: Date): string => moment(date).format("YYYY-MM-DD[T]HH:mm");
+export const formatDatepick = (date: Date): string => moment(date).format("YYYY-MM-DD");
+export const formatTimepick = (date: Date): string => moment(date).format("HH:mm");

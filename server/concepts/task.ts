@@ -3,16 +3,11 @@ import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotAllowedError, NotFoundError } from "./errors";
 
-export interface TimeInterval {
-  start: Date;
-  end: Date;
-}
-
 export interface TaskDoc extends BaseDoc {
   requester: ObjectId;
   title: string;
   description: string;
-  availability: TimeInterval[]; // array of json objects. json has `start` and `end` dates
+  deadline: Date; // array of json objects. json has `start` and `end` dates
   files: string[];
   assisters: ObjectId[];
   viewed: ObjectId[];
@@ -20,14 +15,14 @@ export interface TaskDoc extends BaseDoc {
 }
 
 export default class TaskConcept {
-  public readonly tasks = new DocCollection<TaskDoc>("Tasks");
+  public readonly tasks = new DocCollection<TaskDoc>("tasks");
 
-  async create(requester: ObjectId, title: string, description: string, availability: TimeInterval[] = [], files: string[] = []) {
+  async create(requester: ObjectId, title: string, description: string, deadline: Date, files: string[] = []) {
     const _id = await this.tasks.createOne({
       requester,
       title,
       description,
-      availability,
+      deadline,
       files,
       assisters: [],
       viewed: [],

@@ -312,30 +312,14 @@ class Routes {
    * @param availability array of json formatted as {start: `date string`, end: `date string`}
    */
   @Router.post("/tasks")
-  async createTask(session: WebSessionDoc, title: string, description: string, availability: Record<string, string>[], tags: string[], files?: string[]) {
-    console.log(title);
-    console.log(description);
-    console.log(availability);
-    console.log(tags);
+  async createTask(session: WebSessionDoc, title: string, description: string, deadline: string, tags: string[], files?: string[]) {
     const user = WebSession.getUser(session);
 
-    const avail = [];
+    const deadlineTimestamp = Date.parse(deadline);
+    if (!deadlineTimestamp) throw new BadValuesError("Could Not Parse Start Time");
+    const dl = new Date(deadlineTimestamp);
 
-    for (const interval of availability) {
-      const startTimestamp = Date.parse(interval.start);
-      const endTimestamp = Date.parse(interval.end);
-
-      // value checking
-      if (!startTimestamp) throw new BadValuesError("Could Not Parse Start Time");
-      if (!endTimestamp) throw new BadValuesError("Could Not Parse End Time");
-      if (endTimestamp < startTimestamp) throw new BadValuesError("End time has to be later than start time in the interval.");
-
-      const start = new Date(startTimestamp);
-      const end = new Date(endTimestamp);
-      avail.push({ start: start, end: end });
-    }
-
-    const created = await Task.create(user, title, description, avail, files);
+    const created = await Task.create(user, title, description, dl, files);
 
     // attach tags
     if (created.task)
@@ -350,27 +334,15 @@ class Routes {
    * @param availability array of json formatted as {start: `date string`, end: `date string`}
    */
   @Router.patch("/tasks/:_id")
-  async editTask(session: WebSessionDoc, _id: string, title: string, description: string, availability: Record<string, string>[], files?: string[]) {
+  async editTask(session: WebSessionDoc, _id: string, title: string, description: string, deadline: string, files?: string[]) {
     const user = WebSession.getUser(session);
     const id = new ObjectId(_id.toString());
 
-    const avail = [];
+    const deadlineTimestamp = Date.parse(deadline);
+    if (!deadlineTimestamp) throw new BadValuesError("Could Not Parse Start Time");
+    const dl = new Date(deadlineTimestamp);
 
-    for (const interval of availability) {
-      const startTimestamp = Date.parse(interval.start);
-      const endTimestamp = Date.parse(interval.end);
-
-      // value checking
-      if (!startTimestamp) throw new BadValuesError("Could Not Parse Start Time");
-      if (!endTimestamp) throw new BadValuesError("Could Not Parse End Time");
-      if (endTimestamp < startTimestamp) throw new BadValuesError("End time has to be later than start time in the interval.");
-
-      const start = new Date(startTimestamp);
-      const end = new Date(endTimestamp);
-      avail.push({ start: start, end: end });
-    }
-
-    return await Task.update(id, { requester: user, title, description, availability: avail, files });
+    return await Task.update(id, { requester: user, title, description, deadline: dl, files });
   }
 
   @Router.delete("/tasks/:_id")
