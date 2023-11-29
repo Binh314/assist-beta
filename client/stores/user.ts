@@ -28,6 +28,19 @@ export const useUserStore = defineStore(
       });
     };
 
+    const authUser = async (username: string, password: string) => {
+      try {
+        const response = await fetchy('/api/auth', 'POST', {
+          body: { username: username, password: password }
+        });
+        console.log(`This is auth response: `,response)
+        return response.authentication;
+      } catch (error) {
+        console.log('Encounter Error')
+        return false;
+      }
+    }
+
     const updateSession = async () => {
       try {
         const { username } = await fetchy("/api/session", "GET", { alert: false });
@@ -36,7 +49,7 @@ export const useUserStore = defineStore(
         const response = await fetchy(`/api/users/${currentUsername.value}`,"GET")
         currentProfilePicture.value = response.picture;
 
-        
+
       } catch {
         currentUsername.value = "";
         currentProfilePicture.value = "";
@@ -68,6 +81,7 @@ export const useUserStore = defineStore(
       logoutUser,
       updateUser,
       deleteUser,
+      authUser
     };
   },
   { persist: true },

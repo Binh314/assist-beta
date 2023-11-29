@@ -52,6 +52,22 @@ class Routes {
     return { msg: "Logged in!" };
   }
 
+  @Router.post("/auth")
+  async auth(session: WebSessionDoc, username: string, password: string) {
+    try {
+      const u = await User.authenticate(username, password);
+      if (!u) {
+        return { authentication: false };
+      }
+      const user = WebSession.getUser(session);
+      return { authentication: (u._id).toString() === user.toString() };
+    } catch (error) {
+      // Log the error and return a false authentication
+      console.error(error);
+      return { authentication: false };
+    }
+  }
+
   @Router.post("/logout")
   async logOut(session: WebSessionDoc) {
     WebSession.end(session);

@@ -66,17 +66,6 @@ async function updateUsername() {
   fieldset{
     border: none;
   }
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--light-pink);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
   
   .modal-content {
     background-color: white;
