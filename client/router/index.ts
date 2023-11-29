@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
 import HomeView from "../views/HomeView.vue";
+import LandingView from "../views/LandingView.vue";
 import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import RegisterView from "../views/RegisterView.vue";
@@ -51,6 +52,12 @@ const router = createRouter({
           return { name: "Settings" };
         }
       },
+    },
+    {
+      path: "/landing",
+      name: "Landing",
+      component: LandingView,
+      meta: { requiresAuth: true },
     },
     {
       path: "/:catchAll(.*)",
