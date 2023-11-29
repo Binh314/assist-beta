@@ -1,12 +1,16 @@
 <script setup lang = "ts">
 import { ref } from 'vue';
-import ChangeUsername from '../components/Setting/ChangeUsername.vue';
 import ChangePassword from "../components/Setting/ChangePassword.vue";
+import ChangeUsername from '../components/Setting/ChangeUsername.vue';
+import DeleteAccount from '../components/Setting/DeleteAccount.vue';
+import LogOut from '../components/Setting/LogOut.vue';
 import { useUserStore } from '../stores/user';
 
 const {currentUsername, currentProfilePicture, updateSession} = useUserStore();
 const isChangeUsernameOpen = ref(false);
 const isChangePasswordOpen = ref(false);
+const isDeleteAccountOpen = ref(false)
+const isLogOutOpen = ref(false);
 
 const showChangeUsername = () => {
   isChangeUsernameOpen.value = true;
@@ -25,6 +29,25 @@ const updatePassword = () => {
     updateSession();
     isChangePasswordOpen.value = false;
 }
+
+const showDeleteAccount = () => {
+  isDeleteAccountOpen.value = true;
+};
+
+const updateDeleteAccount = () => {
+    updateSession();
+    isDeleteAccountOpen.value = false;
+}
+
+const showLogOut = () => {
+  isLogOutOpen.value = true;
+};
+
+const updateLogOut = () => {
+    updateSession();
+    isLogOutOpen.value = false;
+}
+
 </script>
 
 <template>
@@ -36,6 +59,10 @@ const updatePassword = () => {
             <ChangeUsername :isOpen="isChangeUsernameOpen" :currentUsername="currentUsername" @close="updateUsername"/>
             <button @click="showChangePassword">Change Password</button>
             <ChangePassword :isOpen="isChangePasswordOpen" @close="updatePassword"/>
+            <button @click="showDeleteAccount">Delete Account</button>
+            <DeleteAccount :isOpen="isDeleteAccountOpen" @close = "updateDeleteAccount" />
+            <button @click="showLogOut">Logout</button>
+            <LogOut :isOpen="isLogOutOpen" @close = "updateLogOut" />
         </div>
         
       </div>
