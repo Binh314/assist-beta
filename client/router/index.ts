@@ -6,6 +6,7 @@ import HomeView from "../views/HomeView.vue";
 import LandingView from "../views/LandingView.vue";
 import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
+import ProfileView from "../views/ProfileView.vue";
 import RegisterView from "../views/RegisterView.vue";
 import SettingView from "../views/SettingView.vue";
 import TaskView from "../views/TaskView.vue";
@@ -54,12 +55,22 @@ const router = createRouter({
       },
     },
     {
+<<<<<<< HEAD
       path: "/landing",
       name: "Landing",
       component: LandingView,
       meta: { requiresAuth: true },
     },
     {
+||||||| 3315c34
+=======
+      path: "/profile",
+      name: "Profile",
+      component: ProfileView,
+      meta: { requiresAuth: false }
+    },
+    {
+>>>>>>> 45201cd01e5f82efa95a8cacd67865b0c2242400
       path: "/:catchAll(.*)",
       name: "not-found",
       component: NotFoundView,

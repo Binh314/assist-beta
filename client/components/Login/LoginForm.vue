@@ -25,7 +25,7 @@ async function login() {
       <div class="pure-control-group">
         <input class = "one-line-input" type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
       </div>
-      <a>Don't have an account? <a href="/signup" class="link">Sign up here!</a></a>
+      <a>Don't have an account? <a href="/register" class="link">Sign up here!</a></a>
       <button type="submit" class = "primary-button">Go!</button>
     </fieldset>
   </form>
