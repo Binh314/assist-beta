@@ -1,8 +1,9 @@
 import { ObjectId } from "mongodb";
 
+import { BadValuesError } from "./concepts/errors";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Friend, Message, Post, Tag, User, WebSession,Kudo } from "./app";
+import { Friend, Kudo, Message, Post, Tag, Task, User, WebSession } from "./app";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -26,9 +27,9 @@ class Routes {
   }
 
   @Router.post("/users")
-  async createUser(session: WebSessionDoc, username: string, password: string) {
+  async createUser(session: WebSessionDoc, username: string, password: string, picture: string) {
     WebSession.isLoggedOut(session);
-    return await User.create(username, password);
+    return await User.create(username, password, picture);
   }
 
   @Router.patch("/users")
@@ -197,16 +198,16 @@ class Routes {
   }
 
   @Router.post("/kudo")
-  async sendKudo(session: WebSessionDoc, receiver: string, task: string, message: string){
+  async sendKudo(session: WebSessionDoc, receiver: string, task: string, message: string) {
     const giver = WebSession.getUser(session);
     const receiverId = new ObjectId(receiver);
     const taskId = new ObjectId(task);
-    
+
     return await Kudo.giveKudos(giver, receiverId, taskId, message);
   }
 
   @Router.get("/kudo/task/:task")
-  async getKudoForTask(session: WebSessionDoc, task: string){
+  async getKudoForTask(session: WebSessionDoc, task: string) {
     const user = WebSession.getUser(session);
     const taskId = new ObjectId(task);
 
@@ -214,7 +215,7 @@ class Routes {
   }
 
   @Router.get("/kudo/received/:received")
-  async getReceivedKudosOfUser(session: WebSessionDoc, receiver: string){
+  async getReceivedKudosOfUser(session: WebSessionDoc, receiver: string) {
     const user = WebSession.getUser(session);
     const receiverId = new ObjectId(receiver);
 
@@ -222,7 +223,7 @@ class Routes {
   }
 
   @Router.get("/kudo/given/:given")
-  async getGivenKudosOfUser(session: WebSessionDoc, giver: string){
+  async getGivenKudosOfUser(session: WebSessionDoc, giver: string) {
     const user = WebSession.getUser(session);
     const giverId = new ObjectId(giver);
 
@@ -230,7 +231,7 @@ class Routes {
   }
 
   @Router.get("/kudo/givenCount/:given")
-  async getGivenKudosCount(session: WebSessionDoc, giver: string){
+  async getGivenKudosCount(session: WebSessionDoc, giver: string) {
     const user = WebSession.getUser(session);
     const giverId = new ObjectId(giver);
 
@@ -238,17 +239,143 @@ class Routes {
   }
 
   @Router.get("/kudo/receivedCount/:received")
-  async getReceivedKudosCount(session: WebSessionDoc, receiver: string){
+  async getReceivedKudosCount(session: WebSessionDoc, receiver: string) {
     const user = WebSession.getUser(session);
     const receiverId = new ObjectId(receiver);
 
-    return await Kudo.getReceivedKudosCount(receiverId);}
+    return await Kudo.getReceivedKudosCount(receiverId);
+  }
 
   @Router.get("/message/all")
   async getAllMessages(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
     return Responses.messages(await Message.getMessages({ $or: [{ from: user }, { to: user }] }));
-  
-}}
+  }
+
+  // Task
+
+  @Router.get("/tasks")
+  async getTasks(requester?: string) {
+    let tasks;
+    if (requester) {
+      const id = (await User.getUserByUsername(requester))._id;
+      tasks = await Task.getTasksByRequester(id);
+    } else {
+      tasks = await Task.getTasks({ completed: false });
+    }
+    return Responses.tasks(tasks);
+  }
+
+  /**
+   *
+   * @param session
+   * @returns tasks that the user has requested that have been completed
+   */
+  @Router.get("/tasks/completed")
+  async getCompletedTasks(session: WebSessionDoc) {
+    const requester = WebSession.getUser(session);
+    const tasks = await Task.getTasks({ _id: requester });
+    return Responses.tasks(tasks);
+  }
+
+  /**
+   *
+   * @param session
+   * @returns tasks that the user has requested that have not been completed
+   */
+  @Router.get("/tasks/requested")
+  async getRequestedTasks(session: WebSessionDoc) {
+    const requester = WebSession.getUser(session);
+    const tasks = await Task.getTasksByRequester(requester);
+    return Responses.tasks(tasks);
+  }
+
+  /**
+   *
+   * @param id id of task
+   * @returns task
+   */
+  @Router.get("/tasks/id/:id")
+  async getTask(id: string) {
+    let tasks;
+    if (id) {
+      const _id = new ObjectId(id);
+      tasks = await Task.getTasks({ _id });
+    } else {
+      tasks = await Task.getTasks({});
+    }
+    return Responses.tasks(tasks);
+  }
+
+  /**
+   *
+   * @param availability array of json formatted as {start: `date string`, end: `date string`}
+   */
+  @Router.post("/tasks")
+  async createTask(session: WebSessionDoc, title: string, description: string, deadline: string, tags: string[], files?: string[]) {
+    const user = WebSession.getUser(session);
+
+    const deadlineTimestamp = Date.parse(deadline);
+    if (!deadlineTimestamp) throw new BadValuesError("Could Not Parse Start Time");
+    const dl = new Date(deadlineTimestamp);
+
+    const created = await Task.create(user, title, description, dl, files);
+
+    // attach tags
+    if (created.task)
+      for (const tag of tags) {
+        Tag.create(created.task._id, tag);
+      }
+
+    return { msg: created.msg, task: await Responses.task(created.task) };
+  }
+  /**
+   *
+   * @param availability array of json formatted as {start: `date string`, end: `date string`}
+   */
+  @Router.patch("/tasks/:_id/edit")
+  async editTask(session: WebSessionDoc, _id: string, title: string, description: string, deadline: string, files?: string[]) {
+    const user = WebSession.getUser(session);
+    const id = new ObjectId(_id.toString());
+
+    const deadlineTimestamp = Date.parse(deadline);
+    if (!deadlineTimestamp) throw new BadValuesError("Could Not Parse Start Time");
+    const dl = new Date(deadlineTimestamp);
+
+    return await Task.update(id, { title, description, deadline: dl, files });
+  }
+
+  @Router.delete("/tasks/:_id")
+  async deleteTask(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    await Task.isRequester(user, _id);
+    return await Task.delete(_id);
+  }
+
+  @Router.patch("tasks/:id/complete")
+  async completeTask(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    await Task.isRequester(user, _id);
+    return await Task.complete(_id);
+  }
+
+  @Router.patch("/tasks/:_id/help/offer")
+  async offerTaskHelp(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    return await Task.offerHelp(user, _id);
+  }
+
+  @Router.patch("/tasks/:_id/help/retract")
+  async retractTaskHelp(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    return await Task.retractHelp(user, _id);
+  }
+
+  @Router.patch("/tasks/:_id/view")
+  async viewTask(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    return await Task.view(user, _id);
+  }
+}
 
 export default getExpressRouter(new Routes());

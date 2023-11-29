@@ -3,16 +3,11 @@ import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotAllowedError, NotFoundError } from "./errors";
 
-export interface TimeInterval {
-  start: Date;
-  end: Date;
-}
-
 export interface TaskDoc extends BaseDoc {
   requester: ObjectId;
   title: string;
   description: string;
-  availability: TimeInterval[];
+  deadline: Date; // array of json objects. json has `start` and `end` dates
   files: string[];
   assisters: ObjectId[];
   viewed: ObjectId[];
@@ -20,14 +15,14 @@ export interface TaskDoc extends BaseDoc {
 }
 
 export default class TaskConcept {
-  public readonly tasks = new DocCollection<TaskDoc>("Tasks");
+  public readonly tasks = new DocCollection<TaskDoc>("tasks");
 
-  async create(requester: ObjectId, title: string, description: string, availability: TimeInterval[], files: string[] = []) {
+  async create(requester: ObjectId, title: string, description: string, deadline: Date, files: string[] = []) {
     const _id = await this.tasks.createOne({
       requester,
       title,
       description,
-      availability,
+      deadline,
       files,
       assisters: [],
       viewed: [],
@@ -58,6 +53,12 @@ export default class TaskConcept {
     return { msg: "Task deleted successfully!" };
   }
 
+  /**
+   * Assister offers to help with task.
+   *
+   * @param assister id of assister
+   * @param _id id of task
+   */
   async offerHelp(assister: ObjectId, _id: ObjectId) {
     await this.isNotRequester(assister, _id);
     await this.isNotAssister(assister, _id);
@@ -71,19 +72,52 @@ export default class TaskConcept {
     return { msg: "Successfully offered help." };
   }
 
-  async completeTask(_id: ObjectId) {
+  /**
+   * Assister reacts help offer for task.
+   *
+   * @param assister id of assister
+   * @param _id id of task
+   */
+  async retractHelp(assister: ObjectId, _id: ObjectId) {
+    await this.isNotRequester(assister, _id);
+    await this.isAssister(assister, _id);
+
+    const task = await this.tasks.readOne({ _id });
+    if (!task) throw new NotFoundError(`Task ${_id} does not exist!`);
+
+    const assisters = task.assisters;
+    const index = assisters.map((e) => e.toString()).indexOf(assister.toString());
+    if (index !== -1) assisters.splice(index, 1);
+    this.tasks.updateOne({ _id }, { assisters: assisters });
+    return { msg: "Successfully retracted help offer." };
+  }
+
+  /**
+   * Marks task as completed.
+   *
+   * @param _id id of task
+   */
+  async complete(_id: ObjectId) {
     const task = await this.tasks.readOne({ _id });
     if (!task) throw new NotFoundError(`Task ${_id} does not exist!`);
     await this.tasks.updateOne({ _id }, { completed: true });
+    return { msg: "Successfully completed task." };
   }
 
-  async viewTask(viewer: ObjectId, _id: ObjectId) {
+  /**
+   * Adds viewer to the viewed set.
+   *
+   * @param viewer id of viewer
+   * @param _id id of task
+   */
+  async view(viewer: ObjectId, _id: ObjectId) {
     const task = await this.tasks.readOne({ _id });
     if (!task) throw new NotFoundError(`Task ${_id} does not exist!`);
 
     const viewed = task.viewed;
 
-    if (viewed.map((e) => e.toString()).includes(viewer.toString())) {
+    // if viewer has not viewed task yet
+    if (!viewed.map((e) => e.toString()).includes(viewer.toString())) {
       viewed.push(viewer);
       await this.tasks.updateOne({ _id }, { viewed: viewed });
     }
@@ -119,6 +153,17 @@ export default class TaskConcept {
     const assisters = task.assisters.map((e) => e.toString());
     if (assisters.includes(assister.toString())) {
       throw new NotAllowedError("Person is already an assister.");
+    }
+  }
+
+  async isAssister(assister: ObjectId, _id: ObjectId) {
+    const task = await this.tasks.readOne({ _id });
+    if (!task) {
+      throw new NotFoundError(`Task ${_id} does not exist!`);
+    }
+    const assisters = task.assisters.map((e) => e.toString());
+    if (!assisters.includes(assister.toString())) {
+      throw new NotAllowedError("Person is not an assister.");
     }
   }
 

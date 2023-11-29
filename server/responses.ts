@@ -2,6 +2,7 @@ import { User } from "./app";
 import { AlreadyFriendsError, FriendNotFoundError, FriendRequestAlreadyExistsError, FriendRequestDoc, FriendRequestNotFoundError } from "./concepts/friend";
 import { MessageDoc } from "./concepts/message";
 import { PostAuthorNotMatchError, PostDoc } from "./concepts/post";
+import { TaskDoc } from "./concepts/task";
 import { Router } from "./framework/router";
 
 /**
@@ -48,6 +49,29 @@ export default class Responses {
     const to = messages.map((message) => message.to);
     const usernames = await User.idsToUsernames(from.concat(to));
     return messages.map((message, i) => ({ ...message, from: usernames[i], to: usernames[i + messages.length] }));
+  }
+
+  /**
+   * Convert TaskDoc into more readable format for the frontend
+   * by converting the host, attendees, and interested ids into usernames.
+   */
+  static async task(task: TaskDoc | null) {
+    if (!task) return task;
+    const requester = await User.getUserById(task.requester);
+    const assisters = await User.idsToUsernames(task.assisters);
+    const viewers = await User.idsToUsernames(task.viewed);
+    return { ...task, requester: requester.username, assisters: assisters, viewed: viewers };
+  }
+
+  /**
+   * Convert many TaskDocs into more readable format for the frontend
+   * by converting the host, attendees, and interested ids into usernames.
+   */
+  static async tasks(tasks: TaskDoc[]) {
+    const requesters = await User.idsToUsernames(tasks.map((task) => task.requester));
+    const assisters = await Promise.all(tasks.map((task) => User.idsToUsernames(task.assisters)));
+    const viewers = await Promise.all(tasks.map((task) => User.idsToUsernames(task.viewed)));
+    return tasks.map((task, i) => ({ ...task, requester: requesters[i], assisters: assisters[i], viewed: viewers[i] }));
   }
 }
 

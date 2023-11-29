@@ -8,6 +8,7 @@ import NotFoundView from "../views/NotFoundView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import RegisterView from "../views/RegisterView.vue";
 import SettingView from "../views/SettingView.vue";
+import TaskView from "../views/TaskView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -16,6 +17,11 @@ const router = createRouter({
       path: "/",
       name: "Home",
       component: HomeView,
+    },
+    {
+      path: "/tasks",
+      name: "Task",
+      component: TaskView,
     },
     {
       path: "/setting",
