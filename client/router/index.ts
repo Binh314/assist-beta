@@ -55,22 +55,18 @@ const router = createRouter({
       },
     },
     {
-<<<<<<< HEAD
       path: "/landing",
       name: "Landing",
       component: LandingView,
       meta: { requiresAuth: true },
     },
     {
-||||||| 3315c34
-=======
       path: "/profile",
       name: "Profile",
       component: ProfileView,
-      meta: { requiresAuth: false }
+      meta: { requiresAuth: false },
     },
     {
->>>>>>> 45201cd01e5f82efa95a8cacd67865b0c2242400
       path: "/:catchAll(.*)",
       name: "not-found",
       component: NotFoundView,
