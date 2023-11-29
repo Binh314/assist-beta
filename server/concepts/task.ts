@@ -12,6 +12,8 @@ export interface TaskDoc extends BaseDoc {
   assisters: ObjectId[];
   viewed: ObjectId[];
   completed: boolean;
+  completionDate: Date | null;
+  completer: ObjectId | null;
 }
 
 export default class TaskConcept {
@@ -27,6 +29,8 @@ export default class TaskConcept {
       assisters: [],
       viewed: [],
       completed: false,
+      completionDate: null,
+      completer: null,
     });
     return { msg: "Task successfully created!", id: _id, task: await this.tasks.readOne({ _id }) };
   }
@@ -97,10 +101,10 @@ export default class TaskConcept {
    *
    * @param _id id of task
    */
-  async complete(_id: ObjectId) {
+  async complete(assister: ObjectId, _id: ObjectId) {
     const task = await this.tasks.readOne({ _id });
     if (!task) throw new NotFoundError(`Task ${_id} does not exist!`);
-    await this.tasks.updateOne({ _id }, { completed: true });
+    await this.tasks.updateOne({ _id }, { completed: true, completionDate: new Date(), completer: assister });
     return { msg: "Successfully completed task." };
   }
 

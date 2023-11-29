@@ -167,10 +167,10 @@ class Routes {
   }
 
   @Router.get("/tag/user/:username")
-  async getTagsByUser(session: WebSessionDoc, username: string){
+  async getTagsByUser(session: WebSessionDoc, username: string) {
     const user = WebSession.getUser(session);
     const userId = (await User.getUserByUsername(username))._id;
-    return await Tag.getTagsByItemId(userId)
+    return await Tag.getTagsByItemId(userId);
   }
 
   @Router.patch("/tag/attach")
@@ -359,11 +359,19 @@ class Routes {
     return await Task.delete(_id);
   }
 
+  /**
+   *
+   * @param _id id of task
+   * @param assister username of assister who completed the task
+   */
   @Router.patch("tasks/:id/complete")
-  async completeTask(session: WebSessionDoc, _id: ObjectId) {
+  async completeTask(session: WebSessionDoc, _id: ObjectId, assister: string) {
     const user = WebSession.getUser(session);
     await Task.isRequester(user, _id);
-    return await Task.complete(_id);
+
+    const userId = (await User.getUserByUsername(assister))._id;
+
+    return await Task.complete(userId, _id);
   }
 
   @Router.patch("/tasks/:_id/help/offer")
