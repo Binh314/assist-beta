@@ -69,15 +69,15 @@ onBeforeMount(async () => {
     <font-awesome-icon icon="tags" size="lg" class="icon" /> {{  tags.join(", ")  }}
   </p>
 
+  <h3 id="assisters" class="assisters" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0"> 
+    <br>
+    <font-awesome-icon :icon="['fas', 'handshake']" size="2xl" class="icon"/> {{  props.task.assisters.join(", ")  }}
+  </h3>
+
+
   <label for="description" v-if="task.description"><b>Description</b></label>
   <p class = "description" v-if="task.description"> {{ props.task.description }} </p>
  
-  <label for="tags" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0">
-    <b>Help Offers</b>
-  </label>
-  <p id="tags" class="tags" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0"> 
-    {{  props.task.assisters.join(", ")  }}
-  </p>
     
   <br>
   <menu v-if="props.task.requester == currentUsername" class = "options">
