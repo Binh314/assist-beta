@@ -58,7 +58,7 @@ const router = createRouter({
       path: "/landing",
       name: "Landing",
       component: LandingView,
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true },
     },
     {
       path: "/profile",

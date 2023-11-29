@@ -10,12 +10,7 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
   <main>
     <section>
       <h1 v-if="isLoggedIn">Welcome {{ currentUsername }}!</h1>
-      <TaskFeed/>
-      <!-- <div class="content">
-        <img src="@/assets/images/temp_logo.png" />
-        <div class="text">^ placeholder image (replace with screenshot of part of app or maybe storyboard to give a sense of how the app works); insert blurb on aims of Assist</div>
-        <img class="icon" src="@/assets/images/scroll_down.png" />
-      </div> -->
+      <TaskFeed />
     </section>
   </main>
 </template>
