@@ -1,3 +1,5 @@
+import BadgeConcept from "./concepts/badge";
+import ChallengeConcept from "./concepts/challenge";
 import FriendConcept from "./concepts/friend";
 import KudoConcept from "./concepts/kudos";
 import MessageConcept from "./concepts/message";
@@ -16,3 +18,5 @@ export const Tag = new TagConcept();
 export const Kudo = new KudoConcept();
 export const Message = new MessageConcept();
 export const Task = new TaskConcept();
+export const Challenge = new ChallengeConcept();
+export const Badge = new BadgeConcept();
