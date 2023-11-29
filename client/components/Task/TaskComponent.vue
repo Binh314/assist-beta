@@ -16,7 +16,7 @@ const tags = ref<Array<string>>([]);
 const deleteTask = async () => {
   if (!confirm("Are you sure you want to delete this task?")) return;
   try {
-    await fetchy(`/api/events/${props.task._id}`, "DELETE");
+    await fetchy(`/api/tasks/${props.task._id}`, "DELETE");
   } catch {
     return;
   }
