@@ -166,6 +166,13 @@ class Routes {
     return await Tag.getTagsByItemId(objectId);
   }
 
+  @Router.get("/tag/user/:username")
+  async getTagsByUser(session: WebSessionDoc, username: string){
+    const user = WebSession.getUser(session);
+    const userId = (await User.getUserByUsername(username))._id;
+    return await Tag.getTagsByItemId(userId)
+  }
+
   @Router.patch("/tag/attach")
   async attachItemToTag(session: WebSessionDoc, tagId: string, itemId: string) {
     const user = WebSession.getUser(session);
