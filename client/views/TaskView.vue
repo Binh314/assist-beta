@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import createTaskForm from "@/components/Task/CreateTaskForm.vue";
+import TaskFeed from "@/components/Task/TaskFeed.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 
@@ -10,7 +10,7 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
   <main>
     <section>
       <h1 v-if="isLoggedIn">Welcome {{ currentUsername }}!</h1>
-      <createTaskForm/>
+      <TaskFeed/>
       <!-- <div class="content">
         <img src="@/assets/images/temp_logo.png" />
         <div class="text">^ placeholder image (replace with screenshot of part of app or maybe storyboard to give a sense of how the app works); insert blurb on aims of Assist</div>

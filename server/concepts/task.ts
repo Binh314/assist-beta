@@ -73,6 +73,26 @@ export default class TaskConcept {
   }
 
   /**
+   * Assister reacts help offer for task.
+   *
+   * @param assister id of assister
+   * @param _id id of task
+   */
+  async retractHelp(assister: ObjectId, _id: ObjectId) {
+    await this.isNotRequester(assister, _id);
+    await this.isAssister(assister, _id);
+
+    const task = await this.tasks.readOne({ _id });
+    if (!task) throw new NotFoundError(`Task ${_id} does not exist!`);
+
+    const assisters = task.assisters;
+    const index = assisters.map((e) => e.toString()).indexOf(assister.toString());
+    if (index !== -1) assisters.splice(index, 1);
+    this.tasks.updateOne({ _id }, { assisters: assisters });
+    return { msg: "Successfully retracted help offer." };
+  }
+
+  /**
    * Marks task as completed.
    *
    * @param _id id of task
@@ -133,6 +153,17 @@ export default class TaskConcept {
     const assisters = task.assisters.map((e) => e.toString());
     if (assisters.includes(assister.toString())) {
       throw new NotAllowedError("Person is already an assister.");
+    }
+  }
+
+  async isAssister(assister: ObjectId, _id: ObjectId) {
+    const task = await this.tasks.readOne({ _id });
+    if (!task) {
+      throw new NotFoundError(`Task ${_id} does not exist!`);
+    }
+    const assisters = task.assisters.map((e) => e.toString());
+    if (!assisters.includes(assister.toString())) {
+      throw new NotAllowedError("Person is not an assister.");
     }
   }
 

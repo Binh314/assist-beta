@@ -1,0 +1,167 @@
+<script setup lang="ts">
+
+import { useUserStore } from "@/stores/user";
+import { formatDate, formatTaskDate } from "@/utils/formatDate";
+import { storeToRefs } from "pinia";
+import { computed, onBeforeMount, ref } from "vue";
+import { fetchy } from "../../utils/fetchy";
+
+const props = defineProps(["task"]);
+const emit = defineEmits(["editTask", "refreshTasks"]);
+const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+
+const offeredHelp = computed(() => props.task.assisters.includes(currentUsername.value));
+const tags = ref<Array<string>>([]);
+
+const deleteTask = async () => {
+  if (!confirm("Are you sure you want to delete this task?")) return;
+  try {
+    await fetchy(`/api/events/${props.task._id}`, "DELETE");
+  } catch {
+    return;
+  }
+  emit("refreshTasks");
+};
+
+const offerHelp = async () => {
+  if (!offeredHelp.value)
+    try {
+      await fetchy(`/api/tasks/${props.task._id}/help/offer`, "PATCH")
+    } catch (_) {
+      return;
+    }
+  emit("refreshTasks");
+}
+
+const retractHelp = async () => {
+  if (offeredHelp.value)
+    try {
+      await fetchy(`/api/tasks/${props.task._id}/help/retract`, "PATCH")
+    } catch (_) {
+      return;
+    }
+  emit("refreshTasks");
+}
+
+onBeforeMount(async () => {
+  let tagResults;
+  try {
+    tagResults = await fetchy(`/api/tag/item/${props.task._id}`, "GET");
+  } catch {
+    return;
+  }
+  tags.value = tagResults.map((e: Record<string, string> )=> e.name)
+});
+
+
+</script>
+
+
+<template>
+  <h3 class="Requester"> {{ props.task.requester }} </h3>
+  <h2 class = "title">{{ props.task.title }}</h2>
+
+  <p class = "time">
+    <font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" /> {{ formatTaskDate(props.task.deadline) }}
+  </p>
+
+  <p id="tags" class="tags" v-if="tags.length > 0"> 
+    <font-awesome-icon icon="tags" size="lg" class="icon" /> {{  tags.join(", ")  }}
+  </p>
+
+  <label for="description" v-if="task.description"><b>Description</b></label>
+  <p class = "description" v-if="task.description"> {{ props.task.description }} </p>
+ 
+  <label for="tags" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0">
+    <b>Help Offers</b>
+  </label>
+  <p id="tags" class="tags" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0"> 
+    {{  props.task.assisters.join(", ")  }}
+  </p>
+    
+  <br>
+  <menu v-if="props.task.requester == currentUsername" class = "options">
+    <li><button class="btn-small pure-button" @click="emit('editTask', props.task._id)">Edit</button></li>
+    <li><button class="button-error btn-small pure-button" @click="deleteTask">Delete</button></li>
+  </menu>
+  <div v-else-if="isLoggedIn">
+    <div class="addTask">
+      <button v-if="!offeredHelp" class="pure-button pure-button-primary" @click="offerHelp"> Offer Help! </button>
+      <button v-else class="pure-button button-error" @click="retractHelp"> Retract Help Offer </button>
+    </div>
+  </div>
+  <div class="timestamp">
+    <p v-if="props.task.dateCreated !== props.task.dateUpdated">Edited on: {{ formatDate(props.task.dateUpdated) }}</p>
+    <p v-else>Created on: {{ formatDate(props.task.dateCreated) }}</p>
+  </div>
+</template>
+
+<style scoped>
+
+
+label {
+  padding-top: 1em;
+}
+.icon {
+  width: 1em;
+}
+.dropdownButton {
+  width: 10em;
+}
+
+.host {
+  font-weight: normal;
+}
+
+h2, h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+p {
+  margin: 0em;
+}
+
+.photo{
+  height: 50vh;
+  max-width: 100%;
+  border-radius: 1em;
+  object-fit: scale-down;
+
+  
+}
+
+.title {
+  font-weight: bold;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+}
+
+menu {
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  padding: 0;
+  margin: 0;
+}
+
+.timestamp {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+.base {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.base article:only-child {
+  margin-left: auto;
+}
+</style>

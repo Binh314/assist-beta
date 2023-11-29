@@ -333,7 +333,7 @@ class Routes {
    *
    * @param availability array of json formatted as {start: `date string`, end: `date string`}
    */
-  @Router.patch("/tasks/:_id")
+  @Router.patch("/tasks/:_id/edit")
   async editTask(session: WebSessionDoc, _id: string, title: string, description: string, deadline: string, files?: string[]) {
     const user = WebSession.getUser(session);
     const id = new ObjectId(_id.toString());
@@ -342,7 +342,7 @@ class Routes {
     if (!deadlineTimestamp) throw new BadValuesError("Could Not Parse Start Time");
     const dl = new Date(deadlineTimestamp);
 
-    return await Task.update(id, { requester: user, title, description, deadline: dl, files });
+    return await Task.update(id, { title, description, deadline: dl, files });
   }
 
   @Router.delete("/tasks/:_id")
@@ -359,10 +359,16 @@ class Routes {
     return await Task.complete(_id);
   }
 
-  @Router.patch("/tasks/:_id/help")
+  @Router.patch("/tasks/:_id/help/offer")
   async offerTaskHelp(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
     return await Task.offerHelp(user, _id);
+  }
+
+  @Router.patch("/tasks/:_id/help/retract")
+  async retractTaskHelp(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    return await Task.retractHelp(user, _id);
   }
 
   @Router.patch("/tasks/:_id/view")
