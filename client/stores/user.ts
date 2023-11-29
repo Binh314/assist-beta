@@ -7,11 +7,13 @@ export const useUserStore = defineStore(
   "user",
   () => {
     const currentUsername = ref("");
+    const currentProfilePicture = ref("");
 
     const isLoggedIn = computed(() => currentUsername.value !== "");
 
     const resetStore = () => {
       currentUsername.value = "";
+      currentProfilePicture.value = "";
     };
 
     const createUser = async (username: string, password: string, picture: string) => {
@@ -30,9 +32,16 @@ export const useUserStore = defineStore(
       try {
         const { username } = await fetchy("/api/session", "GET", { alert: false });
         currentUsername.value = username;
+        
+        const response = await fetchy(`/api/users/${currentUsername.value}`,"GET")
+        currentProfilePicture.value = response.picture;
+
+        
       } catch {
         currentUsername.value = "";
+        currentProfilePicture.value = "";
       }
+
     };
 
     const logoutUser = async () => {
@@ -51,6 +60,7 @@ export const useUserStore = defineStore(
 
     return {
       currentUsername,
+      currentProfilePicture,
       isLoggedIn,
       createUser,
       loginUser,

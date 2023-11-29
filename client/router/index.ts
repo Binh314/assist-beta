@@ -9,6 +9,7 @@ import NotFoundView from "../views/NotFoundView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import RegisterView from "../views/RegisterView.vue";
 import SettingView from "../views/SettingView.vue";
+import SettingsView from "../views/SettingsView.vue";
 import TaskView from "../views/TaskView.vue";
 
 const router = createRouter({
@@ -28,6 +29,12 @@ const router = createRouter({
       path: "/setting",
       name: "Settings",
       component: SettingView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/settings",
+      name: "Settings",
+      component: SettingsView,
       meta: { requiresAuth: true },
     },
     {
@@ -64,7 +71,7 @@ const router = createRouter({
       path: "/profile",
       name: "Profile",
       component: ProfileView,
-      meta: { requiresAuth: false },
+      meta: { requiresAuth: true }
     },
     {
       path: "/:catchAll(.*)",

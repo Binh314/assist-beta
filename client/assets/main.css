@@ -62,6 +62,10 @@ a.button {
   font-family: 'Smooch Sans', sans-serif;
 }
 
+.primary-button:hover{
+  background-color: var(--dark-purple);
+}
+
 .ProfilePicture {
   width: 5vw; 
   height: 100%;
