@@ -38,7 +38,7 @@ async function signup() {
           <button @click="signup">Sign up</button>
           <button @click="login">Login</button>
         </div>
-        <a href="#">
+        <a href="#top">
           <img class="icon" id="content-3-icon" src="@/assets/images/top_of_page.png" />
         </a>
       </div>
