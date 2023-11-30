@@ -4,7 +4,8 @@ import { defineEmits, onMounted, ref, watch } from 'vue';
 import { useUserStore } from '../../stores/user';
 import ImageUploader from '../ImageUploader.vue';
 import { fetchy } from '../../utils/fetchy';
-import TagInput from "../Tag/TAgsInput.vue";
+import TagsInput from "../Tag/TagsInput.vue";
+import { ObjectId } from "mongodb";
 
 const props = defineProps({
 isOpen: Boolean,
@@ -13,7 +14,7 @@ isOpen: Boolean,
 
 const emit = defineEmits(["close"]);
 
-const { updateUser, updateSession, loginUser, authUser, currentUsername, getUserID} = useUserStore();
+const { updateUser, updateSession, loginUser, authUser, currentUsername} = useUserStore();
 
 const isVisible = ref(props.isOpen);
 const userTags = ref([""]);
@@ -73,14 +74,17 @@ async function uploadNewTag(){
     closeModal();
 }
 
-async function handleUpdate(updatedTag){
+async function handleUpdate(updatedTag:string[]){
     newTags.value = updatedTag
 }
 
 async function getUserTags(){
     try{
         const response = await fetchy(`/api/tag/user/${currentUsername}`,"GET");
-        userTags.value = response.map((item)=>(item.name));
+        userTags.value = response.map((item:{
+                                    name: String;
+                                    item: Array<ObjectId>;
+                                    })=>(item.name));
         console.log(`This is fetched: `,userTags.value)
     }
     catch{
@@ -105,7 +109,7 @@ onMounted(async()=>{
             <button @click="closeModal" class = "exit-btn">X</button>
                 <h1>Update Tag</h1>
             <div class="content">
-                <TagInput id="tagsInput" :initTags="userTags" @updateTags="(updatedTag)=>{handleUpdate(updatedTag)}"/>
+                <TagsInput id="tagsInput" :initTags="userTags" @updateTags="(updatedTag)=>{handleUpdate(updatedTag)}"/>
                 <button class="primary-button" @click = "uploadNewTag">Submit</button>
             </div>
             
