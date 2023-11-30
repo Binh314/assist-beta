@@ -2,6 +2,7 @@ import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
+import EditProfileView from "../views/EditProfileView.vue";
 import HomeView from "../views/HomeView.vue";
 import LandingView from "../views/LandingView.vue";
 import LoginView from "../views/LoginView.vue";
@@ -19,6 +20,12 @@ const router = createRouter({
       path: "/",
       name: "Home",
       component: HomeView,
+    },
+    {
+      path: "/profile/edit",
+      name: "Edit Profile",
+      component: EditProfileView,
+      meta: { requiresAuth: true },
     },
     {
       path: "/tasks",

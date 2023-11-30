@@ -1,17 +1,18 @@
 <script setup lang = "ts">
 import { ref } from 'vue';
-import ChangePassword from "../components/Setting/ChangePassword.vue";
+import ChangeProfilePicture from "../components/Profile/ChangeProfilePicture.vue";
+import ChangeTag from "../components/Profile/ChangeTag.vue";
 import ChangeUsername from '../components/Setting/ChangeUsername.vue';
-import DeleteAccount from '../components/Setting/DeleteAccount.vue';
-import LogOut from '../components/Setting/LogOut.vue';
 import router from '../router';
 import { useUserStore } from '../stores/user';
+import ChangeBadge from '../components/Profile/ChangeBadge.vue';
+
+const isChangeBadgeOpen = ref(false);
 
 const {currentUsername, currentProfilePicture, updateSession} = useUserStore();
 const isChangeUsernameOpen = ref(false);
-const isChangePasswordOpen = ref(false);
-const isDeleteAccountOpen = ref(false)
-const isLogOutOpen = ref(false);
+const isChangeProfilePicOpen = ref(false);
+const isChangeTagOpen = ref(false);
 
 const goBack = () => {
   router.go(-1);
@@ -26,55 +27,56 @@ const updateUsername = () => {
     isChangeUsernameOpen.value = false;
 }
 
-const showChangePassword = () => {
-  isChangePasswordOpen.value = true;
+const showChangeProfilePic = () => {
+  isChangeProfilePicOpen.value = true;
 };
 
-const updatePassword = () => {
+const updateProfilePic = () => {
     updateSession();
-    isChangePasswordOpen.value = false;
+    isChangeProfilePicOpen.value = false;
 }
 
-const showDeleteAccount = () => {
-  isDeleteAccountOpen.value = true;
+const showChangeTag = () => {
+  isChangeTagOpen.value = true;
 };
 
-const updateDeleteAccount = () => {
+const updateTag = () => {
     updateSession();
-    isDeleteAccountOpen.value = false;
+    isChangeTagOpen.value = false;
 }
 
-const showLogOut = () => {
-  isLogOutOpen.value = true;
+
+const showChangeBadge = () => {
+  isChangeBadgeOpen.value = true;
 };
 
-const updateLogOut = () => {
-    updateSession();
-    isLogOutOpen.value = false;
+const updateBadge = () => {
+  // Logic to update the badge
+  updateSession();
+  isChangeBadgeOpen.value = false;
 }
 
 </script>
-
 <template>
     <div class="modal-overlay">
       <div class="modal-content">
         <div class="header-container">
-            <h1>Setting</h1>
+            <h1>Edit Profile</h1>
             <button class = "back-btn" @click="goBack">Back</button>
         </div>
         <hr>
         <div class = "column">
             <button class = "setting-selection" @click="showChangeUsername">Change Username</button>
             <ChangeUsername :isOpen="isChangeUsernameOpen" :currentUsername="currentUsername" @close="updateUsername"/>
-            <button class = "setting-selection"  @click="showChangePassword">Change Password</button>
-            <ChangePassword :isOpen="isChangePasswordOpen" @close="updatePassword"/>
-            <button  class = "setting-selection" @click="showDeleteAccount">Delete Account</button>
-            <DeleteAccount :isOpen="isDeleteAccountOpen" @close = "updateDeleteAccount" />
-            <button  class = "setting-selection" @click="showLogOut">Logout</button>
-            <LogOut :isOpen="isLogOutOpen" @close = "updateLogOut" />
+            <button class = "setting-selection" @click="showChangeProfilePic">Change Profile Picture</button>
+            <ChangeProfilePicture :isOpen="isChangeProfilePicOpen" @close="updateProfilePic"/>
+            <button class = "setting-selection" @click="showChangeTag">Change Tag</button>
+            <ChangeTag :isOpen="isChangeTagOpen" @close="updateTag"/>
+            <button class = "setting-selection" @click="showChangeBadge">Change Badge</button>
+            <ChangeBadge :isOpen="isChangeBadgeOpen" @close="updateBadge"/>
         </div>
         
-      </div>
+        </div>
     </div>
     
 </template>

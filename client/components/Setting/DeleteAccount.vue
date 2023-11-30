@@ -71,20 +71,8 @@ async function deleteAccount() {
   fieldset{
     border: none;
   }
-  
-  .modal-content {
-    background-color: white;
-    min-width: 30%;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
 
-  .exit-btn{
-    background-color: transparent;
-    border:none;
-    margin-left: 95%
-  }
+
 
   </style>
   
