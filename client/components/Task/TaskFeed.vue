@@ -6,12 +6,13 @@ import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 
-const { isLoggedIn } = storeToRefs(useUserStore());
+const { isLoggedIn, currentUsername } = storeToRefs(useUserStore());
+const props = defineProps(["requestedTasks"])
 
 const loaded = ref(false);
 let tasks = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
-let searchHost = ref("");
+let searchRequester = ref("");
 const componentKey = ref(1);
 
 // to be implemented after task match is implemented. rn just calls getTasks
@@ -19,15 +20,19 @@ async function getMatchedTasks(host?: string) {
   return getTasks();
 }
 
-async function getTasks(host?: string) {
-  let query: Record<string, string> = host !== undefined ? { host } : {};
+async function getTasks(requester?: string) {
+  let query: Record<string, string> = requester !== undefined ? { requester } : {};
   let taskResults;
   try {
-    taskResults = await fetchy("/api/tasks", "GET", { query });
+    const allTaskResults = await fetchy("/api/tasks", "GET", { query });
+    if (props.requestedTasks)
+      taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester === currentUsername.value);
+    else 
+      taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester !== currentUsername.value)
   } catch (_) {
     return;
   }
-  searchHost.value = host ? host : "";
+  searchRequester.value = requester ? requester : "";
   tasks.value = taskResults;
 }
 
