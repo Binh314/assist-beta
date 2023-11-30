@@ -5,7 +5,7 @@ import moment from "moment";
  * @param {Date} date - A date object
  * @returns {string} - formatted date as string
  */
-export const formatDate = (date: Date): string => moment(date).format("MMMM Do YYYY, h:mm:ss a");
+export const formatDate = (date: Date): string => moment(date).format("MMMM Do YYYY, h:mm a");
 export const formatDateShort = (date: Date): string => moment(date).format("MMM Do YYYY, h:mm A");
 export const formatTaskDate = (date: Date): string => moment(date).format("MMMM Do YYYY, h:mm a");
 export const formatTime = (date: Date): string => moment(date).format("h:mm a");

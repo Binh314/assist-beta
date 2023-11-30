@@ -11,11 +11,11 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
     <section>
       <div class="taskFeed">
         <h1>my tasks</h1>
-        <TaskFeed />
+        <TaskFeed :requestedTasks="true" />
       </div>
       <div class="taskFeed">
         <h1>requests from friends <font-awesome-icon :icon="['fas', 'shuffle']" size="sm" class="icon" /></h1>
-        <TaskFeed />
+        <TaskFeed :requestedTasks="false"/>
       </div>
     </section>
   </main>
