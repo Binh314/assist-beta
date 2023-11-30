@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { useUserStore } from "@/stores/user";
 import { formatDate, formatTaskDate } from "@/utils/formatDate";
 import { storeToRefs } from "pinia";
@@ -26,22 +25,22 @@ const deleteTask = async () => {
 const offerHelp = async () => {
   if (!offeredHelp.value)
     try {
-      await fetchy(`/api/tasks/${props.task._id}/help/offer`, "PATCH")
+      await fetchy(`/api/tasks/${props.task._id}/help/offer`, "PATCH");
     } catch (_) {
       return;
     }
   emit("refreshTasks");
-}
+};
 
 const retractHelp = async () => {
   if (offeredHelp.value)
     try {
-      await fetchy(`/api/tasks/${props.task._id}/help/retract`, "PATCH")
+      await fetchy(`/api/tasks/${props.task._id}/help/retract`, "PATCH");
     } catch (_) {
       return;
     }
   emit("refreshTasks");
-}
+};
 
 onBeforeMount(async () => {
   let tagResults;
@@ -50,44 +49,35 @@ onBeforeMount(async () => {
   } catch {
     return;
   }
-  tags.value = tagResults.map((e: Record<string, string> )=> e.name)
+  tags.value = tagResults.map((e: Record<string, string>) => e.name);
 });
-
-
 </script>
 
-
 <template>
-  <h3 class="Requester"> {{ props.task.requester }} </h3>
-  <h2 class = "title">{{ props.task.title }}</h2>
+  <h3 class="Requester">{{ props.task.requester }}</h3>
+  <h2 class="title">{{ props.task.title }}</h2>
 
-  <p class = "time">
-    <font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" /> {{ formatTaskDate(props.task.deadline) }}
-  </p>
+  <p class="time"><font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" /> {{ formatTaskDate(props.task.deadline) }}</p>
 
-  <p id="tags" class="tags" v-if="tags.length > 0"> 
-    <font-awesome-icon icon="tags" size="lg" class="icon" /> {{  tags.join(", ")  }}
-  </p>
+  <p id="tags" class="tags" v-if="tags.length > 0"><font-awesome-icon icon="tags" size="lg" class="icon" /> {{ tags.join(", ") }}</p>
 
-  <h3 id="assisters" class="assisters" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0"> 
-    <br>
-    <font-awesome-icon :icon="['fas', 'handshake']" size="2xl" class="icon"/> {{  props.task.assisters.join(", ")  }}
+  <h3 id="assisters" class="assisters" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0">
+    <br />
+    <font-awesome-icon :icon="['fas', 'handshake']" size="2xl" class="icon" /> {{ props.task.assisters.join(", ") }}
   </h3>
 
-
   <label for="description" v-if="task.description"><b>Description</b></label>
-  <p class = "description" v-if="task.description"> {{ props.task.description }} </p>
- 
-    
-  <br>
-  <menu v-if="props.task.requester == currentUsername" class = "options">
+  <p class="description" v-if="task.description">{{ props.task.description }}</p>
+
+  <br />
+  <menu v-if="props.task.requester == currentUsername" class="options">
     <li><button class="btn-small pure-button" @click="emit('editTask', props.task._id)">Edit</button></li>
     <li><button class="button-error btn-small pure-button" @click="deleteTask">Delete</button></li>
   </menu>
   <div v-else-if="isLoggedIn">
     <div class="addTask">
-      <button v-if="!offeredHelp" class="pure-button pure-button-primary" @click="offerHelp"> Offer Help! </button>
-      <button v-else class="pure-button button-error" @click="retractHelp"> Retract Help Offer </button>
+      <button v-if="!offeredHelp" class="pure-button pure-button-primary" @click="offerHelp">Offer Help!</button>
+      <button v-else class="pure-button button-error" @click="retractHelp">Retract Help Offer</button>
     </div>
   </div>
   <div class="timestamp">
@@ -97,8 +87,6 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
-
-
 label {
   padding-top: 1em;
 }
@@ -113,7 +101,8 @@ label {
   font-weight: normal;
 }
 
-h2, h3 {
+h2,
+h3 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -121,13 +110,11 @@ p {
   margin: 0em;
 }
 
-.photo{
+.photo {
   height: 50vh;
   max-width: 100%;
   border-radius: 1em;
   object-fit: scale-down;
-
-  
 }
 
 .title {
