@@ -13,7 +13,8 @@ async function register() {
   await createUser(username.value, password.value, profile.value);
   await loginUser(username.value, password.value);
   void updateSession();
-  void router.push({ name: "Home" });
+  // void router.push({ name: "Home" });
+  void router.push({ name: "Task" });
 }
 
 async function handleImageUpload(url: string) {

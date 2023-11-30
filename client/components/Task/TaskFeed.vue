@@ -7,7 +7,7 @@ import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 
 const { isLoggedIn, currentUsername } = storeToRefs(useUserStore());
-const props = defineProps(["requestedTasks"])
+const props = defineProps(["requestedTasks"]);
 
 const loaded = ref(false);
 let tasks = ref<Array<Record<string, string>>>([]);
@@ -25,10 +25,8 @@ async function getTasks(requester?: string) {
   let taskResults;
   try {
     const allTaskResults = await fetchy("/api/tasks", "GET", { query });
-    if (props.requestedTasks)
-      taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester === currentUsername.value);
-    else 
-      taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester !== currentUsername.value)
+    if (props.requestedTasks) taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester === currentUsername.value);
+    else taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester !== currentUsername.value);
   } catch (_) {
     return;
   }
