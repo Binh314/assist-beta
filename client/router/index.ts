@@ -3,9 +3,9 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
 import ChallengesView from "../views/ChallengesView.vue";
+import CreateTaskView from "../views/CreateTaskView.vue";
 import EditProfileView from "../views/EditProfileView.vue";
 import HomeView from "../views/HomeView.vue";
-import LandingView from "../views/LandingView.vue";
 import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import ProfileView from "../views/ProfileView.vue";
@@ -32,6 +32,13 @@ const router = createRouter({
       path: "/tasks",
       name: "Task",
       component: TaskView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/create",
+      name: "Create",
+      component: CreateTaskView,
+      meta: { requiresAuth: true },
     },
     {
       path: "/setting",
@@ -70,12 +77,6 @@ const router = createRouter({
       },
     },
     {
-      path: "/landing",
-      name: "Landing",
-      component: LandingView,
-      // meta: { requiresAuth: true },
-    },
-    {
       path: "/profile",
       name: "Profile",
       component: ProfileView,
@@ -85,6 +86,7 @@ const router = createRouter({
       path: "/challenges",
       name: "Challenges",
       component: ChallengesView,
+      meta: { requiresAuth: true },
       meta: { requiresAuth: true },
     },
     {
