@@ -37,7 +37,7 @@ export default class TaskConcept {
 
   async getTasks(query: Filter<TaskDoc>) {
     const tasks = await this.tasks.readMany(query, {
-      sort: { dateUpdated: -1 },
+      sort: { deadline: 1 },
     });
     return tasks;
   }
@@ -99,9 +99,10 @@ export default class TaskConcept {
   /**
    * Marks task as completed.
    *
+   * @param assiter id of assister
    * @param _id id of task
    */
-  async complete(assister: ObjectId, _id: ObjectId) {
+  async complete(_id: ObjectId, assister?: ObjectId) {
     const task = await this.tasks.readOne({ _id });
     if (!task) throw new NotFoundError(`Task ${_id} does not exist!`);
     await this.tasks.updateOne({ _id }, { completed: true, completionDate: new Date(), completer: assister });

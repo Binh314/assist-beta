@@ -400,9 +400,13 @@ class Routes {
     const user = WebSession.getUser(session);
     await Task.isRequester(user, _id);
 
-    const userId = (await User.getUserByUsername(assister))._id;
+    // requester resolved the task without any help
+    if (!assister) {
+      return await Task.complete(_id);
+    }
 
-    const result = await Task.complete(userId, _id);
+    const userId = (await User.getUserByUsername(assister))._id;
+    const result = await Task.complete(_id, userId);
 
     // Check if completing this task completes any new challenges, and award badges if needed
     const challenges = await Challenge.getActiveChallenges();
