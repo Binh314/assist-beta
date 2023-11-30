@@ -20,7 +20,7 @@ async function signup() {
   <main>
     <section>
       <div v-if="isLoggedIn" class="page landing">
-        <img src="@/assets/images/tempChallenge.png" />
+        <img src="@/assets/images/tempChallenge.png" class="progress" />
         <p>[challenge] - 64% complete</p>
         <p class="link">view active challenges</p>
         <div class="notifications">
@@ -138,9 +138,13 @@ p {
   padding-bottom: 2em;
 }
 
-img {
+.progress {
   max-width: 15em;
   margin-top: 2em;
+}
+
+img {
+  max-width: 45%;
 }
 
 .text {
