@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
-import { NotAllowedError, NotFoundError } from "./errors";
+import { NotFoundError } from "./errors";
 
 export interface ChallengeDoc extends BaseDoc {
   name: string;
@@ -14,14 +14,22 @@ export interface ChallengeDoc extends BaseDoc {
 export default class ChallengeConcept {
   public readonly challenges = new DocCollection<ChallengeDoc>("challenges");
 
-  async create(description: string, goal: number, endTime: Date, reward: ObjectId) {
-    const _id = await this.challenges.createOne({ description, goal, endTime, reward });
+  async create(name: string, description: string, goal: number, endTime: Date, reward: ObjectId) {
+    const _id = await this.challenges.createOne({ name, description, goal, endTime, reward });
     return { msg: "Challenge successfully created!", challenge: await this.challenges.readOne({ _id }) };
   }
 
   async getActiveChallenges() {
     const now = new Date();
     return await this.challenges.readMany({ endTime: { $gte: now } });
+  }
+
+  async getChallengeById(_id: ObjectId) {
+    const challenge = await this.challenges.readOne({ _id });
+    if (!challenge) {
+      throw new NotFoundError(`Challenge ${_id} does not exist!`);
+    }
+    return challenge;
   }
 
   async completeChallenge(_id: ObjectId, user: ObjectId, progress: number) {
@@ -33,7 +41,7 @@ export default class ChallengeConcept {
     if (now <= challenge.endTime && progress >= challenge.goal) {
       await this.challenges.updateOneGeneral({ _id }, { $addToSet: { completedBy: user } });
     } else {
-      throw new NotAllowedError("Challenge requirements not met!");
+      return { msg: "Challenge requirements not met!" };
     }
     return { msg: "Challenge successfully completed!", reward: challenge.reward };
   }
