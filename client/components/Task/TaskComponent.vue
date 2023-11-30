@@ -12,9 +12,11 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 const offeredHelp = computed(() => props.task.assisters.includes(currentUsername.value));
 const tags = ref<Array<string>>([]);
 const completing = ref(false);
+const assisterIndex = ref(props.task.assisters.length);
 
 const toggleComplete = async() => {
   completing.value = !completing.value;
+  assisterIndex.value = props.task.assisters.length;
 }
 
 const deleteTask = async () => {
@@ -47,6 +49,26 @@ const retractHelp = async () => {
   emit("refreshTasks");
 };
 
+const markAssister = async(index: number) => {
+  assisterIndex.value = index;
+}
+
+const completeTask = async () => {
+  try {
+    const assister = (assisterIndex.value !== props.task.assisters.length) ? 
+      props.task.assisters[assisterIndex.value] : null;
+
+    await fetchy(`/api/tasks/${props.task._id}/complete`, "PATCH",
+      { body : {
+        assister: assister
+      }
+    });
+  } catch (_) {
+    return;
+  }
+  emit("refreshTasks");
+}
+
 onBeforeMount(async () => {
   let tagResults;
   try {
@@ -77,13 +99,13 @@ onBeforeMount(async () => {
   <br />
   <div v-if="props.task.requester == currentUsername">
     <menu class="options">
-      <li><button class="btn-small pure-button" @click="emit('editTask', props.task._id)">Edit</button></li>
+      <li><button v-if="!props.task.completed" class="btn-small pure-button" @click="emit('editTask', props.task._id)">Edit</button></li>
       <li><button class="button-error btn-small pure-button" @click="deleteTask">Delete</button></li>
     </menu>
     <br>
     <button class="pure-button pure-button-primary" @click="toggleComplete"> Mark Completed </button>
   </div>
-  <div v-else-if="isLoggedIn">
+  <div v-else-if="isLoggedIn" v-if="!props.task.completed">
     <div class="addTask">
       <button v-if="!offeredHelp" class="pure-button pure-button-primary" @click="offerHelp">Offer Help!</button>
       <button v-else class="pure-button button-error" @click="retractHelp">Retract Help Offer</button>
@@ -98,13 +120,33 @@ onBeforeMount(async () => {
             <button @click="toggleComplete" class = "exit-btn">X</button>
                 <h1>Who helped you?</h1>
             <div class="content">
-
+              <span v-for="(assister, index) in props.task.assisters.concat('I resolved it myself!')" :key="index">
+                <button :class="`pure-button assisterButton ${(index === assisterIndex) ? 'selectedAssistant' : 'unselectedAssistant'}`" @click="markAssister(index)">
+                  {{ assister }}
+                </button>
+              </span>
             </div>
+            <br>
+            <br>
+            <menu class="options">
+              <li><button class="pure-button pure-button-primary" @click="completeTask">Mark Completed</button></li>
+              <li><button class="button-error btn-small pure-button" @click="toggleComplete">Cancel</button></li>
+            </menu>
         </div>
     </div>
 </template>
 
 <style scoped>
+
+.selectedAssistant {
+  font-weight: bold;
+
+}
+
+.assisterButton {
+  margin-right: 1em;
+}
+
 label {
   padding-top: 1em;
 }
