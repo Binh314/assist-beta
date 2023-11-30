@@ -46,6 +46,15 @@ export default class ChallengeConcept {
     return { msg: "Challenge successfully completed!", reward: challenge.reward };
   }
 
+  async hasCompleted(_id: ObjectId, user: ObjectId) {
+    user = new ObjectId(user);
+    const record = await this.challenges.readOne({ _id, completedBy: user });
+    if (record) {
+      return true;
+    }
+    return false;
+  }
+
   async getCompletedUsers(_id: ObjectId) {
     const challenge = await this.challenges.readOne({ _id });
     if (!challenge) {
