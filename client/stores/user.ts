@@ -81,7 +81,7 @@ export const useUserStore = defineStore(
       logoutUser,
       updateUser,
       deleteUser,
-      authUser
+      authUser,
     };
   },
   { persist: true },
