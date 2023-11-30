@@ -19,7 +19,8 @@ const props = defineProps({
   display: flex;
   flex-direction: column; /* Stack children vertically */
   align-items: center; /* Center align items */
-  /* Add additional styling as needed */
+  padding-bottom: 10%;
+  color: var(--dark-purple)
 }
 
 .badge-icon {

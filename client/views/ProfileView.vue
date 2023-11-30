@@ -1,21 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router"; // Import useRouter
 import Badge from "../components/Badge/BadgeIcon.vue";
 import ProfilePicture from "../components/Profile/ProfilePicture.vue";
 import { useUserStore } from "../stores/user";
 import { fetchy } from "../utils/fetchy";
-import { useRouter } from "vue-router"; // Import useRouter
 
-
-
-const router = useRouter();
 const {currentUsername, currentProfilePicture} = useUserStore();
 const kudos = ref(0)
 const tags = ref([])
 
-const navigateToSettings = () => {
-    router.push('/settings'); // Replace '/settings' with your settings page route
-};
 
 onMounted(async () => {
     try {
@@ -28,7 +22,7 @@ onMounted(async () => {
     try {
         const response = await fetchy(`api/tag/user/${currentUsername}`, "GET")
         tags.value = response;
-        tags.value = ["hello","wordld", "i Lovw", "you"]
+        tags.value = ["hello","wordld", "i Love", "you"]
     }
     catch (error) {
         console.error("Error fetching tags:", error);
@@ -42,9 +36,11 @@ onMounted(async () => {
         <ProfilePicture :pictureLink = currentProfilePicture />
         <span class = "username" >{{ currentUsername }}</span>
         <span class = "subtitle" >kudos: {{ kudos }}</span>
-        <hr/>
+        <div class = "button-container">
+            <button class="primary-button">Edit Profile</button>
+        </div>
         <span  class = "subtitle">Tags:</span>
-        <div v-if="tags.length > 0">
+        <div class = "tags" v-if="tags.length > 0">
             <ul>
                 <li v-for="(tag, index) in tags.slice(0, 3)" :key="index">{{ tag }}</li>
                 <span v-if="tags.length > 3">...</span>
@@ -59,26 +55,27 @@ onMounted(async () => {
             <Badge :icon="currentProfilePicture" badgeName="Challenge 2"/>
             <Badge :icon="currentProfilePicture" badgeName="Challenge 3"/>
         </div>
-        <button class = "setting-btn" @click="navigateToSettings">
-            <img class = "setting-icon" src="@/assets/images/setting.png"/>
-        </button>
     </div>
     
     
 </template>
 
 <style scoped>
-hr{
+.button-container{
     width: 30%;
-    color: var(--purple);
+    display: flex;
+    justify-content: center;
 }
+
 .username{
-    font-size: 4vh;
+    font-size: 5vh;
+    font-weight: 700;
     color: var(--dark-purple);
 }
 
 .subtitle{
-    font-size: 2.5vh;
+    font-size: 3vh;
+    font-weight: 550;
     color: var(--dark-purple);
 }
 
@@ -88,14 +85,8 @@ hr{
     gap: 7vh; /* Adjust the space between badges */
 }
 
-.setting-btn{
-    margin-top: 1vh;
-    background: none;
-    border: none;
+.tags{
+    color: var(--deep-purple);
 }
 
-.setting-icon{
-    height: 8vh;
-    width: 8vh;
-}
 </style>
