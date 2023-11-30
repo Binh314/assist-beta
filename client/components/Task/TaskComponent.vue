@@ -11,6 +11,11 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 
 const offeredHelp = computed(() => props.task.assisters.includes(currentUsername.value));
 const tags = ref<Array<string>>([]);
+const completing = ref(false);
+
+const toggleComplete = async() => {
+  completing.value = !completing.value;
+}
 
 const deleteTask = async () => {
   if (!confirm("Are you sure you want to delete this task?")) return;
@@ -70,10 +75,14 @@ onBeforeMount(async () => {
   <p class="description" v-if="task.description">{{ props.task.description }}</p>
 
   <br />
-  <menu v-if="props.task.requester == currentUsername" class="options">
-    <li><button class="btn-small pure-button" @click="emit('editTask', props.task._id)">Edit</button></li>
-    <li><button class="button-error btn-small pure-button" @click="deleteTask">Delete</button></li>
-  </menu>
+  <div v-if="props.task.requester == currentUsername">
+    <menu class="options">
+      <li><button class="btn-small pure-button" @click="emit('editTask', props.task._id)">Edit</button></li>
+      <li><button class="button-error btn-small pure-button" @click="deleteTask">Delete</button></li>
+    </menu>
+    <br>
+    <button class="pure-button pure-button-primary" @click="toggleComplete"> Mark Completed </button>
+  </div>
   <div v-else-if="isLoggedIn">
     <div class="addTask">
       <button v-if="!offeredHelp" class="pure-button pure-button-primary" @click="offerHelp">Offer Help!</button>
@@ -84,6 +93,15 @@ onBeforeMount(async () => {
     <p v-if="props.task.dateCreated !== props.task.dateUpdated">Edited on: {{ formatDate(props.task.dateUpdated) }}</p>
     <p v-else>Created on: {{ formatDate(props.task.dateCreated) }}</p>
   </div>
+  <div v-if="completing" class="modal-overlay">
+        <div class = "modal-content">
+            <button @click="toggleComplete" class = "exit-btn">X</button>
+                <h1>Who helped you?</h1>
+            <div class="content">
+
+            </div>
+        </div>
+    </div>
 </template>
 
 <style scoped>
