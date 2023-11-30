@@ -25,8 +25,11 @@ async function getTasks(requester?: string) {
   let taskResults;
   try {
     const allTaskResults = await fetchy("/api/tasks", "GET", { query });
-    if (props.requestedTasks) taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester === currentUsername.value);
-    else taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester !== currentUsername.value);
+    if (props.requestedTasks) {
+      taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester === currentUsername.value);
+    } else {
+      taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester !== currentUsername.value);
+    }
   } catch (_) {
     return;
   }
@@ -75,6 +78,11 @@ p,
   /* max-width: 60em; */
 }
 
+p {
+  width: 35em;
+  padding-left: 1em;
+}
+
 article {
   background-color: var(--base-bg);
   border-radius: 1em;
@@ -82,7 +90,7 @@ article {
   flex-direction: column;
   gap: 0.5em;
   padding: 1em;
-  width: 40em;
+  width: 35em;
 }
 
 .tasks {

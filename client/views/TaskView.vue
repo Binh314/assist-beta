@@ -15,7 +15,7 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
       </div>
       <div class="taskFeed">
         <h1>requests from friends <font-awesome-icon :icon="['fas', 'shuffle']" size="sm" class="icon" /></h1>
-        <TaskFeed :requestedTasks="false"/>
+        <TaskFeed :requestedTasks="false" />
       </div>
     </section>
   </main>
@@ -35,13 +35,17 @@ h1 {
   display: flex;
   align-items: center;
 }
-.taskfeed {
+.taskFeed {
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  margin-left: 2.5em;
+  margin-right: 2.5em;
 }
 
 .icon {
   margin-left: 0.5em;
+  display: none;
 }
 
 .icon:hover {
