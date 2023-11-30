@@ -1,12 +1,18 @@
 <script setup lang="ts">
+import router from "@/router";
 import CreateTaskForm from "../components/Task/CreateTaskForm.vue";
+
+const goToTasks = async () => {
+  router.push({name: "Task"})
+}
+
 </script>
 
 <template>
   <main>
     <div class="content">
       <h1>Create Task</h1>
-      <CreateTaskForm />
+      <CreateTaskForm @refreshTasks="goToTasks"/>
     </div>
   </main>
 </template>
