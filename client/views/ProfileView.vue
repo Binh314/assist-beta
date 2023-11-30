@@ -5,6 +5,7 @@ import ProfilePicture from "../components/Profile/ProfilePicture.vue";
 import router from "../router";
 import { useUserStore } from "../stores/user";
 import { fetchy } from "../utils/fetchy";
+import { ObjectId } from "mongodb";
 
 const {currentUsername, currentProfilePicture} = useUserStore();
 const kudos = ref(0)
@@ -25,8 +26,10 @@ onMounted(async () => {
 
     try {
         const response = await fetchy(`api/tag/user/${currentUsername}`, "GET")
-        tags.value = response;
-        tags.value = ["hello","wordld", "i Love", "you"]
+        tags.value = response.map((item:{
+                                        name: String;
+                                        item: Array<ObjectId>;
+                                        })=>item.name)
     }
     catch (error) {
         console.error("Error fetching tags:", error);

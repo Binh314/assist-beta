@@ -199,6 +199,15 @@ class Routes {
     return await Tag.attach(itemObjectId, tagObjectId);
   }
 
+  @Router.patch("/tag/detach")
+  async detachItemToTag(session: WebSessionDoc, tagId: string, itemId: string) {
+    const user = WebSession.getUser(session);
+    const tagObjectId = new ObjectId(tagId); // Convert string to ObjectId for the tag
+    const itemObjectId = new ObjectId(itemId); // Convert string to ObjectId for the item
+
+    return await Tag.detach(itemObjectId, tagObjectId);
+  }
+
   // Message
 
   @Router.post("/message/:otherUser")
