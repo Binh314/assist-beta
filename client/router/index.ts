@@ -2,6 +2,7 @@ import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
+import ChallengesView from "../views/ChallengesView.vue";
 import CreateTaskView from "../views/CreateTaskView.vue";
 import EditProfileView from "../views/EditProfileView.vue";
 import HomeView from "../views/HomeView.vue";
@@ -79,6 +80,13 @@ const router = createRouter({
       path: "/profile",
       name: "Profile",
       component: ProfileView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/challenges",
+      name: "Challenges",
+      component: ChallengesView,
+      meta: { requiresAuth: true },
       meta: { requiresAuth: true },
     },
     {

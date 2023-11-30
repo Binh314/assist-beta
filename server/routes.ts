@@ -1,9 +1,10 @@
 import { ObjectId } from "mongodb";
 
-import { BadValuesError } from "./concepts/errors";
+import { BadValuesError, NotAllowedError } from "./concepts/errors";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Friend, Kudo, Message, Post, Tag, Task, User, WebSession } from "./app";
+import { Badge, Challenge, Friend, Kudo, Message, Post, Tag, Task, User, WebSession } from "./app";
+import { ChallengeDoc } from "./concepts/challenge";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -394,14 +395,34 @@ class Routes {
    * @param _id id of task
    * @param assister username of assister who completed the task
    */
-  @Router.patch("tasks/:id/complete")
+  @Router.patch("/tasks/:_id/complete")
   async completeTask(session: WebSessionDoc, _id: ObjectId, assister: string) {
     const user = WebSession.getUser(session);
     await Task.isRequester(user, _id);
 
     const userId = (await User.getUserByUsername(assister))._id;
 
-    return await Task.complete(userId, _id);
+    const result = await Task.complete(userId, _id);
+
+    // Check if completing this task completes any new challenges, and award badges if needed
+    const challenges = await Challenge.getActiveChallenges();
+    for (const challenge of challenges) {
+      if (challenge.name === "Complete Tasks!" && !Challenge.hasCompleted(challenge._id, user)) {
+        const progress = await getChallengeProgressHelper(user, challenge);
+        const result = await Challenge.completeChallenge(challenge._id, user, progress);
+        if (result.reward) {
+          await Badge.awardBadge(result.reward, user);
+        }
+      } else if (challenge.name === "Help Friends!" && !Challenge.hasCompleted(challenge._id, user)) {
+        const progress = await getChallengeProgressHelper(userId, challenge);
+        const result = await Challenge.completeChallenge(challenge._id, userId, progress);
+        if (result.reward) {
+          await Badge.awardBadge(result.reward, userId);
+        }
+      }
+    }
+
+    return result;
   }
 
   @Router.patch("/tasks/:_id/help/offer")
@@ -420,6 +441,82 @@ class Routes {
   async viewTask(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
     return await Task.view(user, _id);
+  }
+
+  /**
+   * Reset challenges for the week. Should be automatically called weekly.
+   * @param helpGoal optional, default = 5. number of tasks users need to help with this week
+   * @param taskGoal optional, default = 5. number of tasks users need to complete this week
+   */
+  @Router.post("/challenges")
+  async resetChallenges(helpGoal = 5, taskGoal = 5) {
+    const challenges = [
+      {
+        name: "Help Friends!",
+        description: `Help with ${helpGoal} tasks this week.`,
+        goal: helpGoal,
+        reward: new ObjectId("6567e30d37085155a767d595"),
+      },
+      {
+        name: "Complete Tasks!",
+        description: `Complete ${taskGoal} tasks this week.`,
+        goal: taskGoal,
+        reward: new ObjectId("6567e42337085155a767d596"),
+      },
+    ];
+    const now = new Date();
+    const deadline = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // Add milliseconds for one week
+
+    for (const challenge of challenges) {
+      await Challenge.create(challenge.name, challenge.description, challenge.goal, deadline, challenge.reward);
+    }
+  }
+
+  @Router.get("/challenges")
+  async getChallenges() {
+    return await Challenge.getActiveChallenges();
+  }
+
+  /**
+   * @param session websession
+   * @param _id challenge id
+   * @returns the user's progress on challenge _id as number of tasks completed or helped with this week
+   */
+  @Router.get("/challenges/:_id/progress")
+  async getChallengeProgress(session: WebSessionDoc, _id: ObjectId) {
+    const user = WebSession.getUser(session);
+    const challenge = await Challenge.getChallengeById(_id);
+    return await getChallengeProgressHelper(user, challenge);
+  }
+
+  /**
+   * @param session websession
+   * @returns array of badges with the count of each badge for the current user
+   */
+  @Router.get("/badges")
+  async getBadgeCount(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const badges = await Badge.getBadges();
+    const badgesWithCount = [];
+    for (const badge of badges) {
+      const count = await Badge.getBadgeCount(badge._id, user);
+      badgesWithCount.push({ ...badge, count: count });
+    }
+    return badgesWithCount;
+  }
+}
+
+async function getChallengeProgressHelper(user: ObjectId, challenge: ChallengeDoc) {
+  const endTime = challenge.endTime;
+  const startTime = new Date(endTime.getTime() - 7 * 24 * 60 * 60 * 1000);
+  if (challenge.name === "Complete Tasks!") {
+    const completedTasks = await Task.getTasks({ requester: user, completionDate: { $gt: startTime, $lte: endTime } });
+    return completedTasks.length;
+  } else if (challenge.name === "Help Friends!") {
+    const helpedTasks = await Task.getTasks({ completer: user, completionDate: { $gt: startTime, $lte: endTime } });
+    return helpedTasks.length;
+  } else {
+    throw new NotAllowedError("Unknown challenge.");
   }
 }
 
