@@ -46,11 +46,26 @@ onBeforeMount(async () => {
       <p>{{ toast.message }}</p>
     </article>
   </header>
+  <div v-if="currentRouteName !== 'Create' && isLoggedIn" class="corner">
+    <RouterLink :to="{ name: 'Create' }">
+      <img class="icon" src="@/assets/images/create.png" />
+    </RouterLink>
+  </div>
   <RouterView />
 </template>
 
 <style scoped>
 @import "./assets/toast.css";
+
+.corner {
+  position: fixed;
+  bottom: 0.75em;
+  right: 0.5em;
+}
+
+.icon {
+  height: 3em;
+}
 
 nav {
   padding: 1em 2em;

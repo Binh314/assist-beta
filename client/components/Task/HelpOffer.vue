@@ -8,7 +8,7 @@ const emit = defineEmits(["removeNotification"]);
 
 // async function getUsername() {
 //   try {
-//     username.value = await fetchy(`/api/users/${props.task.requester}`, "GET", {});
+//     username.value = await fetchy(`/api/users/${props.task.assisters[-1]}`, "GET", {});
 //   } catch (_) {
 //     return;
 //   }
@@ -22,7 +22,7 @@ const emit = defineEmits(["removeNotification"]);
 <template>
   <div class="taskNotification">
     <font-awesome-icon icon="x" size="lg" class="icon" @click="emit('removeNotification', props.task._id)" />
-    <p>Help request from [username] on [task]!</p>
+    <p>Help offer from [username] on [task]!</p>
   </div>
 </template>
 
@@ -42,7 +42,7 @@ const emit = defineEmits(["removeNotification"]);
   display: flex;
   width: 30em;
   height: 5em;
-  background-color: #5c509c;
+  background-color: #a080e3;
   color: white;
   text-align: center;
   align-items: center;

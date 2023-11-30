@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import HelpOffer from "@/components/Task/HelpOffer.vue";
+import HelpRequest from "@/components/Task/HelpRequest.vue";
 import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
@@ -17,30 +19,49 @@ async function signup() {
 <template>
   <main>
     <section>
-      <h1 v-if="isLoggedIn">Welcome {{ currentUsername }}!</h1>
-      <div class="content" id="content-1">
-        <img src="@/assets/images/homepage.png" />
-        <div class="text">^ placeholder image; insert blurb that conveys value of using Assist</div>
-        <a href="#content-2">
-          <img class="icon" src="@/assets/images/scroll_down.png" />
-        </a>
-      </div>
-      <div class="content" id="content-2">
-        <img src="@/assets/images/homepage_help.png" />
-        <div class="text">^ placeholder image; insert blurb that conveys value of using Assist</div>
-        <a href="#content-3">
-          <img class="icon" id="content-2-icon" src="@/assets/images/scroll_down.png" />
-        </a>
-      </div>
-      <div class="content" id="content-3">
-        <img src="@/assets/images/temp_logo.png" />
-        <div>
-          <button @click="signup">Sign up</button>
-          <button @click="login">Login</button>
+      <div v-if="isLoggedIn" class="page landing">
+        <img src="@/assets/images/tempChallenge.png" />
+        <p>[challenge] - 64% complete</p>
+        <p class="link">view active challenges</p>
+        <div class="notifications">
+          <div class="offers">
+            <HelpOffer />
+            <HelpOffer />
+            <HelpOffer />
+          </div>
+          <div class="requests">
+            <HelpRequest />
+            <HelpRequest />
+            <HelpRequest />
+          </div>
         </div>
-        <a href="#top">
-          <img class="icon" id="content-3-icon" src="@/assets/images/top_of_page.png" />
-        </a>
+      </div>
+
+      <div v-else class="page">
+        <div class="content" id="content-1">
+          <img src="@/assets/images/homepage.png" />
+          <div class="text">^ placeholder image; insert blurb that conveys value of using Assist</div>
+          <a href="#content-2">
+            <img class="icon" src="@/assets/images/scroll_down.png" />
+          </a>
+        </div>
+        <div class="content" id="content-2">
+          <img src="@/assets/images/homepage_help.png" />
+          <div class="text">^ placeholder image; insert blurb that conveys value of using Assist</div>
+          <a href="#content-3">
+            <img class="icon" id="content-2-icon" src="@/assets/images/scroll_down.png" />
+          </a>
+        </div>
+        <div class="content" id="content-3">
+          <img src="@/assets/images/temp_logo.png" />
+          <div>
+            <button @click="signup">Sign up</button>
+            <button @click="login">Login</button>
+          </div>
+          <a href="#top">
+            <img class="icon" id="content-3-icon" src="@/assets/images/top_of_page.png" />
+          </a>
+        </div>
       </div>
     </section>
   </main>
@@ -49,6 +70,46 @@ async function signup() {
 <style scoped>
 h1 {
   text-align: center;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+}
+
+.link {
+  color: #b7c2c8;
+  background-color: white;
+  margin-bottom: 0.5em;
+}
+
+.link:hover {
+  cursor: pointer;
+}
+
+.notifications {
+  display: flex;
+  flex-direction: row;
+  margin-top: 1.5em;
+  margin-bottom: 1em;
+}
+
+.offers {
+  display: flex;
+  flex-direction: column;
+  margin-right: 5em;
+}
+
+.requests {
+  display: flex;
+  margin-left: 5em;
+  flex-direction: column;
+}
+
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .content {
@@ -78,7 +139,8 @@ h1 {
 }
 
 img {
-  max-width: 45%;
+  max-width: 15em;
+  margin-top: 2em;
 }
 
 .text {

@@ -26,6 +26,11 @@ class Routes {
     return await User.getUserByUsername(username);
   }
 
+  @Router.get("/users/:userID")
+  async getUsername(userID: ObjectId) {
+    return await User.getUserById(userID);
+  }
+
   @Router.post("/users")
   async createUser(session: WebSessionDoc, username: string, password: string, picture: string) {
     WebSession.isLoggedOut(session);
@@ -60,7 +65,7 @@ class Routes {
         return { authentication: false };
       }
       const user = WebSession.getUser(session);
-      return { authentication: (u._id).toString() === user.toString() };
+      return { authentication: u._id.toString() === user.toString() };
     } catch (error) {
       // Log the error and return a false authentication
       console.error(error);
