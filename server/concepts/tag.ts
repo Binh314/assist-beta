@@ -47,6 +47,25 @@ export default class TagConcept {
     }
   }
 
+  async detach(i: ObjectId, t: ObjectId) {
+    const tag = await this.tags.readOne({ _id: t });
+  
+    if (!tag) {
+      throw new NotFoundError("This tag does not exist");
+    }
+  
+    const newItem = []
+
+    for(const currentItem of tag.item){
+      if(currentItem.toString() !== i.toString()){
+        newItem.push(currentItem);
+      }
+    }
+    const updatedTag = await this.tags.updateOne({ _id: t }, { item: newItem });
+    return { msg: "Item successfully detached from tag", tag: updatedTag };
+
+  }
+
   async getTagByName(n: string) {
     const tag = await this.tags.readOne({ name: n });
     if (!tag) {
@@ -74,4 +93,5 @@ export default class TagConcept {
     const tags = await this.tags.readMany({ item: { $elemMatch: { $eq: itemId } } });
     return tags;
   }
+
 }

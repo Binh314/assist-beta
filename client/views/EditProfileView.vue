@@ -72,8 +72,8 @@ const updateBadge = () => {
             <ChangeProfilePicture :isOpen="isChangeProfilePicOpen" @close="updateProfilePic"/>
             <button class = "setting-selection" @click="showChangeTag">Change Tag</button>
             <ChangeTag :isOpen="isChangeTagOpen" @close="updateTag"/>
-            <button class = "setting-selection" @click="showChangeBadge">Change Badge</button>
-            <ChangeBadge :isOpen="isChangeBadgeOpen" @close="updateBadge"/>
+            <!-- <button class = "setting-selection" @click="showChangeBadge">Change Badge</button>
+            <ChangeBadge :isOpen="isChangeBadgeOpen" @close="updateBadge"/> -->
         </div>
         
         </div>
