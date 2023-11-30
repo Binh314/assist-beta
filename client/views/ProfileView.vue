@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { ObjectId } from "mongodb";
 import { onMounted, ref } from "vue";
 import Badge from "../components/Badge/BadgeIcon.vue";
 import ProfilePicture from "../components/Profile/ProfilePicture.vue";
 import router from "../router";
 import { useUserStore } from "../stores/user";
 import { fetchy } from "../utils/fetchy";
-import { ObjectId } from "mongodb";
 
 const {currentUsername, currentProfilePicture} = useUserStore();
 const kudos = ref(0)
@@ -54,7 +54,7 @@ onMounted(async () => {
             </ul>      
         </div>
         <div v-else>
-            You have not selected any tag yet. <a href="/select-tags">Select here</a>
+            You have not selected any tag yet. <router-link to="/profile/edit">Select here</router-link>
         </div>
         <span class = "subtitle">Badges:</span>
         <div class="badges-container">
