@@ -9,38 +9,39 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 <template>
   <main>
     <section>
-      <TaskFeed />
+      <div class="taskFeed">
+        <h1>my tasks</h1>
+        <TaskFeed />
+      </div>
+      <div class="taskFeed">
+        <h1>requests from friends <font-awesome-icon :icon="['fas', 'shuffle']" size="sm" class="icon" /></h1>
+        <TaskFeed />
+      </div>
     </section>
   </main>
 </template>
 
 <style scoped>
-h1 {
-  text-align: center;
-}
-
-.content {
-  display: block;
-  margin-top: 3em;
-  text-align: center;
+section {
+  display: flex;
+  flex-direction: row;
   width: 100%;
-  align-items: center;
   justify-content: center;
 }
 
-img {
-  max-width: 40%;
+h1 {
+  margin-left: 0.5em;
+  margin-top: 1em;
+  display: flex;
+  align-items: center;
 }
-
-.text {
-  margin-top: 0.5em;
-  margin-left: 30%;
-  width: 40%;
-  text-align: center;
+.taskfeed {
+  display: flex;
+  flex-direction: column;
 }
 
 .icon {
-  width: 5%;
+  margin-left: 0.5em;
 }
 
 .icon:hover {
