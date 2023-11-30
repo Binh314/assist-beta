@@ -25,9 +25,9 @@ const props = defineProps({
 
 .badge-icon {
   object-fit: cover;
-  width: 125px; /* Adjust the size as needed */
-  height: 125px; /* Adjust the size as needed */
-  margin-bottom: 10px; /* Space between the icon and the name */
+  width: 15vh; /* Adjust the size as needed */
+  height: 15vh; /* Adjust the size as needed */
+  margin-bottom: 1vh; /* Space between the icon and the name */
 }
 
 .badge-name {
