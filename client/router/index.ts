@@ -87,7 +87,6 @@ const router = createRouter({
       name: "Challenges",
       component: ChallengesView,
       meta: { requiresAuth: true },
-      meta: { requiresAuth: true },
     },
     {
       path: "/:catchAll(.*)",
