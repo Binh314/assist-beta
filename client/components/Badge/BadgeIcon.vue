@@ -3,7 +3,8 @@ import { defineProps } from 'vue';
 
 const props = defineProps({
   icon: String,
-  badgeName: String
+  badgeName: String,
+  count: Number,
 });
 </script>
 
@@ -11,11 +12,13 @@ const props = defineProps({
   <div class="badge-container">
     <img :src="props.icon" class="badge-icon" alt="Badge Icon"/>
     <span class="badge-name">{{ props.badgeName }}</span>
+    <span>Count: {{ count }}</span>
   </div>
 </template>
 
 <style scoped>
 .badge-container {
+  /* border: black solid 2px; */
   display: flex;
   flex-direction: column; /* Stack children vertically */
   align-items: center; /* Center align items */
@@ -31,7 +34,7 @@ const props = defineProps({
 }
 
 .badge-name {
-  /* Style for the badge name */
+  font-weight: 600;
 }
 
 </style>

@@ -7,9 +7,16 @@ import router from "../router";
 import { useUserStore } from "../stores/user";
 import { fetchy } from "../utils/fetchy";
 
+interface Badge {
+  icon: string;
+  name: string;
+  count: number;
+}
+
 const {currentUsername, currentProfilePicture} = useUserStore();
 const kudos = ref(0)
 const tags = ref([])
+const badges = ref<Badge[]>([]);
 
 function editProfile(){
     router.push("/profile/edit")
@@ -34,6 +41,16 @@ onMounted(async () => {
     catch (error) {
         console.error("Error fetching tags:", error);
     }
+
+    try {
+        const response = await fetchy(`api/badges`,"GET")
+        console.log(`this is badge response: `,response)
+        badges.value = response
+
+    }
+    catch(error){
+        console.log(`Error fetching badges:`, error)
+    }
 });
 
 </script>
@@ -57,11 +74,12 @@ onMounted(async () => {
             You have not selected any tag yet. <router-link to="/profile/edit">Select here</router-link>
         </div>
         <span class = "subtitle">Badges:</span>
-        <div class="badges-container">
-            <Badge :icon="currentProfilePicture" badgeName="Challenge 1"/>
-            <Badge :icon="currentProfilePicture" badgeName="Challenge 2"/>
-            <Badge :icon="currentProfilePicture" badgeName="Challenge 3"/>
+        <div class="badges-container"> 
+            <div v-for="[index, badge] in Object.entries(badges)">
+            <Badge :icon="badge.icon" :badgeName="badge.name" :count="badge.count"></Badge>
         </div>
+        </div>
+        
     </div>
     
     
@@ -89,7 +107,7 @@ onMounted(async () => {
 
 .badges-container {
     display: flex;
-    justify-content: center; /* Center the badges horizontally */
+    flex-direction: row;
     gap: 7vh; /* Adjust the space between badges */
 }
 
