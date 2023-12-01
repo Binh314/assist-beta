@@ -2,14 +2,16 @@
 import { useToastStore } from "@/stores/toast";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import { computed, onBeforeMount } from "vue";
+import { computed, onBeforeMount, ref } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
+import NavMenu from "./components/Navigation/NavMenu.vue";
 
 const currentRoute = useRoute();
 const currentRouteName = computed(() => currentRoute.name);
 const userStore = useUserStore();
 const { isLoggedIn, currentUsername, currentProfilePicture } = storeToRefs(userStore);
 const { toast } = storeToRefs(useToastStore());
+const displayMenu = ref(false);
 
 // Make sure to update the session before mounting the app in case the user is already logged in
 onBeforeMount(async () => {
@@ -19,35 +21,27 @@ onBeforeMount(async () => {
     // User is not logged in
   }
 });
+
+function controlMenu(){
+  displayMenu.value= !displayMenu.value
+  console.log('trying to control menu: ', displayMenu.value)
+}
 </script>
 
 <template>
   <header>
-    <nav>
+    <nav class = "navigation">
       <div class="title">
         <img src="@/assets/images/temp_logo.png" />
         <RouterLink :to="{ name: 'Home' }">
           <h1>Assist</h1>
         </RouterLink>
       </div>
-      <ul>
-        <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Task' }" :class="{ underline: currentRouteName == 'Task' }"> Tasks </RouterLink>
-        </li>
-        <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Challenges' }" :class="{ underline: currentRouteName == 'Challenges' }"> Challenges </RouterLink>
-        </li>
-        <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Profile' }" :class="{ underline: currentRouteName == 'Profile' }"> Profile </RouterLink>
-        </li>
-        <li v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
-        </li>
-        <li v-else>
-          <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
-        </li>
-      </ul>
+      <button class ="expand" @click = "controlMenu" >
+        <img class = "expand-img" src="@/assets/images/scroll_down.png" />
+      </button>
     </nav>
+    
     <article v-if="toast !== null" class="toast" :class="toast.style">
       <p>{{ toast.message }}</p>
     </article>
@@ -57,11 +51,29 @@ onBeforeMount(async () => {
       <img class="icon" src="@/assets/images/create.png" />
     </RouterLink>
   </div>
+  <NavMenu v-if = "displayMenu" @selection = "controlMenu"/>
   <RouterView />
 </template>
 
 <style scoped>
+
+.navigation{
+  height: 7vh;
+}
+
 @import "./assets/toast.css";
+.expand{
+  background-color: transparent;
+  border: none;
+  padding-left: 38%;
+}
+
+.expand-img{
+  object-fit: cover; /* Ensures the image covers the area without distorting */
+  height: 5vh; /* Adjust this value as needed */
+  width: 20vh; /* Make width equal to height for a perfect circle */
+  overflow: hidden; /* This will clip the corners of the image */
+}
 
 .corner {
   position: fixed;
@@ -74,7 +86,7 @@ onBeforeMount(async () => {
 }
 
 nav {
-  padding: 1em 2em;
+  /* padding: 1em 2em; */
   background-color: var(--dark-purple);
   display: flex;
   align-items: center;

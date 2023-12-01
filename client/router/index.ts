@@ -89,10 +89,29 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/friends",
+      name: "Friends",
+      component: NotFoundView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/messages",
+      name: "Messages",
+      component: NotFoundView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/kudos",
+      name: "Kudos",
+      component: NotFoundView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/:catchAll(.*)",
       name: "not-found",
       component: NotFoundView,
     },
+
   ],
 });
 
