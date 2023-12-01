@@ -7,6 +7,7 @@ import { fetchy } from '../../utils/fetchy';
 import TagsInput from "../Tag/TagsInput.vue";
 import { ObjectId } from "mongodb";
 
+
 const props = defineProps({
 isOpen: Boolean,
 });
