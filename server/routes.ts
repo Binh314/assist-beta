@@ -33,6 +33,11 @@ class Routes {
     return await User.getUserById(userID);
   }
 
+  @Router.get("/users/matching/:prefix")
+  async getUsersByPrefix(prefix: string) {
+    return await User.getUsersByUsernameMatch(prefix);
+  }
+
   @Router.post("/users")
   async createUser(session: WebSessionDoc, username: string, password: string, picture: string) {
     WebSession.isLoggedOut(session);
@@ -117,7 +122,7 @@ class Routes {
   @Router.get("/friends")
   async getFriends(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
-    return await User.idsToUsernames(await Friend.getFriends(user));
+    return await User.getUsersByIds(await Friend.getFriends(user));
   }
 
   @Router.delete("/friends/:friend")
@@ -125,6 +130,27 @@ class Routes {
     const user = WebSession.getUser(session);
     const friendId = (await User.getUserByUsername(friend))._id;
     return await Friend.removeFriend(user, friendId);
+  }
+
+  @Router.get("/friend/incomingRequests")
+  async getIncomingRequests(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const requesters = (await Friend.getIncomingRequests(user)).map((request) => request.from);
+    return await User.getUsersByIds(requesters);
+  }
+
+  /**
+   *
+   * @param session websession
+   * @param other the user you want to check your friendship status with
+   * @returns "friends" if you are friends, "sent" if you have a pending request to them,
+   *          "received" if you have a pending request from them, "non" if no friendship or requests
+   */
+  @Router.get("/friend/status/:other")
+  async getOutgoingRequests(session: WebSessionDoc, other: string) {
+    const user = WebSession.getUser(session);
+    const otherId = (await User.getUserByUsername(other))._id;
+    return await Friend.getStatus(user, otherId);
   }
 
   @Router.get("/friend/requests")
@@ -526,12 +552,12 @@ class Routes {
   }
 
   /**
-   * @param session websession
-   * @returns array of badges with the count of each badge for the current user
+   * @param user username of the user
+   * @returns array of badges with the count of each badge for the specified user
    */
-  @Router.get("/badges")
-  async getBadgeCount(session: WebSessionDoc) {
-    const user = WebSession.getUser(session);
+  @Router.get("/badges/:username")
+  async getBadgeCount(username: string) {
+    const user = (await User.getUserByUsername(username))._id;
     const badges = await Badge.getBadges();
     const badgesWithCount = [];
     for (const badge of badges) {

@@ -54,6 +54,16 @@ export default class UserConcept {
     return users;
   }
 
+  async getUsersByUsernameMatch(partialUsername: string, limit = 10) {
+    const filter = { username: { $regex: `^${partialUsername}`, $options: "i" } };
+    const users = (await this.users.readMany(filter)).slice(0, limit).map(this.sanitizeUser);
+    return users;
+  }
+
+  async getUsersByIds(ids: ObjectId[]) {
+    return await this.users.readMany({ _id: { $in: ids } });
+  }
+
   async authenticate(username: string, password: string) {
     const user = await this.users.readOne({ username, password });
     if (!user) {

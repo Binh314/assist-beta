@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
+import { useUserStore } from "../../stores/user";
 import { fetchy } from "../../utils/fetchy";
 
+const { currentUsername } = useUserStore();
 const loaded = ref(false);
 const badges = ref<Array<Record<string, string>>>([]);
 
 async function getBadges() {
   let badgeResults;
   try {
-    badgeResults = await fetchy("/api/badges", "GET", {});
+    badgeResults = await fetchy(`/api/badges/${currentUsername}`, "GET", {});
   } catch (_) {
     return;
   }
