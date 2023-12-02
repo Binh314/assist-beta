@@ -56,11 +56,10 @@ function controlMenu() {
 </template>
 
 <style scoped>
+@import "./assets/toast.css";
 .navigation {
   height: 7vh;
 }
-
-@import "./assets/toast.css";
 .expand {
   background-color: transparent;
   border: none;
