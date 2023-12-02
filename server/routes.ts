@@ -3,9 +3,10 @@ import { ObjectId } from "mongodb";
 import { BadValuesError, NotAllowedError } from "./concepts/errors";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Badge, Challenge, Friend, Kudo, Match, Message, Post, Tag, Task, User, WebSession } from "./app";
+import { Badge, Challenge, Friend, Kudo, Match, Message, Post, Reminder, Tag, Task, User, WebSession } from "./app";
 import { ChallengeDoc } from "./concepts/challenge";
 import { PostDoc, PostOptions } from "./concepts/post";
+import { ReminderDoc } from "./concepts/reminder";
 import { TaskDoc } from "./concepts/task";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -423,6 +424,8 @@ class Routes {
         Tag.create(created.task._id, tag);
       }
 
+    // TODO: REMINDER SYNC
+
     return { msg: created.msg, task: await Responses.task(created.task) };
   }
   /**
@@ -490,6 +493,7 @@ class Routes {
   @Router.patch("/tasks/:_id/help/offer")
   async offerTaskHelp(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
+    // TODO: REMIND SYNC
     return await Task.offerHelp(user, _id);
   }
 
@@ -565,6 +569,22 @@ class Routes {
       badgesWithCount.push({ ...badge, count: count });
     }
     return badgesWithCount;
+  }
+
+  // Reminders
+
+  @Router.get("/reminders/new")
+  async getNewReminders(session: WebSessionDoc, type?: string) {
+    const user = await WebSession.getUser(session);
+    const reminders: ReminderDoc[] = await Reminder.getNewReminders(user, type);
+    return reminders;
+  }
+
+  @Router.get("/reminders")
+  async getReminders(session: WebSessionDoc, type?: string) {
+    const user = await WebSession.getUser(session);
+    const reminders: ReminderDoc[] = await Reminder.getReminders(user, type);
+    return reminders;
   }
 }
 
