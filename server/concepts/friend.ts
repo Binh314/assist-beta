@@ -27,6 +27,32 @@ export default class FriendConcept {
     return await this.requests.readMany({ to: user, status: "pending" });
   }
 
+  async getStatus(u1: ObjectId, u2: ObjectId) {
+    const friendship = await this.friends.readOne({
+      $or: [
+        { user1: u1, user2: u2 },
+        { user1: u2, user2: u1 },
+      ],
+    });
+    if (friendship) return "friends";
+
+    const requestFrom = await this.requests.readOne({
+      from: u2,
+      to: u1,
+      status: "pending",
+    });
+    if (requestFrom) return "received";
+
+    const requestTo = await this.requests.readOne({
+      from: u1,
+      to: u2,
+      status: "pending",
+    });
+    if (requestTo) return "sent";
+
+    return "none";
+  }
+
   async sendRequest(from: ObjectId, to: ObjectId) {
     await this.canSendRequest(from, to);
     await this.requests.createOne({ from, to, status: "pending" });

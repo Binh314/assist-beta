@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import FriendComponent from "@/components/Friend/FriendComponent.vue";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
@@ -22,15 +23,21 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="row">
-    <article v-if="loaded">
-      <p v-if="friends.length === 0">No friends yet!</p>
-      <div v-for="friend in friends" :key="friend._id">
-        <img v-bind:src="friend.picture" />
-        <h4>{{ friend.username }}</h4>
-      </div>
-    </article>
+  <div v-if="loaded" class="section">
+    <p v-if="friends.length === 0">No friends yet!</p>
+    <div v-for="friend in friends" :key="friend._id">
+      <FriendComponent :username="friend.username" :picture="friend.picture" />
+    </div>
   </div>
+  <div v-else>Loading...</div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.section {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  gap: 2em;
+  padding: 2em;
+}
+</style>

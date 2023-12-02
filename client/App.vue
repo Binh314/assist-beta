@@ -22,26 +22,26 @@ onBeforeMount(async () => {
   }
 });
 
-function controlMenu(){
-  displayMenu.value= !displayMenu.value
-  console.log('trying to control menu: ', displayMenu.value)
+function controlMenu() {
+  displayMenu.value = !displayMenu.value;
+  console.log("trying to control menu: ", displayMenu.value);
 }
 </script>
 
 <template>
   <header>
-    <nav class = "navigation">
+    <nav class="navigation">
       <div class="title">
         <img src="@/assets/images/temp_logo.png" />
         <RouterLink :to="{ name: 'Home' }">
           <h1>Assist</h1>
         </RouterLink>
       </div>
-      <button class ="expand" @click = "controlMenu" >
-        <img class = "expand-img" src="@/assets/images/scroll_down.png" />
+      <button class="expand" @click="controlMenu">
+        <img class="expand-img" src="@/assets/images/scroll_down.png" />
       </button>
     </nav>
-    
+
     <article v-if="toast !== null" class="toast" :class="toast.style">
       <p>{{ toast.message }}</p>
     </article>
@@ -51,24 +51,23 @@ function controlMenu(){
       <img class="icon" src="@/assets/images/create.png" />
     </RouterLink>
   </div>
-  <NavMenu v-if = "displayMenu" @selection = "controlMenu"/>
-  <RouterView />
+  <NavMenu v-if="displayMenu" @selection="controlMenu" />
+  <RouterView :key="$route.fullPath" />
 </template>
 
 <style scoped>
-
-.navigation{
+.navigation {
   height: 7vh;
 }
 
 @import "./assets/toast.css";
-.expand{
+.expand {
   background-color: transparent;
   border: none;
   padding-left: 38%;
 }
 
-.expand-img{
+.expand-img {
   object-fit: cover; /* Ensures the image covers the area without distorting */
   height: 5vh; /* Adjust this value as needed */
   width: 20vh; /* Make width equal to height for a perfect circle */

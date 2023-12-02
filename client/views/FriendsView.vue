@@ -22,14 +22,12 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div class="row">
+  <div class="container">
     <SearchUser />
-  </div>
-  <div class="row requests" @click="$router.push('/requests')">
-    <span>Friend requests</span>
-    <button>{{ pendingRequests }}</button>
-  </div>
-  <div class="row">
+    <div class="requests" @click="$router.push('/requests')">
+      <span>Friend requests</span>
+      <button>{{ pendingRequests }}</button>
+    </div>
     <FriendList />
   </div>
 </template>
@@ -39,11 +37,23 @@ h1 {
   text-align: center;
 }
 
-.requests {
-  cursor: pointer;
+.container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.requests {
+  display: inline-block;
+  color: var(--dark-purple);
+  font-size: 1.5em;
+  cursor: pointer;
   gap: 1em;
-  padding: 2em;
+  padding: 0.5em;
+  margin: 1.5em;
+}
+
+.requests:hover {
+  background-color: var(--light-pink);
 }
 </style>

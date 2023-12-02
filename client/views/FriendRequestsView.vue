@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
+import FriendComponent from "../components/Friend/FriendComponent.vue";
 import { fetchy } from "../utils/fetchy";
 
 const loaded = ref(false);
-let incomingRequests = ref<Array<Record<string, string>>>([]);
+let requesters = ref<Array<Record<string, string>>>([]);
 
 async function getIncomingFriendRequests() {
   let requestResults;
@@ -12,7 +13,7 @@ async function getIncomingFriendRequests() {
   } catch {
     return;
   }
-  incomingRequests.value = requestResults;
+  requesters.value = requestResults;
 }
 
 async function acceptRequest(friend: string) {
@@ -40,18 +41,26 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <h1 v-if="incomingRequests.length === 0">No requests!</h1>
-  <div v-for="request in incomingRequests" :key="request._id">
-    <p>{{ request.from }}</p>
-    <span>
-      <button @click="acceptRequest(request.from)" class="button-success pure-button">Accept</button>
-      <button @click="rejectRequest(request.from)" class="button-error pure-button">Reject</button>
-    </span>
+  <h1 v-if="requesters.length === 0">No requests!</h1>
+  <div class="section">
+    <div v-for="user in requesters" :key="user._id">
+      <FriendComponent :username="user.username" :picture="user.picture" />
+      <span>
+        <button @click="acceptRequest(user.username)" class="pure-button-primary pure-button">Accept</button>
+        <button @click="rejectRequest(user.username)" class="button-error pure-button">Reject</button>
+      </span>
+    </div>
   </div>
 </template>
 
 <style scoped>
 h1 {
   text-align: center;
+}
+
+.section {
+  display: flex;
+  flex-direction: row;
+  padding: 2em;
 }
 </style>

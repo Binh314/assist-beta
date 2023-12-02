@@ -2,6 +2,7 @@
 import { ObjectId } from "mongodb";
 import { onMounted, ref } from "vue";
 import Badge from "../components/Badge/BadgeIcon.vue";
+import FriendButton from "../components/Friend/FriendButton.vue";
 import ProfilePicture from "../components/Profile/ProfilePicture.vue";
 import router from "../router";
 import { useUserStore } from "../stores/user";
@@ -13,6 +14,7 @@ interface Badge {
   count: number;
 }
 
+const props = defineProps(["user"]);
 const { currentUsername, currentProfilePicture } = useUserStore();
 const kudos = ref(0);
 const tags = ref([]);
@@ -25,11 +27,10 @@ function editProfile() {
 }
 
 onMounted(async () => {
-  const userPath = router.currentRoute.value.params.username;
-  if (userPath !== undefined && userPath !== currentUsername && typeof userPath === "string") {
+  if (props.user !== undefined && props.user !== currentUsername && typeof props.user === "string") {
     try {
-      const response = await fetchy(`api/users/${userPath}`, "GET");
-      username.value = userPath;
+      const response = await fetchy(`/api/users/${props.user}`, "GET");
+      username.value = props.user;
       profilePicture.value = response.picture;
     } catch (error) {
       await router.push("/not-found");
@@ -37,21 +38,21 @@ onMounted(async () => {
   }
 
   try {
-    const response = await fetchy(`api/kudo/receivedCount/${username.value}`, "GET");
+    const response = await fetchy(`/api/kudo/receivedCount/${username.value}`, "GET");
     kudos.value = ref(response); // assuming the response is the kudos count
   } catch (error) {
     console.error("Error fetching kudos:", error);
   }
 
   try {
-    const response = await fetchy(`api/tag/user/${username.value}`, "GET");
+    const response = await fetchy(`/api/tag/user/${username.value}`, "GET");
     tags.value = response.map((item: { name: String; item: Array<ObjectId> }) => item.name);
   } catch (error) {
     console.error("Error fetching tags:", error);
   }
 
   try {
-    const response = await fetchy(`api/badges/${username.value}`, "GET");
+    const response = await fetchy(`/api/badges/${username.value}`, "GET");
     console.log(`this is badge response: `, response);
     badges.value = response;
   } catch (error) {
@@ -69,8 +70,7 @@ onMounted(async () => {
       <button class="primary-button" @click="editProfile">Edit Profile</button>
     </div>
     <div v-else>
-      <button class="primary-button">Add Friend</button>
-      <!-- TODO -->
+      <FriendButton :friend="username" />
     </div>
     <span class="subtitle">Tags:</span>
     <div class="tags" v-if="tags.length > 0">

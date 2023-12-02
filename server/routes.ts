@@ -135,7 +135,22 @@ class Routes {
   @Router.get("/friend/incomingRequests")
   async getIncomingRequests(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
-    return await Responses.friendRequests(await Friend.getIncomingRequests(user));
+    const requesters = (await Friend.getIncomingRequests(user)).map((request) => request.from);
+    return await User.getUsersByIds(requesters);
+  }
+
+  /**
+   *
+   * @param session websession
+   * @param other the user you want to check your friendship status with
+   * @returns "friends" if you are friends, "sent" if you have a pending request to them,
+   *          "received" if you have a pending request from them, "non" if no friendship or requests
+   */
+  @Router.get("/friend/status/:other")
+  async getOutgoingRequests(session: WebSessionDoc, other: string) {
+    const user = WebSession.getUser(session);
+    const otherId = (await User.getUserByUsername(other))._id;
+    return await Friend.getStatus(user, otherId);
   }
 
   @Router.get("/friend/requests")
