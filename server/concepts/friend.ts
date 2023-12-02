@@ -23,6 +23,10 @@ export default class FriendConcept {
     });
   }
 
+  async getIncomingRequests(user: ObjectId) {
+    return await this.requests.readMany({ to: user, status: "pending" });
+  }
+
   async sendRequest(from: ObjectId, to: ObjectId) {
     await this.canSendRequest(from, to);
     await this.requests.createOne({ from, to, status: "pending" });

@@ -5,6 +5,8 @@ import { useUserStore } from "@/stores/user";
 import ChallengesView from "../views/ChallengesView.vue";
 import CreateTaskView from "../views/CreateTaskView.vue";
 import EditProfileView from "../views/EditProfileView.vue";
+import RequestsView from "../views/FriendRequestsView.vue";
+import FriendsView from "../views/FriendsView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
@@ -83,6 +85,12 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/profile/:username",
+      name: "General Profile",
+      component: ProfileView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/challenges",
       name: "Challenges",
       component: ChallengesView,
@@ -91,7 +99,13 @@ const router = createRouter({
     {
       path: "/friends",
       name: "Friends",
-      component: NotFoundView,
+      component: FriendsView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/requests",
+      name: "Requests",
+      component: RequestsView,
       meta: { requiresAuth: true },
     },
     {
@@ -111,7 +125,6 @@ const router = createRouter({
       name: "not-found",
       component: NotFoundView,
     },
-
   ],
 });
 
