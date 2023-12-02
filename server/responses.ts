@@ -67,10 +67,13 @@ export default class Responses {
    * Convert many TaskDocs into more readable format for the frontend
    * by converting the host, attendees, and interested ids into usernames.
    */
-  static async tasks(tasks: TaskDoc[]) {
+  static async tasks(tasks: TaskDoc[], isMatched?: boolean[]) {
     const requesters = await User.idsToUsernames(tasks.map((task) => task.requester));
     const assisters = await Promise.all(tasks.map((task) => User.idsToUsernames(task.assisters)));
     const viewers = await Promise.all(tasks.map((task) => User.idsToUsernames(task.viewed)));
+    if (isMatched) {
+      return tasks.map((task, i) => ({ ...task, requester: requesters[i], assisters: assisters[i], viewed: viewers[i], matched: isMatched[i] }));
+    }
     return tasks.map((task, i) => ({ ...task, requester: requesters[i], assisters: assisters[i], viewed: viewers[i] }));
   }
 }

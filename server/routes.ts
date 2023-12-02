@@ -3,9 +3,10 @@ import { ObjectId } from "mongodb";
 import { BadValuesError, NotAllowedError } from "./concepts/errors";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Badge, Challenge, Friend, Kudo, Message, Post, Tag, Task, User, WebSession } from "./app";
+import { Badge, Challenge, Friend, Kudo, Match, Message, Post, Tag, Task, User, WebSession } from "./app";
 import { ChallengeDoc } from "./concepts/challenge";
 import { PostDoc, PostOptions } from "./concepts/post";
+import { TaskDoc } from "./concepts/task";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import Responses from "./responses";
@@ -304,6 +305,37 @@ class Routes {
     return Responses.tasks(tasks);
   }
 
+  @Router.get("/tasks/matched")
+  async getMatchedTasks(session: WebSessionDoc) {
+    const user = await WebSession.getUser(session);
+    const userTags = (await Tag.getTagsByItemId(user)).map((tag) => tag.name);
+
+    // other user's tasks that have not passed deadline
+    const tasks = await Task.getTasks({ requester: { $ne: user }, deadline: { $gte: new Date() } });
+
+    const matchedTasks: TaskDoc[] = [];
+    const unmatchedTasks: TaskDoc[] = [];
+    const isMatched: boolean[] = [];
+
+    // matching
+    for (const task of tasks) {
+      const taskTags = (await Tag.getTagsByItemId(task._id)).map((tag) => tag.name);
+      const similarityScores = await Promise.all(await Match.getSimilarities(userTags, taskTags));
+      if (similarityScores.filter((e) => e > 50).length > 0) {
+        matchedTasks.push(task);
+        isMatched.push(true);
+      } else {
+        isMatched.push(false);
+        unmatchedTasks.push(task);
+      }
+    }
+
+    const sortedtasks = matchedTasks.concat(...unmatchedTasks);
+    isMatched.sort().reverse();
+
+    return Responses.tasks(sortedtasks, isMatched);
+  }
+
   /**
    *
    * @param session
@@ -312,7 +344,7 @@ class Routes {
   @Router.get("/tasks/completed")
   async getCompletedTasks(session: WebSessionDoc) {
     const requester = WebSession.getUser(session);
-    const tasks = await Task.getTasks({ _id: requester });
+    const tasks = await Task.getTasks({ requester: requester, completed: true });
     return Responses.tasks(tasks);
   }
 

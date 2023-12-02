@@ -24,11 +24,10 @@ async function getTasks(requester?: string) {
   let query: Record<string, string> = requester !== undefined ? { requester } : {};
   let taskResults;
   try {
-    const allTaskResults = await fetchy("/api/tasks", "GET", { query });
     if (props.requestedTasks) {
-      taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester === currentUsername.value);
+      taskResults = await fetchy("/api/tasks/requested", "GET");
     } else {
-      taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester !== currentUsername.value);
+      taskResults = await fetchy("/api/tasks/matched", "GET");
     }
   } catch (_) {
     return;
@@ -54,10 +53,12 @@ onBeforeMount(async () => {
 <template>
   <div>
     <section class="tasks" v-if="loaded && tasks.length !== 0">
-      <article v-for="task in tasks" :key="task._id">
-        <TaskComponent v-if="editing !== task._id" :task="task" @refreshTasks="getMatchedTasks" @editTask="updateEditing" />
-        <EditTaskForm v-else :task="task" @refreshTasks="getMatchedTasks" @editTask="updateEditing" />
-      </article>
+      <div v-for="task in tasks" :key="task._id">
+        <article :class="`${(!props.requestedTasks && task.matched) ? 'matchedTask' : ''}`">
+          <TaskComponent v-if="editing !== task._id" :task="task" @refreshTasks="getMatchedTasks" @editTask="updateEditing" />
+          <EditTaskForm v-else :task="task" @refreshTasks="getMatchedTasks" @editTask="updateEditing" />
+        </article>
+      </div>
     </section>
     <p v-else-if="loaded">No tasks found</p>
     <p v-else>Loading...</p>
@@ -65,6 +66,12 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+
+.matchedTask {
+  border-style: solid;
+  background-color: var(--light-pink);
+}
+
 section {
   display: flex;
   flex-direction: column;
