@@ -78,12 +78,6 @@ const router = createRouter({
         }
       },
     },
-    // {
-    //   path: "/profile",
-    //   name: "Profile",
-    //   component: ProfileView,
-    //   meta: { requiresAuth: true },
-    // },
     {
       path: "/profile/:user",
       name: "Profile",

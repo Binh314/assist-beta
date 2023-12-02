@@ -58,7 +58,6 @@ async function getStatus() {
     return;
   }
   status.value = result;
-  console.log(status.value);
 }
 
 onBeforeMount(async () => {
