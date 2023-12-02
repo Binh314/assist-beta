@@ -2,23 +2,42 @@
 import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { ref } from "vue";
+import { fetchy } from "../../utils/fetchy";
 import ImageUploader from "../ImageUploader.vue";
+import TagsInput from "../Tag/TagsInput.vue";
 
 const username = ref("");
 const password = ref("");
 const profile = ref("");
+const tag = ref([""]);
 const { createUser, loginUser, updateSession } = useUserStore();
+
+async function attachTag(tags:string[]){
+  const userID = (await fetchy(`/api/users/${username.value}`,"GET"))._id;
+  for(const t of tags.slice(0,-1)){
+    try{
+      const response = await fetchy('/api/tag',"POST",{body:{i:userID,n:t}})
+    }
+    catch{
+      return new Error(`Fail to attached tag - ${t}`)
+    }
+  }
+}
 
 async function register() {
   await createUser(username.value, password.value, profile.value);
   await loginUser(username.value, password.value);
+  await attachTag(tag.value);
   void updateSession();
-  // void router.push({ name: "Home" });
   void router.push({ name: "Task" });
 }
 
 async function handleImageUpload(url: string) {
   profile.value = url;
+}
+
+async function handleTagChange(newTag: string[]){
+  tag.value = newTag;
 }
 </script>
 
@@ -39,12 +58,27 @@ async function handleImageUpload(url: string) {
           </div>
         </fieldset>
       </div>
+      <hr/>
+      <div class = "tag-container">
+        <h2>Select Tags</h2>
+        <p>Please indicate area you are interested in giving help in</p>
+        <TagsInput :initTags="tag" @updateTags="(updatedTag)=>{handleTagChange(updatedTag)}"/>
+      </div>
+      
+      <hr/>
       <button type="submit" class="primary-button">Register</button>
     </form>
   </div>
 </template>
 
 <style scoped>
+.tag-container{
+  padding: 10%;
+}
+
+hr{
+  width: 100%;
+}
 .register-form {
   display: flex;
   justify-content: center;
