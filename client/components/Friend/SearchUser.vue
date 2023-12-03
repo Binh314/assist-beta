@@ -24,7 +24,7 @@ async function getMatchingUsers(prefix: string) {
   <section>
     <div class="searchbar">
       <span class="material-symbols-outlined">search</span>
-      <input id="username" type="text" v-model="username" @input="getMatchingUsers(username)" placeholder="Search by username" />
+      <input id="username" type="text" v-model="username" @input="getMatchingUsers(username)" placeholder="Search by username" autocomplete="off"/>
     </div>
     <div class="searchresults" v-if="matchingUsers.length > 0">
       <div v-for="user in matchingUsers" :key="user._id">
