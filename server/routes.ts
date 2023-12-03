@@ -337,30 +337,40 @@ class Routes {
     const user = await WebSession.getUser(session);
     const userTags = (await Tag.getTagsByItemId(user)).map((tag) => tag.name);
 
-    // other user's tasks that have not passed deadline
-    const tasks = await Task.getTasks({ requester: { $ne: user }, deadline: { $gte: new Date() } });
+    // other user's tasks that have not passed deadline and is not completed
+    const tasks = await Task.getTasks({ requester: { $ne: user }, deadline: { $gte: new Date() }, completed: false });
 
+    const matchedTasksHelped: TaskDoc[] = [];
     const matchedTasks: TaskDoc[] = [];
     const unmatchedTasks: TaskDoc[] = [];
-    const isMatched: boolean[] = [];
+
+    const matchMap: Map<string, boolean> = new Map();
 
     // matching
     for (const task of tasks) {
       const taskTags = (await Tag.getTagsByItemId(task._id)).map((tag) => tag.name);
       const similarityScores = await Promise.all(await Match.getSimilarities(userTags, taskTags));
       if (similarityScores.filter((e) => e > 50).length > 0) {
-        matchedTasks.push(task);
-        isMatched.push(true);
+        const offeredHelp = task.assisters.filter((a) => a.toString() === user.toString()).length > 0;
+
+        if (offeredHelp) matchedTasksHelped.push(task);
+        else matchedTasks.push(task);
+
+        matchMap.set(task._id.toString(), true);
       } else {
-        isMatched.push(false);
         unmatchedTasks.push(task);
+        matchMap.set(task._id.toString(), false);
       }
     }
 
-    const sortedtasks = matchedTasks.concat(...unmatchedTasks);
-    isMatched.sort().reverse();
+    const allTasks = matchedTasks.concat(...unmatchedTasks, ...matchedTasksHelped);
 
-    return Responses.tasks(sortedtasks, isMatched);
+    const isMatched: boolean[] = allTasks.map((task) => {
+      const matched = matchMap.get(task._id.toString());
+      return matched ? matched : false;
+    });
+
+    return Responses.tasks(allTasks, isMatched);
   }
 
   /**
