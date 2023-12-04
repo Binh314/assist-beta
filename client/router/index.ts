@@ -9,6 +9,7 @@ import RequestsView from "../views/FriendRequestsView.vue";
 import FriendsView from "../views/FriendsView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
+import MessageView from "../views/MessageView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import RegisterView from "../views/RegisterView.vue";
@@ -104,9 +105,9 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: "/messages",
+      path: "/messages/:username?",
       name: "Messages",
-      component: NotFoundView,
+      component: MessageView,
       meta: { requiresAuth: true },
     },
     {
