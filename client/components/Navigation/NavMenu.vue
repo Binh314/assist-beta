@@ -19,8 +19,9 @@ function updateRoute(newRoute: string) {
       <button class="nav-selection" @click="updateRoute('/friends')">Friends</button>
       <button class="nav-selection" @click="updateRoute('/messages')">Messages</button>
       <button class="nav-selection" @click="updateRoute('/challenges')">Challenges</button>
-      <button class="nav-selection" @click="updateRoute(`/profile/${currentUsername}`)">Profile</button>
       <button class="nav-selection" @click="updateRoute('/kudos')">Kudos</button>
+      <button class="nav-selection" @click="updateRoute(`/profile/${currentUsername}`)">Profile</button>
+      <button class="nav-selection" @click="updateRoute('/settings')">Settings</button>
     </div>
   </aside>
 </template>

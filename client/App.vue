@@ -139,7 +139,7 @@ h1 {
 }
 
 img {
-  height: 2em;
+  height: 7vh;
 }
 
 a {
