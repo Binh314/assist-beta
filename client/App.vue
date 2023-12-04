@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import router from "@/router";
 import { useToastStore } from "@/stores/toast";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
@@ -12,6 +13,7 @@ const userStore = useUserStore();
 const { isLoggedIn, currentUsername, currentProfilePicture } = storeToRefs(userStore);
 const { toast } = storeToRefs(useToastStore());
 const displayMenu = ref(false);
+const { logoutUser } = useUserStore();
 
 // Make sure to update the session before mounting the app in case the user is already logged in
 onBeforeMount(async () => {
@@ -22,26 +24,48 @@ onBeforeMount(async () => {
   }
 });
 
-function controlMenu(){
-  displayMenu.value= !displayMenu.value
-  console.log('trying to control menu: ', displayMenu.value)
+function controlMenu() {
+  displayMenu.value = !displayMenu.value;
+  console.log("trying to control menu: ", displayMenu.value);
+}
+
+function showMenu() {
+  displayMenu.value = true;
+}
+
+function hideMenu() {
+  displayMenu.value = false;
+}
+
+async function logout() {
+  await logoutUser();
+  void router.push({ name: "Home" });
 }
 </script>
 
 <template>
   <header>
-    <nav class = "navigation">
+    <nav class="navigation">
+      <button v-if="isLoggedIn" class="expand" @click = "controlMenu">
+        <img class="expand-img" src="@/assets/images/hamburger_white.png" />
+      </button>
       <div class="title">
         <img src="@/assets/images/temp_logo.png" />
         <RouterLink :to="{ name: 'Home' }">
           <h1>Assist</h1>
         </RouterLink>
       </div>
-      <button class ="expand" @click = "controlMenu" >
-        <img class = "expand-img" src="@/assets/images/scroll_down.png" />
-      </button>
+      
+      <ul>
+        <li v-if="isLoggedIn" @click="logout">
+          <p class="button">Logout</p>
+        </li>
+        <li v-else>
+          <RouterLink v-if="currentRouteName !== 'Login'" :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
+        </li>
+      </ul>
     </nav>
-    
+
     <article v-if="toast !== null" class="toast" :class="toast.style">
       <p>{{ toast.message }}</p>
     </article>
@@ -51,27 +75,29 @@ function controlMenu(){
       <img class="icon" src="@/assets/images/create.png" />
     </RouterLink>
   </div>
-  <NavMenu v-if = "displayMenu" @selection = "controlMenu"/>
-  <RouterView />
+  <NavMenu v-if="displayMenu" @selection="controlMenu" />
+  <RouterView :key="$route.fullPath" />
 </template>
 
 <style scoped>
-
-.navigation{
-  height: 7vh;
-}
-
 @import "./assets/toast.css";
-.expand{
+.navigation {
+  height: 7vh;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+.expand {
   background-color: transparent;
   border: none;
-  padding-left: 38%;
+  padding: 1%;
 }
 
-.expand-img{
+.expand-img {
   object-fit: cover; /* Ensures the image covers the area without distorting */
   height: 5vh; /* Adjust this value as needed */
-  width: 20vh; /* Make width equal to height for a perfect circle */
+  width: 5vh; /* Make width equal to height for a perfect circle */
   overflow: hidden; /* This will clip the corners of the image */
 }
 
@@ -83,6 +109,15 @@ function controlMenu(){
 
 .icon {
   height: 3em;
+}
+
+.button {
+  color: white;
+  font-size: 1.25em;
+}
+
+.button:hover {
+  cursor: pointer;
 }
 
 nav {

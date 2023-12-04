@@ -3,7 +3,7 @@ import DocCollection, { BaseDoc } from "../framework/doc";
 import { NotAllowedError, NotFoundError } from "./errors";
 
 export interface TagDoc extends BaseDoc {
-  name: String;
+  name: string;
   item: Array<ObjectId>;
 }
 
@@ -49,21 +49,20 @@ export default class TagConcept {
 
   async detach(i: ObjectId, t: ObjectId) {
     const tag = await this.tags.readOne({ _id: t });
-  
+
     if (!tag) {
       throw new NotFoundError("This tag does not exist");
     }
-  
-    const newItem = []
 
-    for(const currentItem of tag.item){
-      if(currentItem.toString() !== i.toString()){
+    const newItem = [];
+
+    for (const currentItem of tag.item) {
+      if (currentItem.toString() !== i.toString()) {
         newItem.push(currentItem);
       }
     }
     const updatedTag = await this.tags.updateOne({ _id: t }, { item: newItem });
     return { msg: "Item successfully detached from tag", tag: updatedTag };
-
   }
 
   async getTagByName(n: string) {
@@ -93,5 +92,4 @@ export default class TagConcept {
     const tags = await this.tags.readMany({ item: { $elemMatch: { $eq: itemId } } });
     return tags;
   }
-
 }

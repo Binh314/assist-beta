@@ -116,24 +116,24 @@ onBeforeMount(async () => {
     <p v-else>Created on: {{ formatDate(props.task.dateCreated) }}</p>
   </div>
   <div v-if="completing" class="modal-overlay">
-        <div class = "modal-content">
-            <button @click="toggleComplete" class = "exit-btn">X</button>
-                <h1>Who helped you?</h1>
-            <div class="content">
-              <span v-for="(assister, index) in props.task.assisters.concat('I resolved it myself!')" :key="index">
-                <button :class="`pure-button assisterButton ${(index === assisterIndex) ? 'selectedAssistant' : 'unselectedAssistant'}`" @click="markAssister(index)">
-                  {{ assister }}
-                </button>
-              </span>
-            </div>
-            <br>
-            <br>
-            <menu class="options">
-              <li><button class="pure-button pure-button-primary" @click="completeTask">Mark Completed</button></li>
-              <li><button class="button-error btn-small pure-button" @click="toggleComplete">Cancel</button></li>
-            </menu>
+    <div class = "modal-content">
+      <button @click="toggleComplete" class = "exit-btn">X</button>
+        <h1>Who helped you?</h1>
+        <div class="content">
+          <span v-for="(assister, index) in props.task.assisters.concat('I resolved it myself!')" :key="index">
+            <button :class="`pure-button assisterButton ${(index === assisterIndex) ? 'selectedAssistant' : 'unselectedAssistant'}`" @click="markAssister(index)">
+              {{ assister }}
+            </button>
+          </span>
         </div>
+        <br>
+        <br>
+        <menu class="options">
+          <li><button class="pure-button pure-button-primary" @click="completeTask">Mark Completed</button></li>
+          <li><button class="button-error btn-small pure-button" @click="toggleComplete">Cancel</button></li>
+        </menu>
     </div>
+  </div>
 </template>
 
 <style scoped>

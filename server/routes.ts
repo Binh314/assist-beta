@@ -3,9 +3,11 @@ import { ObjectId } from "mongodb";
 import { BadValuesError, NotAllowedError } from "./concepts/errors";
 import { Router, getExpressRouter } from "./framework/router";
 
-import { Badge, Challenge, Friend, Kudo, Message, Post, Tag, Task, User, WebSession } from "./app";
+import { Badge, Challenge, Friend, Kudo, Match, Message, Post, Reminder, Tag, Task, User, WebSession } from "./app";
 import { ChallengeDoc } from "./concepts/challenge";
 import { PostDoc, PostOptions } from "./concepts/post";
+import { ReminderDoc } from "./concepts/reminder";
+import { TaskDoc } from "./concepts/task";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import Responses from "./responses";
@@ -30,6 +32,11 @@ class Routes {
   @Router.get("/users/:userID")
   async getUsername(userID: ObjectId) {
     return await User.getUserById(userID);
+  }
+
+  @Router.get("/users/matching/:prefix")
+  async getUsersByPrefix(prefix: string) {
+    return await User.getUsersByUsernameMatch(prefix);
   }
 
   @Router.post("/users")
@@ -116,7 +123,7 @@ class Routes {
   @Router.get("/friends")
   async getFriends(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
-    return await User.idsToUsernames(await Friend.getFriends(user));
+    return await User.getUsersByIds(await Friend.getFriends(user));
   }
 
   @Router.delete("/friends/:friend")
@@ -124,6 +131,27 @@ class Routes {
     const user = WebSession.getUser(session);
     const friendId = (await User.getUserByUsername(friend))._id;
     return await Friend.removeFriend(user, friendId);
+  }
+
+  @Router.get("/friend/incomingRequests")
+  async getIncomingRequests(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const requesters = (await Friend.getIncomingRequests(user)).map((request) => request.from);
+    return await User.getUsersByIds(requesters);
+  }
+
+  /**
+   *
+   * @param session websession
+   * @param other the user you want to check your friendship status with
+   * @returns "friends" if you are friends, "sent" if you have a pending request to them,
+   *          "received" if you have a pending request from them, "non" if no friendship or requests
+   */
+  @Router.get("/friend/status/:other")
+  async getOutgoingRequests(session: WebSessionDoc, other: string) {
+    const user = WebSession.getUser(session);
+    const otherId = (await User.getUserByUsername(other))._id;
+    return await Friend.getStatus(user, otherId);
   }
 
   @Router.get("/friend/requests")
@@ -304,6 +332,47 @@ class Routes {
     return Responses.tasks(tasks);
   }
 
+  @Router.get("/tasks/matched")
+  async getMatchedTasks(session: WebSessionDoc) {
+    const user = await WebSession.getUser(session);
+    const userTags = (await Tag.getTagsByItemId(user)).map((tag) => tag.name);
+
+    // other user's tasks that have not passed deadline and is not completed
+    const tasks = await Task.getTasks({ requester: { $ne: user }, deadline: { $gte: new Date() }, completed: false });
+
+    const matchedTasksHelped: TaskDoc[] = [];
+    const matchedTasks: TaskDoc[] = [];
+    const unmatchedTasks: TaskDoc[] = [];
+
+    const matchMap: Map<string, boolean> = new Map();
+
+    // matching
+    for (const task of tasks) {
+      const taskTags = (await Tag.getTagsByItemId(task._id)).map((tag) => tag.name);
+      const similarityScores = await Promise.all(await Match.getSimilarities(userTags, taskTags));
+      if (similarityScores.filter((e) => e > 50).length > 0) {
+        const offeredHelp = task.assisters.filter((a) => a.toString() === user.toString()).length > 0;
+
+        if (offeredHelp) matchedTasksHelped.push(task);
+        else matchedTasks.push(task);
+
+        matchMap.set(task._id.toString(), true);
+      } else {
+        unmatchedTasks.push(task);
+        matchMap.set(task._id.toString(), false);
+      }
+    }
+
+    const allTasks = matchedTasks.concat(...unmatchedTasks, ...matchedTasksHelped);
+
+    const isMatched: boolean[] = allTasks.map((task) => {
+      const matched = matchMap.get(task._id.toString());
+      return matched ? matched : false;
+    });
+
+    return Responses.tasks(allTasks, isMatched);
+  }
+
   /**
    *
    * @param session
@@ -312,7 +381,7 @@ class Routes {
   @Router.get("/tasks/completed")
   async getCompletedTasks(session: WebSessionDoc) {
     const requester = WebSession.getUser(session);
-    const tasks = await Task.getTasks({ _id: requester });
+    const tasks = await Task.getTasks({ requester: requester, completed: true });
     return Responses.tasks(tasks);
   }
 
@@ -364,6 +433,8 @@ class Routes {
       for (const tag of tags) {
         Tag.create(created.task._id, tag);
       }
+
+    // TODO: REMINDER SYNC
 
     return { msg: created.msg, task: await Responses.task(created.task) };
   }
@@ -432,6 +503,7 @@ class Routes {
   @Router.patch("/tasks/:_id/help/offer")
   async offerTaskHelp(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
+    // TODO: REMIND SYNC
     return await Task.offerHelp(user, _id);
   }
 
@@ -494,12 +566,12 @@ class Routes {
   }
 
   /**
-   * @param session websession
-   * @returns array of badges with the count of each badge for the current user
+   * @param user username of the user
+   * @returns array of badges with the count of each badge for the specified user
    */
-  @Router.get("/badges")
-  async getBadgeCount(session: WebSessionDoc) {
-    const user = WebSession.getUser(session);
+  @Router.get("/badges/:username")
+  async getBadgeCount(username: string) {
+    const user = (await User.getUserByUsername(username))._id;
     const badges = await Badge.getBadges();
     const badgesWithCount = [];
     for (const badge of badges) {
@@ -507,6 +579,22 @@ class Routes {
       badgesWithCount.push({ ...badge, count: count });
     }
     return badgesWithCount;
+  }
+
+  // Reminders
+
+  @Router.get("/reminders/new")
+  async getNewReminders(session: WebSessionDoc, type?: string) {
+    const user = await WebSession.getUser(session);
+    const reminders: ReminderDoc[] = await Reminder.getNewReminders(user, type);
+    return reminders;
+  }
+
+  @Router.get("/reminders")
+  async getReminders(session: WebSessionDoc, type?: string) {
+    const user = await WebSession.getUser(session);
+    const reminders: ReminderDoc[] = await Reminder.getReminders(user, type);
+    return reminders;
   }
 }
 

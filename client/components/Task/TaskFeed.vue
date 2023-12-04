@@ -4,7 +4,7 @@ import TaskComponent from "@/components/Task/TaskComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
-import { onBeforeMount, ref } from "vue";
+import { computed, onBeforeMount, ref } from "vue";
 
 const { isLoggedIn, currentUsername } = storeToRefs(useUserStore());
 const props = defineProps(["requestedTasks"]);
@@ -13,7 +13,27 @@ const loaded = ref(false);
 let tasks = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
 let searchRequester = ref("");
-const componentKey = ref(1);
+
+// maps from task id to class
+const taskClasses = computed(() => {
+  const classes = new Map();
+  for (const task of tasks.value) classes.set(task._id, "");
+
+  if (props.requestedTasks) {
+    return classes;
+  }
+
+  for (const task of tasks.value) {
+    
+    if (task.assisters.includes(currentUsername.value)) classes.set(task._id, "helpTask");
+    else if (task.matched) classes.set(task._id, "matchedTask");
+
+    // both matched and offered help
+    if (task.assisters.includes(currentUsername.value) && task.matched) classes.set(task._id, "matchedHelpTask")
+  }
+
+  return classes;
+})
 
 // to be implemented after task match is implemented. rn just calls getTasks
 async function getMatchedTasks(host?: string) {
@@ -24,11 +44,10 @@ async function getTasks(requester?: string) {
   let query: Record<string, string> = requester !== undefined ? { requester } : {};
   let taskResults;
   try {
-    const allTaskResults = await fetchy("/api/tasks", "GET", { query });
     if (props.requestedTasks) {
-      taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester === currentUsername.value);
+      taskResults = await fetchy("/api/tasks/requested", "GET");
     } else {
-      taskResults = allTaskResults.filter((task: Record<string, string>) => task.requester !== currentUsername.value);
+      taskResults = await fetchy("/api/tasks/matched", "GET");
     }
   } catch (_) {
     return;
@@ -54,10 +73,12 @@ onBeforeMount(async () => {
 <template>
   <div>
     <section class="tasks" v-if="loaded && tasks.length !== 0">
-      <article v-for="task in tasks" :key="task._id">
-        <TaskComponent v-if="editing !== task._id" :task="task" @refreshTasks="getMatchedTasks" @editTask="updateEditing" />
-        <EditTaskForm v-else :task="task" @refreshTasks="getMatchedTasks" @editTask="updateEditing" />
-      </article>
+      <div v-for="task in tasks" :key="task._id">
+        <article :class="taskClasses.get(task._id)">
+          <TaskComponent v-if="editing !== task._id" :task="task" @refreshTasks="getMatchedTasks" @editTask="updateEditing" />
+          <EditTaskForm v-else :task="task" @refreshTasks="getMatchedTasks" @editTask="updateEditing" />
+        </article>
+      </div>
     </section>
     <p v-else-if="loaded">No tasks found</p>
     <p v-else>Loading...</p>
@@ -65,6 +86,21 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+
+.matchedTask {
+  border-style: solid;
+  background-color: var(--light-pink);
+}
+
+.helpTask {
+  background-color: var(--blue-gray);
+}
+
+.matchedHelpTask {
+  background-color: var(--blue-gray);
+  border-style: solid;
+}
+
 section {
   display: flex;
   flex-direction: column;

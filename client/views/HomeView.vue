@@ -40,18 +40,21 @@ async function signup() {
       <div v-else class="page">
         <div class="content" id="content-1">
           <img src="@/assets/images/homepage.png" />
-          <div class="text">^ placeholder image; insert blurb that conveys value of using Assist</div>
-          <a href="#content-2">
+          <div class="text">
+            Ever needed or wanted assistance but not known which of your friends to ask? Or been concerned you'd be putting a burden on them by asking? With Assist, you can input a task, and we'll
+            help you get the help you're looking for.
+          </div>
+          <a href="#content-3">
             <img class="icon" src="@/assets/images/scroll_down.png" />
           </a>
         </div>
-        <div class="content" id="content-2">
+        <!-- <div class="content" id="content-2">
           <img src="@/assets/images/homepage_help.png" />
           <div class="text">^ placeholder image; insert blurb that conveys value of using Assist</div>
           <a href="#content-3">
             <img class="icon" id="content-2-icon" src="@/assets/images/scroll_down.png" />
           </a>
-        </div>
+        </div> -->
         <div class="content" id="content-3">
           <img src="@/assets/images/temp_logo.png" />
           <div>
@@ -130,7 +133,7 @@ p {
 }
 
 #content-3 {
-  padding-top: 5em;
+  padding-top: 4em;
 }
 
 #content-3-icon {
@@ -152,6 +155,7 @@ img {
   margin-left: 30%;
   width: 40%;
   text-align: center;
+  line-height: 1.5em;
 }
 
 .icon {
