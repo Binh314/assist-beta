@@ -39,7 +39,6 @@ onBeforeMount(async () => {
   <div class="header" @click="goToProfile">
     <div class="container">
       <img v-if="profile.picture" :src="profile.picture"/>
-      <img v-else src="@/assets/images/user-solid.png"/>
       <h2 class="name"> {{ profile.username }} </h2>
     </div>
   </div>

@@ -64,7 +64,6 @@ onBeforeUnmount(async () => {
 <template>
   <div class="container" @click="goToMessages">
     <img v-if="profile.picture" :src="profile.picture" @click.stop="goToProfile"/>
-    <img v-else src="@/assets/images/user-solid.png" @click.stop="goToProfile"/>
     <div class="header" @click="goToMessages">
       <h2>
       <span class="name"> {{ profile.username }} </span>
