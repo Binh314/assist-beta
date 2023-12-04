@@ -26,6 +26,10 @@ function editProfile() {
   router.push("/profile/edit");
 }
 
+async function goToMessages() {
+  void router.push(`/messages/${username.value}`);
+}
+
 onMounted(async () => {
   if (props.user !== undefined && props.user !== currentUsername && typeof props.user === "string") {
     try {
@@ -64,7 +68,10 @@ onMounted(async () => {
 <template>
   <div class="column">
     <ProfilePicture :pictureLink="profilePicture" />
-    <span class="username">{{ username }}</span>
+    <span class="username">{{ username }} 
+      <font-awesome-icon v-if="username !== currentUsername"
+      class="icon clickable messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages"/>
+    </span>
     <span class="subtitle">kudos: {{ kudos }}</span>
     <div v-if="username == currentUsername" class="button-container">
       <button class="primary-button" @click="editProfile">Edit Profile</button>
@@ -117,5 +124,12 @@ onMounted(async () => {
 
 .tags {
   color: var(--deep-purple);
+}
+
+.icon {
+  width: 1em;
+}
+.messageIcon:hover {
+  cursor: pointer;
 }
 </style>

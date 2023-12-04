@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { formatDate, formatTaskDate } from "@/utils/formatDate";
 import { storeToRefs } from "pinia";
@@ -13,10 +14,19 @@ const offeredHelp = computed(() => props.task.assisters.includes(currentUsername
 const tags = ref<Array<string>>([]);
 const completing = ref(false);
 const assisterIndex = ref(props.task.assisters.length);
+let profile = ref<Record<string, string>>({});
 
 const toggleComplete = async() => {
   completing.value = !completing.value;
   assisterIndex.value = props.task.assisters.length;
+}
+
+async function goToMessages() {
+  void router.push(`/messages/${props.task.requester}`);
+}
+
+async function goToProfile() {
+  void router.push(`/profile/${props.task.requester}`);
 }
 
 const deleteTask = async () => {
@@ -69,6 +79,16 @@ const completeTask = async () => {
   emit("refreshTasks");
 }
 
+async function getProfile() {
+  let profileResult;
+  try {
+    profileResult = await fetchy(`/api/users/${props.task.requester}`, "GET")
+  } catch (_) {
+    return;
+  }
+  profile.value = profileResult;
+}
+
 onBeforeMount(async () => {
   let tagResults;
   try {
@@ -77,11 +97,23 @@ onBeforeMount(async () => {
     return;
   }
   tags.value = tagResults.map((e: Record<string, string>) => e.name);
+  await getProfile();
 });
 </script>
 
 <template>
-  <h3 class="Requester">{{ props.task.requester }}</h3>
+  <h2 class="requester">
+    <img v-if="profile.picture" :src="profile.picture" @click.stop="goToProfile"/>
+    <span class="profile"  @click.stop="goToProfile">
+      <span class="name"> 
+        <!-- <img v-if="profile.picture" :src="profile.picture"/> -->
+        {{ props.task.requester }} 
+      </span>
+    </span>
+    <font-awesome-icon v-if="$props.task.requester !== currentUsername && isLoggedIn"
+    class="icon messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages"/>
+  </h2>
+  <br>
   <h2 class="title">{{ props.task.title }}</h2>
 
   <p class="time"><font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" /> {{ formatTaskDate(props.task.deadline) }}</p>
@@ -137,6 +169,29 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+.requester {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+img {
+  object-fit: cover;
+  height: 2em;
+  aspect-ratio: 1;
+  margin-right: 0.5em;
+  cursor:pointer;
+  border-radius: 1em;
+}
+
+.profile:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.clickable:hover {
+  cursor: pointer;
+}
 
 .selectedAssistant {
   font-weight: bold;
@@ -153,6 +208,15 @@ label {
 .icon {
   width: 1em;
 }
+
+.messageIcon {
+  margin-left: 0.5em;
+}
+
+.messageIcon:hover {
+  cursor: pointer;
+}
+
 .dropdownButton {
   width: 10em;
 }
