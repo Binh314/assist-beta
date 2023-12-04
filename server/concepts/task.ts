@@ -42,6 +42,12 @@ export default class TaskConcept {
     return tasks;
   }
 
+  async getTaskById(_id: ObjectId) {
+    const task = await this.tasks.readOne({ _id });
+    if (!task) throw new NotFoundError("Task not found!");
+    return task;
+  }
+
   async getTasksByRequester(requester: ObjectId) {
     return await this.getTasks({ requester, completed: false });
   }

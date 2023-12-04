@@ -164,13 +164,28 @@ class Routes {
   async sendFriendRequest(session: WebSessionDoc, to: string) {
     const user = WebSession.getUser(session);
     const toId = (await User.getUserByUsername(to))._id;
-    return await Friend.sendRequest(user, toId);
+
+    const username = (await User.getUserById(user)).username;
+
+    const result = await Friend.sendRequest(user, toId);
+
+    // TODO: Modify Friend reminder to fit frontend implementation
+    const requests = await Friend.getRequests(user);
+    const id = requests.filter((request) => request.to.toString() === toId.toString())[0]._id;
+    if (id) await Reminder.create(toId, `You have a friend request from ${username}!`, "friendRequest", id, 24);
+
+    return result;
   }
 
   @Router.delete("/friend/requests/:to")
   async removeFriendRequest(session: WebSessionDoc, to: string) {
     const user = WebSession.getUser(session);
     const toId = (await User.getUserByUsername(to))._id;
+
+    const requests = await Friend.getRequests(user);
+    const id = requests.filter((request) => request.to.toString() === toId.toString())[0]._id;
+    if (id) await Reminder.deleteByContent(id);
+
     return await Friend.removeRequest(user, toId);
   }
 
@@ -178,6 +193,12 @@ class Routes {
   async acceptFriendRequest(session: WebSessionDoc, from: string) {
     const user = WebSession.getUser(session);
     const fromId = (await User.getUserByUsername(from))._id;
+
+    const username = (await User.getUserById(user)).username;
+
+    // TODO: Modify Reminder to work with frontend implementation
+    await Reminder.create(fromId, `${username} accepted your friend request!`, "friendAccept", user);
+
     return await Friend.acceptRequest(fromId, user);
   }
 
@@ -429,12 +450,15 @@ class Routes {
     const created = await Task.create(user, title, description, dl, files);
 
     // attach tags
-    if (created.task)
-      for (const tag of tags) {
-        Tag.create(created.task._id, tag);
-      }
+    if (created.task) {
+      for (const tag of tags) Tag.create(created.task._id, tag);
 
-    // TODO: REMINDER SYNC
+      const friends = await Friend.getFriends(user);
+      for (const friend of friends) {
+        const username = (await User.getUserById(user)).username;
+        await Reminder.create(friend, `Help Request from ${username} on ${created.task.title}!`, "task", created.task._id);
+      }
+    }
 
     return { msg: created.msg, task: await Responses.task(created.task) };
   }
@@ -458,6 +482,9 @@ class Routes {
   async deleteTask(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
     await Task.isRequester(user, _id);
+
+    await Reminder.deleteByContent(new ObjectId(_id.toString()));
+
     return await Task.delete(_id);
   }
 
@@ -478,6 +505,9 @@ class Routes {
 
     const userId = (await User.getUserByUsername(assister))._id;
     const result = await Task.complete(_id, userId);
+
+    // TODO: Modify Kudos Reminder to fit implementation of kudos frontend
+    await Reminder.create(user, `Don't forget to give a kudos to ${assister}!`, "kudos", userId);
 
     // Check if completing this task completes any new challenges, and award badges if needed
     const challenges = await Challenge.getActiveChallenges();
@@ -503,13 +533,18 @@ class Routes {
   @Router.patch("/tasks/:_id/help/offer")
   async offerTaskHelp(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
-    // TODO: REMIND SYNC
+
+    const task = await Task.getTaskById(_id);
+    const username = (await User.getUserById(user)).username;
+
+    await Reminder.create(task.requester, `Help offer from ${username} on ${task.title}!`, "task", task._id);
     return await Task.offerHelp(user, _id);
   }
 
   @Router.patch("/tasks/:_id/help/retract")
   async retractTaskHelp(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
+
     return await Task.retractHelp(user, _id);
   }
 
@@ -595,6 +630,13 @@ class Routes {
     const user = await WebSession.getUser(session);
     const reminders: ReminderDoc[] = await Reminder.getReminders(user, type);
     return reminders;
+  }
+
+  @Router.delete("/reminders/:id")
+  async deleteReminder(session: WebSessionDoc, id: string) {
+    const user = WebSession.getUser(session);
+    await Reminder.isRecipient(user, new ObjectId(id));
+    return await Reminder.deleteById(new ObjectId(id));
   }
 }
 

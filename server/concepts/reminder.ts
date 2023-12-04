@@ -1,5 +1,6 @@
-import { ObjectId } from "mongodb";
+import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
+import { NotAllowedError, NotFoundError } from "./errors";
 
 export interface ReminderDoc extends BaseDoc {
   recipient: ObjectId;
@@ -21,7 +22,7 @@ export default class ReminderConcept {
    * @param type type of the reminder
    * @param contentId objectId of something related to the reminder
    */
-  async create(recipient: ObjectId, message: string, frequency?: number, type?: string, contentId?: ObjectId) {
+  async create(recipient: ObjectId, message: string, type?: string, contentId?: ObjectId, frequency?: number) {
     const _id = await this.reminders.createOne({ recipient, message, frequency, type, contentId });
     return { msg: "Message successfully created", reminder: await this.reminders.readOne({ _id }) };
   }
@@ -91,11 +92,28 @@ export default class ReminderConcept {
     return reminders;
   }
 
-  async delete(_id: ObjectId) {
-    this.reminders.deleteOne({ _id });
+  async deleteById(_id: ObjectId) {
+    await this.reminders.deleteOne({ _id });
+    return { msg: "Successfully deleted reminder." };
+  }
+
+  async deleteByContent(contentId: ObjectId) {
+    await this.reminders.deleteMany({ contentId });
+    return { msg: "Successfully deleted reminder(s)." };
+  }
+
+  async delete(query: Filter<ReminderDoc>) {
+    await this.reminders.deleteMany(query);
+    return { msg: "Successfully deleted reminder(s)." };
   }
 
   private addHours(date: Date, hours: number) {
     return new Date(date.getTime() + hours * 60 * 60 * 1000);
+  }
+
+  async isRecipient(recipient: ObjectId, _id: ObjectId) {
+    const reminder = await this.reminders.readOne({ _id });
+    if (!reminder) throw new NotFoundError("Reminder not found.");
+    if (recipient.toString() !== reminder.recipient.toString()) throw new NotAllowedError("User is not recipient of reminder.");
   }
 }
