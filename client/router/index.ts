@@ -15,6 +15,7 @@ import ProfileView from "../views/ProfileView.vue";
 import RegisterView from "../views/RegisterView.vue";
 import SettingView from "../views/SettingView.vue";
 import SettingsView from "../views/SettingsView.vue";
+import SingleTaskView from "../views/SingleTaskView.vue";
 import TaskView from "../views/TaskView.vue";
 
 const router = createRouter({
@@ -83,6 +84,13 @@ const router = createRouter({
       path: "/profile/:user",
       name: "Profile",
       component: ProfileView,
+      meta: { requiresAuth: true },
+      props: true,
+    },
+    {
+      path: "/task/:id",
+      name: "SingleTask",
+      component: SingleTaskView,
       meta: { requiresAuth: true },
       props: true,
     },

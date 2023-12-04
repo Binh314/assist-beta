@@ -3,9 +3,13 @@ import HelpOffer from "@/components/Task/HelpOffer.vue";
 import HelpRequest from "@/components/Task/HelpRequest.vue";
 import router from "@/router";
 import { useUserStore } from "@/stores/user";
+import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
+import { onBeforeMount, ref } from "vue";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const requestReminders = ref<Record<string, string>>();
+  const offerReminders = ref<Record<string, string>>();
 
 function login() {
   void router.push({ name: "Login" });
@@ -14,6 +18,22 @@ function login() {
 async function signup() {
   void router.push({ name: "Register" });
 }
+
+async function getTaskReminders() {
+  try {
+    requestReminders.value = await fetchy(`/api/reminders/all/taskRequest`, "GET");
+    offerReminders.value = await fetchy(`/api/reminders/all/taskOffer`, "GET");
+    console.log(offerReminders)
+  } catch(_) {
+    console.log(_);
+    return;
+  }
+}
+
+onBeforeMount(async () => {
+  await getTaskReminders();
+})
+
 </script>
 
 <template>
@@ -25,14 +45,14 @@ async function signup() {
         <p class="link">view active challenges</p>
         <div class="notifications">
           <div class="offers">
-            <HelpOffer />
-            <HelpOffer />
-            <HelpOffer />
+            <div v-for="reminder in offerReminders">
+              <HelpOffer :reminder="reminder" />
+            </div>
           </div>
           <div class="requests">
-            <HelpRequest />
-            <HelpRequest />
-            <HelpRequest />
+            <div v-for="reminder in requestReminders">
+              <HelpRequest :reminder="reminder" />
+            </div>
           </div>
         </div>
       </div>

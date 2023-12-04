@@ -29,7 +29,7 @@ class Routes {
     return await User.getUserByUsername(username);
   }
 
-  @Router.get("/users/:userID")
+  @Router.get("/users/id/:userID")
   async getUsername(userID: ObjectId) {
     return await User.getUserById(userID);
   }
@@ -425,14 +425,8 @@ class Routes {
    */
   @Router.get("/tasks/id/:id")
   async getTask(id: string) {
-    let tasks;
-    if (id) {
-      const _id = new ObjectId(id);
-      tasks = await Task.getTasks({ _id });
-    } else {
-      tasks = await Task.getTasks({});
-    }
-    return Responses.tasks(tasks);
+    const _id = new ObjectId(id);
+    return Responses.task(await Task.getTaskById(_id));
   }
 
   /**
@@ -456,7 +450,7 @@ class Routes {
       const friends = await Friend.getFriends(user);
       for (const friend of friends) {
         const username = (await User.getUserById(user)).username;
-        await Reminder.create(friend, `Help Request from ${username} on ${created.task.title}!`, "task", created.task._id);
+        await Reminder.create(friend, `Help Request from ${username} on ${created.task.title}!`, "taskRequest", created.task._id);
       }
     }
 
@@ -537,13 +531,15 @@ class Routes {
     const task = await Task.getTaskById(_id);
     const username = (await User.getUserById(user)).username;
 
-    await Reminder.create(task.requester, `Help offer from ${username} on ${task.title}!`, "task", task._id);
+    await Reminder.create(task.requester, `Help offer from ${username} on ${task.title}!`, "taskOffer", user);
     return await Task.offerHelp(user, _id);
   }
 
   @Router.patch("/tasks/:_id/help/retract")
   async retractTaskHelp(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
+
+    Reminder.delete({ contentId: user, type: "taskOffer" });
 
     return await Task.retractHelp(user, _id);
   }
@@ -618,17 +614,17 @@ class Routes {
 
   // Reminders
 
-  @Router.get("/reminders/new")
+  @Router.get("/reminders/new/:type")
   async getNewReminders(session: WebSessionDoc, type?: string) {
     const user = await WebSession.getUser(session);
     const reminders: ReminderDoc[] = await Reminder.getNewReminders(user, type);
     return reminders;
   }
 
-  @Router.get("/reminders")
+  @Router.get("/reminders/all/:type")
   async getReminders(session: WebSessionDoc, type?: string) {
     const user = await WebSession.getUser(session);
-    const reminders: ReminderDoc[] = await Reminder.getReminders(user, type);
+    const reminders = await Reminder.getReminders(user, type);
     return reminders;
   }
 
