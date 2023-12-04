@@ -28,29 +28,32 @@ function updateRoute(newRoute: string) {
 <style scoped>
 .nav-menu {
   position: fixed;
-  top: 7vh;
   left: 0;
-  width: 100%;
-  height: object-fit;
-  background-color: var(--blue-gray);
+  width:  25%;
+  height: 100vh;
+  background-color: var(--deep-purple);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   z-index: 1000; /* Ensure it's above other content */
 }
 
+.column{
+  width: 100%;
+}
+
 .nav-selection {
+  width: 100%;
   background-color: transparent;
   border: none;
   color: white;
   font-size: 2.5vh;
-  padding: 1vh;
+  padding: 2vh;
   font-weight: 600;
 }
 
 .nav-selection:hover {
-  background-color: var(--deep-purple);
-  width: 10000%;
+  background-color: var(--dark-purple);
   color: white;
 }
 </style>

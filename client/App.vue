@@ -29,6 +29,14 @@ function controlMenu() {
   console.log("trying to control menu: ", displayMenu.value);
 }
 
+function showMenu() {
+  displayMenu.value = true;
+}
+
+function hideMenu() {
+  displayMenu.value = false;
+}
+
 async function logout() {
   await logoutUser();
   void router.push({ name: "Home" });
@@ -38,15 +46,16 @@ async function logout() {
 <template>
   <header>
     <nav class="navigation">
+      <button v-if="isLoggedIn" class="expand" @click = "controlMenu">
+        <img class="expand-img" src="@/assets/images/hamburger_white.png" />
+      </button>
       <div class="title">
         <img src="@/assets/images/temp_logo.png" />
         <RouterLink :to="{ name: 'Home' }">
           <h1>Assist</h1>
         </RouterLink>
       </div>
-      <button v-if="isLoggedIn" class="expand" @click="controlMenu">
-        <img class="expand-img" src="@/assets/images/scroll_down.png" />
-      </button>
+      
       <ul>
         <li v-if="isLoggedIn" @click="logout">
           <p class="button">Logout</p>
@@ -82,13 +91,13 @@ async function logout() {
 .expand {
   background-color: transparent;
   border: none;
-  padding-left: 38%;
+  padding: 1%;
 }
 
 .expand-img {
   object-fit: cover; /* Ensures the image covers the area without distorting */
   height: 5vh; /* Adjust this value as needed */
-  width: 20vh; /* Make width equal to height for a perfect circle */
+  width: 5vh; /* Make width equal to height for a perfect circle */
   overflow: hidden; /* This will clip the corners of the image */
 }
 
