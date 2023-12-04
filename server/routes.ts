@@ -164,13 +164,28 @@ class Routes {
   async sendFriendRequest(session: WebSessionDoc, to: string) {
     const user = WebSession.getUser(session);
     const toId = (await User.getUserByUsername(to))._id;
-    return await Friend.sendRequest(user, toId);
+
+    const username = (await User.getUserById(user)).username;
+
+    const result = await Friend.sendRequest(user, toId);
+
+    // TODO: Modify Friend reminder to fit frontend implementation
+    const requests = await Friend.getRequests(user);
+    const id = requests.filter((request) => request.to.toString() === toId.toString())[0]._id;
+    if (id) await Reminder.create(toId, `You have a friend request from ${username}!`, "friendRequest", id, 24);
+
+    return result;
   }
 
   @Router.delete("/friend/requests/:to")
   async removeFriendRequest(session: WebSessionDoc, to: string) {
     const user = WebSession.getUser(session);
     const toId = (await User.getUserByUsername(to))._id;
+
+    const requests = await Friend.getRequests(user);
+    const id = requests.filter((request) => request.to.toString() === toId.toString())[0]._id;
+    if (id) await Reminder.deleteByContent(id);
+
     return await Friend.removeRequest(user, toId);
   }
 
@@ -178,6 +193,12 @@ class Routes {
   async acceptFriendRequest(session: WebSessionDoc, from: string) {
     const user = WebSession.getUser(session);
     const fromId = (await User.getUserByUsername(from))._id;
+
+    const username = (await User.getUserById(user)).username;
+
+    // TODO: Modify Reminder to work with frontend implementation
+    await Reminder.create(fromId, `${username} accepted your friend request!`, "friendAccept", user);
+
     return await Friend.acceptRequest(fromId, user);
   }
 
@@ -485,6 +506,9 @@ class Routes {
     const userId = (await User.getUserByUsername(assister))._id;
     const result = await Task.complete(_id, userId);
 
+    // TODO: Modify Kudos Reminder to fit implementation of kudos frontend
+    await Reminder.create(user, `Don't forget to give a kudos to ${assister}!`, "kudos", userId);
+
     // Check if completing this task completes any new challenges, and award badges if needed
     const challenges = await Challenge.getActiveChallenges();
     for (const challenge of challenges) {
@@ -520,6 +544,7 @@ class Routes {
   @Router.patch("/tasks/:_id/help/retract")
   async retractTaskHelp(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
+
     return await Task.retractHelp(user, _id);
   }
 
