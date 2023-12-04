@@ -429,12 +429,15 @@ class Routes {
     const created = await Task.create(user, title, description, dl, files);
 
     // attach tags
-    if (created.task)
-      for (const tag of tags) {
-        Tag.create(created.task._id, tag);
-      }
+    if (created.task) {
+      for (const tag of tags) Tag.create(created.task._id, tag);
 
-    // TODO: REMINDER SYNC
+      const friends = await Friend.getFriends(user);
+      for (const friend of friends) {
+        const username = (await User.getUserById(user)).username;
+        await Reminder.create(friend, `Help Request from ${username} on ${created.task.title}!`, "task", created.task._id);
+      }
+    }
 
     return { msg: created.msg, task: await Responses.task(created.task) };
   }
@@ -458,6 +461,9 @@ class Routes {
   async deleteTask(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
     await Task.isRequester(user, _id);
+
+    await Reminder.deleteByContent(new ObjectId(_id.toString()));
+
     return await Task.delete(_id);
   }
 
@@ -503,7 +509,11 @@ class Routes {
   @Router.patch("/tasks/:_id/help/offer")
   async offerTaskHelp(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
-    // TODO: REMIND SYNC
+
+    const task = await Task.getTaskById(_id);
+    const username = (await User.getUserById(user)).username;
+
+    await Reminder.create(task.requester, `Help offer from ${username} on ${task.title}!`, "task", task._id);
     return await Task.offerHelp(user, _id);
   }
 
@@ -595,6 +605,13 @@ class Routes {
     const user = await WebSession.getUser(session);
     const reminders: ReminderDoc[] = await Reminder.getReminders(user, type);
     return reminders;
+  }
+
+  @Router.delete("/reminders/:id")
+  async deleteReminder(session: WebSessionDoc, id: string) {
+    const user = WebSession.getUser(session);
+    await Reminder.isRecipient(user, new ObjectId(id));
+    return await Reminder.deleteById(new ObjectId(id));
   }
 }
 
