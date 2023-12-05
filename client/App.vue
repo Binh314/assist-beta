@@ -76,7 +76,7 @@ async function logout() {
     </RouterLink>
   </div>
   <NavMenu v-if="displayMenu" @selection="controlMenu" />
-  <RouterView :key="$route.fullPath" />
+  <RouterView :key="$route.fullPath" @click="hideMenu"/>
 </template>
 
 <style scoped>
