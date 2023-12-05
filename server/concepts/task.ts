@@ -162,7 +162,7 @@ export default class TaskConcept {
       throw new NotFoundError(`Task ${_id} does not exist!`);
     }
     const assisters = task.assisters.map((e) => e.toString());
-    if (assisters.includes(assister.toString())) {
+    if (assisters.map((assister) => assister.toString()).includes(assister.toString())) {
       throw new NotAllowedError("Person is already an assister.");
     }
   }
@@ -173,7 +173,7 @@ export default class TaskConcept {
       throw new NotFoundError(`Task ${_id} does not exist!`);
     }
     const assisters = task.assisters.map((e) => e.toString());
-    if (!assisters.includes(assister.toString())) {
+    if (!assisters.map((assister) => assister.toString()).includes(assister.toString())) {
       throw new NotAllowedError("Person is not an assister.");
     }
   }
