@@ -15,6 +15,7 @@ const { isLoggedIn, currentUsername } = storeToRefs(useUserStore());
 const interval = ref();
 const name = ref("");
 const componentKey = ref(1);
+const isFriend = ref(false);
 
 let messages = ref<Array<Record<string, string>>>([]);
 
@@ -24,7 +25,6 @@ watch(async () => router.currentRoute.value.params.username,
     if (typeof user === "string") 
       name.value = user;
     else name.value = ""
-    console.log(name.value)
     messages.value = [];
     componentKey.value = componentKey.value * -1;
     loaded.value = false;
@@ -66,9 +66,15 @@ onBeforeMount(async () => {
   console.log("mount");
   interval.value = setInterval(getMessages, 1000);
   componentKey.value = componentKey.value * -1;
+  const friends = (await fetchy(`/api/friends`, "GET")).map((friend: Record<string, string>) => friend.username);
+  isFriend.value = friends.includes(props.username);
   await getMessages();
   loaded.value = true;
 });
+
+async function goToProfile() {
+  router.push(`/profile/${props.username}`)
+}
 
 onBeforeUnmount(async () => {
   console.log("unmount");
@@ -101,11 +107,15 @@ const emptyForm = () => {
         <br/>
       </body>
     </section>
-    <form v-if="loaded" @submit.prevent="sendMessage(text)">
+    <form v-if="loaded && isFriend" @submit.prevent="sendMessage(text)">
       <input id="text" v-model="text" placeholder="Enter text." autocomplete="off"/>
       <button type="submit" class="pure-button-primary pure-button">Send</button>
     </form>
-    <h2 v-else> Loading... </h2>
+    <form v-else-if="loaded && !isFriend" @submit.prevent="goToProfile">
+      <input id="text" v-model="text" placeholder="You must be friends to message." autocomplete="off" disabled/>
+      <button type="submit" class="pure-button-primary pure-button">See Profile</button>
+    </form>
+    <!-- <h2 v-else> Loading... </h2> -->
   </div>
 </template>
 

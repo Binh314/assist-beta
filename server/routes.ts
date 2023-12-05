@@ -374,25 +374,27 @@ class Routes {
 
   // Task
 
-  @Router.get("/tasks")
-  async getTasks(requester?: string) {
-    let tasks;
-    if (requester) {
-      const id = (await User.getUserByUsername(requester))._id;
-      tasks = await Task.getTasksByRequester(id);
-    } else {
-      tasks = await Task.getTasks({ completed: false });
-    }
-    return Responses.tasks(tasks);
-  }
+  // @Router.get("/tasks")
+  // async getTasks(requester?: string) {
+  //   let tasks;
+  //   if (requester) {
+  //     const id = (await User.getUserByUsername(requester))._id;
+  //     tasks = await Task.getTasksByRequester(id);
+  //   } else {
+  //     tasks = await Task.getTasks({ completed: false });
+  //   }
+  //   return Responses.tasks(tasks);
+  // }
 
   @Router.get("/tasks/matched")
   async getMatchedTasks(session: WebSessionDoc) {
     const user = await WebSession.getUser(session);
     const userTags = (await Tag.getTagsByItemId(user)).map((tag) => tag.name);
 
+    const friends = await Friend.getFriends(user);
+
     // other user's tasks that have not passed deadline and is not completed
-    const tasks = await Task.getTasks({ requester: { $ne: user }, deadline: { $gte: new Date() }, completed: false });
+    const tasks = await Task.getTasks({ requester: { $ne: user, $in: friends }, deadline: { $gte: new Date() }, completed: false });
 
     const matchedTasksHelped: TaskDoc[] = [];
     const matchedTasks: TaskDoc[] = [];

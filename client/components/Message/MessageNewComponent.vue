@@ -14,6 +14,7 @@ const { isLoggedIn, currentUsername } = storeToRefs(useUserStore());
 const interval = ref();
 const validUsername = ref(false);
 const username = ref("");
+const isFriend = ref(false);
 
 let messages = ref<Array<Record<string, string>>>([]);
 const navColor = ref("#F98A1D");
@@ -33,7 +34,7 @@ async function getMatchingUsers(prefix: string) {
   }
   let userResults;
   try {
-    userResults = await fetchy(`/api/users/matching/${prefix}`, "GET");
+    userResults = await fetchy(`/api/users/matching/${prefix}`, "GET", {alert: false});
   } catch {
     return;
   }
@@ -41,17 +42,21 @@ async function getMatchingUsers(prefix: string) {
 }
 
 async function goToMessages() {
-  void router.push({ name: "Messages", params: {username: username.value} });
+  void router.push({ name: "Messages", params: {username: username.value}});
 }
 
 async function getMessages() {
   let messageResults;
   try {
-    messageResults = await fetchy(`/api/message/user/${username.value}`, "GET")
+    messageResults = await fetchy(`/api/message/user/${username.value}`, "GET", {alert: false})
   } catch (_) {
     return;
   }
   messages.value = messageResults;
+}
+
+async function goToProfile() {
+  router.push(`/profile/${username.value}`)
 }
 
 async function checkProfile() {
@@ -60,6 +65,10 @@ async function checkProfile() {
     try {
       await fetchy(`/api/users/${username.value}`, "GET", {alert: false});
       validUsername.value = true;
+
+      const friends = await fetchy(`/api/friends`, "GET", {alert: false});
+      isFriend.value = friends.includes(username);
+
       await getMessages();
     } catch (_) {
       validUsername.value = false;
@@ -126,9 +135,17 @@ const emptyForm = () => {
         <br/>
       </body>
     </section>
-    <form v-if="validUsername" @submit.prevent="sendMessage(text)">
+    <!-- <form v-if="validUsername" @submit.prevent="sendMessage(text)">
       <input id="text" v-model="text" placeholder="Enter text." autocomplete="off"/>
       <button type="submit" class="pure-button-primary pure-button">Send</button>
+    </form> -->
+    <form v-if="validUsername && isFriend" @submit.prevent="sendMessage(text)">
+      <input id="text" v-model="text" placeholder="Enter text." autocomplete="off"/>
+      <button type="submit" class="pure-button-primary pure-button">Send</button>
+    </form>
+    <form v-else-if="validUsername && !isFriend" @submit.prevent="goToProfile">
+      <input id="text" v-model="text" placeholder="You must be friends to message." autocomplete="off" disabled/>
+      <button type="submit" class="pure-button-primary pure-button">See Profile</button>
     </form>
   </div>
 </template>
@@ -203,26 +220,36 @@ form {
 
 .sentContainer {
   display:flex;
-  justify-content : flex-end;
+  justify-content: flex-end;
   padding-right: 2em;
+  padding-left: 50%;
 }
 
 .receivedContainer {
   display:flex;
   justify-content : flex-start;
   padding-left: 2em;
+  padding-right: 50%;
 }
 
 .sent {
-  background-color: plum;
+  background-color: var(--light-pink);
   padding: 0.5em 1em;
   border-radius: 1em;
+
+  border-style: solid;
+  /* box-shadow: 0.5em .5em 1em black; */
+  border-width: .25em;
 }
 
 .received {
   padding: 0.5em 1em;
-  background-color: lightgray;
+  background-color: var(--blue-gray);
   border-radius: 1em;
+
+  border-style: solid;
+  /* box-shadow: 0.5em .5em 1em black; */
+  border-width: .25em;
 }
 
 .messagesSection {

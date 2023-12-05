@@ -46,7 +46,7 @@ const deleteTask = async () => {
 const offerHelp = async () => {
   if (!offeredHelp.value)
     try {
-      await fetchy(`/api/tasks/${props.task._id}/help/offer`, "PATCH");
+      await fetchy(`/api/tasks/${props.task._id}/help/offer`, "PATCH", {alert: false});
     } catch (_) {
       return;
     }
@@ -57,7 +57,7 @@ const offerHelp = async () => {
 const retractHelp = async () => {
   if (offeredHelp.value)
     try {
-      await fetchy(`/api/tasks/${props.task._id}/help/retract`, "PATCH");
+      await fetchy(`/api/tasks/${props.task._id}/help/retract`, "PATCH", {alert: false});
     } catch (_) {
       return;
     }
