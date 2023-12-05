@@ -8,8 +8,8 @@ import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
-const requestReminders = ref<Record<string, string>>();
-  const offerReminders = ref<Record<string, string>>();
+const requestReminders = ref<Array<Record<string, string>>>([]);
+const offerReminders = ref<Array<Record<string, string>>>([]);
 
 function login() {
   void router.push({ name: "Login" });
@@ -23,11 +23,20 @@ async function getTaskReminders() {
   try {
     requestReminders.value = await fetchy(`/api/reminders/all/taskRequest`, "GET");
     offerReminders.value = await fetchy(`/api/reminders/all/taskOffer`, "GET");
-    console.log(offerReminders)
   } catch(_) {
     console.log(_);
     return;
   }
+}
+
+async function removeNotification(id: string) {
+  try {
+    await fetchy(`/api/reminders/${id}`, "DELETE");
+  } catch(_) {
+    console.log(_);
+    return;
+  }
+  getTaskReminders();
 }
 
 onBeforeMount(async () => {
@@ -44,15 +53,21 @@ onBeforeMount(async () => {
         <p>[challenge] - 64% complete</p>
         <p class="link">view active challenges</p>
         <div class="notifications">
-          <div class="offers">
+          <div class="offers" v-if="offerReminders.length > 0">
             <div v-for="reminder in offerReminders">
-              <HelpOffer :reminder="reminder" />
+              <HelpOffer :reminder="reminder" @removeNotification="removeNotification"/>
             </div>
           </div>
-          <div class="requests">
+          <div class="offers" v-else>
+            <p class="reminderPlaceholder">You have no task offer reminders.</p>
+          </div>
+          <div class="requests" v-if="requestReminders.length > 0">
             <div v-for="reminder in requestReminders">
-              <HelpRequest :reminder="reminder" />
+              <HelpRequest :reminder="reminder" @removeNotification="removeNotification"/>
             </div>
+          </div>
+          <div class="requests" v-else>
+            <p class="reminderPlaceholder">You have no task request reminders.</p>
           </div>
         </div>
       </div>
@@ -91,6 +106,11 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+.reminderPlaceholder {
+  width: 30em;
+  text-align: center;
+}
+
 h1 {
   text-align: center;
 }
