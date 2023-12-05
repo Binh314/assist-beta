@@ -9,7 +9,6 @@ async function createChallenges() {
 </script>
 
 <template>
-  <button @click="createChallenges">Create Challenges (Temp button, should be run automatically)</button>
   <div class="row">
     <Badges />
   </div>

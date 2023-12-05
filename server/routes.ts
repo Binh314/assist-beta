@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import { BadValuesError, NotAllowedError } from "./concepts/errors";
 import { Router, getExpressRouter } from "./framework/router";
 
+import schedule from "node-schedule";
 import { Badge, Challenge, Friend, Kudo, Match, Message, Post, Reminder, Tag, Task, User, WebSession } from "./app";
 import { ChallengeDoc } from "./concepts/challenge";
 import { PostDoc, PostOptions } from "./concepts/post";
@@ -11,6 +12,38 @@ import { TaskDoc } from "./concepts/task";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import Responses from "./responses";
+
+schedule.scheduleJob({ hour: 0, minute: 0, dayOfWeek: 0 }, function () {
+  void resetChallenges();
+});
+
+/**
+ * Reset challenges for the week. Should be automatically called weekly.
+ * @param helpGoal optional, default = 5. number of tasks users need to help with this week
+ * @param taskGoal optional, default = 5. number of tasks users need to complete this week
+ */
+async function resetChallenges(helpGoal = 5, taskGoal = 5) {
+  const challenges = [
+    {
+      name: "Help Friends!",
+      description: `Help with ${helpGoal} tasks this week.`,
+      goal: helpGoal,
+      reward: new ObjectId("6567e30d37085155a767d595"),
+    },
+    {
+      name: "Complete Tasks!",
+      description: `Complete ${taskGoal} tasks this week.`,
+      goal: taskGoal,
+      reward: new ObjectId("6567e42337085155a767d596"),
+    },
+  ];
+  const now = new Date();
+  const deadline = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // Add milliseconds for one week
+
+  for (const challenge of challenges) {
+    await Challenge.create(challenge.name, challenge.description, challenge.goal, deadline, challenge.reward);
+  }
+}
 
 class Routes {
   @Router.get("/session")
@@ -148,7 +181,7 @@ class Routes {
    *          "received" if you have a pending request from them, "non" if no friendship or requests
    */
   @Router.get("/friend/status/:other")
-  async getOutgoingRequests(session: WebSessionDoc, other: string) {
+  async getFriendStatus(session: WebSessionDoc, other: string) {
     const user = WebSession.getUser(session);
     const otherId = (await User.getUserByUsername(other))._id;
     return await Friend.getStatus(user, otherId);
@@ -548,35 +581,6 @@ class Routes {
   async viewTask(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
     return await Task.view(user, _id);
-  }
-
-  /**
-   * Reset challenges for the week. Should be automatically called weekly.
-   * @param helpGoal optional, default = 5. number of tasks users need to help with this week
-   * @param taskGoal optional, default = 5. number of tasks users need to complete this week
-   */
-  @Router.post("/challenges")
-  async resetChallenges(helpGoal = 5, taskGoal = 5) {
-    const challenges = [
-      {
-        name: "Help Friends!",
-        description: `Help with ${helpGoal} tasks this week.`,
-        goal: helpGoal,
-        reward: new ObjectId("6567e30d37085155a767d595"),
-      },
-      {
-        name: "Complete Tasks!",
-        description: `Complete ${taskGoal} tasks this week.`,
-        goal: taskGoal,
-        reward: new ObjectId("6567e42337085155a767d596"),
-      },
-    ];
-    const now = new Date();
-    const deadline = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // Add milliseconds for one week
-
-    for (const challenge of challenges) {
-      await Challenge.create(challenge.name, challenge.description, challenge.goal, deadline, challenge.reward);
-    }
   }
 
   @Router.get("/challenges")
