@@ -527,7 +527,21 @@ class Routes {
 
     // requester resolved the task without any help
     if (!assister) {
-      return await Task.complete(_id);
+      const result = await Task.complete(_id);
+
+      // check "complete tasks" challenge
+      const challenges = await Challenge.getActiveChallenges();
+      for (const challenge of challenges) {
+        if (challenge.name === "Complete Tasks!" && !(await Challenge.hasCompleted(challenge._id, user))) {
+          const progress = await getChallengeProgressHelper(user, challenge);
+          const result = await Challenge.completeChallenge(challenge._id, user, progress);
+          if (result.reward) {
+            await Badge.awardBadge(result.reward, user);
+          }
+        }
+      }
+
+      return result;
     }
 
     const userId = (await User.getUserByUsername(assister))._id;
@@ -539,13 +553,13 @@ class Routes {
     // Check if completing this task completes any new challenges, and award badges if needed
     const challenges = await Challenge.getActiveChallenges();
     for (const challenge of challenges) {
-      if (challenge.name === "Complete Tasks!" && !Challenge.hasCompleted(challenge._id, user)) {
+      if (challenge.name === "Complete Tasks!" && !(await Challenge.hasCompleted(challenge._id, user))) {
         const progress = await getChallengeProgressHelper(user, challenge);
         const result = await Challenge.completeChallenge(challenge._id, user, progress);
         if (result.reward) {
           await Badge.awardBadge(result.reward, user);
         }
-      } else if (challenge.name === "Help Friends!" && !Challenge.hasCompleted(challenge._id, user)) {
+      } else if (challenge.name === "Help Friends!" && !(await Challenge.hasCompleted(challenge._id, userId))) {
         const progress = await getChallengeProgressHelper(userId, challenge);
         const result = await Challenge.completeChallenge(challenge._id, userId, progress);
         if (result.reward) {
