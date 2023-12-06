@@ -103,7 +103,8 @@ onBeforeMount(async () => {
   font-size: 73px;
   color: var(--deep-purple);
   font-weight: 700;
-  background-color: rgb(229, 204, 244,0.5);
+  background-color: rgb(229, 204, 244,0.9);
+  border-radius: 10px;
   padding: 1%;
 }
 
