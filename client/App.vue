@@ -70,7 +70,7 @@ async function logout() {
       <p>{{ toast.message }}</p>
     </article>
   </header>
-  <div v-if="currentRouteName !== 'Create' && isLoggedIn" class="corner">
+  <div v-if="currentRouteName !== 'Create' && currentRouteName !== 'Task' && isLoggedIn" class="corner">
     <RouterLink :to="{ name: 'Create' }">
       <img class="icon" src="@/assets/images/create.png" />
     </RouterLink>
