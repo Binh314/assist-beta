@@ -1,4 +1,4 @@
-<script setup lang="ts"  crossorigin="anonymous"> 
+<script setup lang="ts" crossorigin="anonymous">
 // src="https://kit.fontawesome.com/40828c6ea5.js"
 import { ref } from "vue";
 
@@ -9,12 +9,11 @@ const tags = ref<Array<string>>(props.initTags);
 
 function inputWidth(i: number) {
   if (tags.value[i].length === 0) return 10 + "em";
-  return Math.max(tags.value[i].length, 8) * 5/8 + "em"; 
+  return (Math.max(tags.value[i].length, 8) * 5) / 8 + "em";
 }
 
-
 function addTag() {
-  tags.value.push('');
+  tags.value.push("");
   console.log(tags.value);
   if (document.activeElement) (document.activeElement as HTMLElement).blur();
   emit("updateTags", tags.value);
@@ -26,30 +25,33 @@ function removeTag(i: number) {
   emit("updateTags", tags.value);
 }
 
-
 // onBeforeMount(() => {
 //   console.log(props.initTags);
 //   tags.value.push(...props.initTags);
 // });
-
 </script>
-
 
 <template>
   <div>
     <span v-for="(tag, index) in tags">
-      <input v-model="tags[index]" class = "tagInput" @blur="emit('updateTags', tags)"  :placeholder="`click to enter tag`"
-      :style="{ width: inputWidth(index) }" @keyup.enter="addTag" @keypress.enter.prevent> 
-      <font-awesome-icon :ref="`input${index}`" :icon="['fas', 'square-xmark']" size="2xl" @click="removeTag(index)" class="removeIcon"/>
+      <input
+        v-model="tags[index]"
+        class="tagInput"
+        @blur="emit('updateTags', tags)"
+        :placeholder="`click to enter tag`"
+        :style="{ width: inputWidth(index) }"
+        @keyup.enter="addTag"
+        @keypress.enter.prevent
+      />
+      <font-awesome-icon :ref="`input${index}`" :icon="['fas', 'square-xmark']" size="2xl" @click="removeTag(index)" class="removeIcon" />
     </span>
-    <font-awesome-icon :icon="['far', 'square-plus']" size="2xl" @click="addTag" class="addIcon"/>
+    <font-awesome-icon :icon="['far', 'square-plus']" size="2xl" @click="addTag" class="addIcon" />
   </div>
 </template>
 
 <style scoped>
-
 input {
-  padding: .25em;
+  padding: 0.25em;
 }
 
 span {
@@ -66,7 +68,6 @@ h3 {
   flex-wrap: wrap;
 }
 
-
 .removeIcon {
   gap: 0px;
   margin-right: 0.5em;
@@ -74,7 +75,7 @@ h3 {
 
 .tagInput {
   gap: 0px;
-  background-color: lightgrey;
+  background-color: white;
   font-weight: bold;
   text-align: center;
   max-width: 85%;
@@ -85,5 +86,4 @@ h3 {
   background-color: white;
   font-weight: normal;
 }
-
 </style>
