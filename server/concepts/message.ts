@@ -29,4 +29,8 @@ export default class MessageConcept {
     const query = { $or: [fromToQuery, toFromQuery] };
     return await this.getMessages(query);
   }
+
+  async deleteMessages(user: ObjectId) {
+    await this.messages.deleteMany({ $or: [{ from: user }, { to: user }] });
+  }
 }
