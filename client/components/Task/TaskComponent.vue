@@ -16,6 +16,10 @@ const completing = ref(false);
 const assisterIndex = ref(props.task.assisters.length);
 let profile = ref<Record<string, string>>({});
 
+const isOfferVisible = ref(false);
+const isRetractVisible = ref(false);
+const isDeleteVisible = ref(false);
+
 const toggleComplete = async() => {
   completing.value = !completing.value;
   assisterIndex.value = props.task.assisters.length;
@@ -30,32 +34,34 @@ async function goToProfile() {
 }
 
 const deleteTask = async () => {
-  if (!confirm("Are you sure you want to delete this task?")) return;
   try {
     await fetchy(`/api/tasks/${props.task._id}`, "DELETE");
   } catch {
     return;
   }
+  closeDeleteModal();
   emit("refreshTasks");
 };
 
 const offerHelp = async () => {
   if (!offeredHelp.value)
     try {
-      await fetchy(`/api/tasks/${props.task._id}/help/offer`, "PATCH");
+      await fetchy(`/api/tasks/${props.task._id}/help/offer`, "PATCH", {alert: false});
     } catch (_) {
       return;
     }
+  closeOfferModal();
   emit("refreshTasks");
 };
 
 const retractHelp = async () => {
   if (offeredHelp.value)
     try {
-      await fetchy(`/api/tasks/${props.task._id}/help/retract`, "PATCH");
+      await fetchy(`/api/tasks/${props.task._id}/help/retract`, "PATCH", {alert: false});
     } catch (_) {
       return;
     }
+  closeRetractModal();
   emit("refreshTasks");
 };
 
@@ -88,6 +94,31 @@ async function getProfile() {
   }
   profile.value = profileResult;
 }
+
+const closeOfferModal = () => {
+  isOfferVisible.value = false;
+};
+
+const openHelpModal = () => {
+  isOfferVisible.value = true;
+};
+
+const closeRetractModal = () => {
+  isRetractVisible.value = false;
+};
+
+const openRetractModal = () => {
+  isRetractVisible.value = true;
+};
+
+const closeDeleteModal = () => {
+  isDeleteVisible.value = false;
+};
+
+const openDeleteModal = () => {
+  isDeleteVisible.value = true;
+};
+
 
 onBeforeMount(async () => {
   let tagResults;
@@ -132,15 +163,15 @@ onBeforeMount(async () => {
   <div v-if="props.task.requester == currentUsername">
     <menu class="options">
       <li><button v-if="!props.task.completed" class="btn-small pure-button" @click="emit('editTask', props.task._id)">Edit</button></li>
-      <li><button class="button-error btn-small pure-button" @click="deleteTask">Delete</button></li>
+      <li><button class="button-error btn-small pure-button" @click="openDeleteModal">Delete</button></li>
     </menu>
     <br>
     <button class="pure-button pure-button-primary" @click="toggleComplete"> Mark Completed </button>
   </div>
   <div v-else-if="isLoggedIn" v-if="!props.task.completed">
     <div class="addTask">
-      <button v-if="!offeredHelp" class="pure-button pure-button-primary" @click="offerHelp">Offer Help!</button>
-      <button v-else class="pure-button button-error" @click="retractHelp">Retract Help Offer</button>
+      <button v-if="!offeredHelp" class="pure-button pure-button-primary" @click="openHelpModal">Offer Help!</button>
+      <button v-else class="pure-button button-error" @click="openRetractModal">Retract Help Offer</button>
     </div>
   </div>
   <div class="timestamp">
@@ -166,9 +197,73 @@ onBeforeMount(async () => {
         </menu>
     </div>
   </div>
+  <div v-if="isOfferVisible" class="modal-overlay">
+    <div class="modal-content confirmMenu">
+      <div class="taskDesc">
+        <h1>Are you sure you want to help {{ props.task.requester }}?</h1>
+        <h2 class="title">{{ props.task.title }}</h2>
+        <p class="time"><font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" /> {{ formatTaskDate(props.task.deadline) }}</p>
+        <p id="tags" class="tags" v-if="tags.length > 0"><font-awesome-icon icon="tags" size="lg" class="icon" /> {{ tags.join(", ") }}</p>
+        <label for="description" v-if="task.description"><b>Description</b></label>
+        <p class="description" v-if="task.description">{{ props.task.description }}</p>
+      </div>
+      <menu class="confirmOptions">
+        <button @click="offerHelp" class = "pure-button-primary pure-button">Offer Help!</button>
+        <button @click="closeOfferModal" class="pure-button">Cancel</button>
+      </menu>
+    </div>
+  </div>
+  <div v-if="isRetractVisible" class="modal-overlay">
+    <div class="modal-content confirmMenu">
+      <div class="taskDesc">
+        <h1>Are you sure you want to retract your help for task?</h1>
+        <h2 class="title">{{ props.task.title }}</h2>
+        <p class="time"><font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" /> {{ formatTaskDate(props.task.deadline) }}</p>
+        <p id="tags" class="tags" v-if="tags.length > 0"><font-awesome-icon icon="tags" size="lg" class="icon" /> {{ tags.join(", ") }}</p>
+        <label for="description" v-if="task.description"><b>Description</b></label>
+        <p class="description" v-if="task.description">{{ props.task.description }}</p>
+      </div>
+      <menu class="confirmOptions">
+        <button @click="retractHelp" class = "pure-button button-error">Retract Help Offer</button>
+        <button @click="closeRetractModal" class="pure-button">Cancel</button>
+      </menu>
+    </div>
+  </div>
+  <div v-if="isDeleteVisible" class="modal-overlay">
+    <div class="modal-content confirmMenu">
+      <div class="taskDesc">
+        <h1>Are you sure you want to delete this task?</h1>
+        <h2 class="title">{{ props.task.title }}</h2>
+        <p class="time"><font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" /> {{ formatTaskDate(props.task.deadline) }}</p>
+        <p id="tags" class="tags" v-if="tags.length > 0"><font-awesome-icon icon="tags" size="lg" class="icon" /> {{ tags.join(", ") }}</p>
+        <label for="description" v-if="task.description"><b>Description</b></label>
+        <p class="description" v-if="task.description">{{ props.task.description }}</p>
+      </div>
+      <menu class="confirmOptions">
+        <button @click="deleteTask" class = "pure-button button-error">Delete Task</button>
+        <button @click="closeDeleteModal" class="pure-button">Cancel</button>
+      </menu>
+    </div>
+  </div>
 </template>
 
 <style scoped>
+
+.taskDesc {
+  line-height: 2em;
+}
+.confirmOptions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.confirmMenu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 .requester {
   display: flex;
   flex-direction: row;

@@ -9,13 +9,15 @@ async function createChallenges() {
 </script>
 
 <template>
-  <div class="row">
-    <Badges />
-  </div>
-  <div class="row">
-    <h1>Challenges</h1>
-    <Challenges />
-  </div>
+  <main>
+    <div class="row">
+      <Badges />
+    </div>
+    <div class="row">
+      <h1>Challenges</h1>
+      <Challenges />
+    </div>
+  </main>
 </template>
 
 <style scoped>
