@@ -4,26 +4,24 @@ import { formatDatepick, formatTimepick, toDateString } from "@/utils/formatDate
 import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
-
 const title = ref("");
 const location = ref("");
 const description = ref("");
-const deadlineDate = ref(formatDatepick(new Date()))
-const deadlineTime = ref(formatTimepick(new Date()))
+const deadlineDate = ref(formatDatepick(new Date()));
+const deadlineTime = ref(formatTimepick(new Date()));
 const availability = ref<Array<Record<string, string>>>([]);
-const tags = ref<Array<string>>(['',]);
-const files = ref<Array<string>>(['',]);
+const tags = ref<Array<string>>([""]);
+const files = ref<Array<string>>([""]);
 const emit = defineEmits(["refreshTasks"]);
 
 const createTask = async (title: string, description: string, deadlineDate: string, deadlineTime: string, ts: string[], fs: string[] = []) => {
   try {
-
     // filter out empty strings
-    const tags = ts.filter(e=>e);
-    const files = fs.filter(e=>e);
+    const tags = ts.filter((e) => e);
+    const files = fs.filter((e) => e);
 
     const deadline = toDateString(deadlineDate + " " + deadlineTime);
-    console.log(deadline)
+    console.log(deadline);
 
     await fetchy("/api/tasks", "POST", {
       body: { title, description, deadline, tags, files },
@@ -35,7 +33,6 @@ const createTask = async (title: string, description: string, deadlineDate: stri
   emptyForm();
 };
 
-
 const emptyForm = () => {
   title.value = "";
   location.value = "";
@@ -45,9 +42,6 @@ const emptyForm = () => {
   tags.value.length = 0;
   files.value.length = 0;
 };
-
-
-
 </script>
 
 <!-- Source for Preventing Submission on Enter:
@@ -56,48 +50,40 @@ const emptyForm = () => {
 <template>
   <form @submit.prevent="createTask(title, description, deadlineDate, deadlineTime, tags, files)">
     <label for="title"> Title </label>
-    <input id="title" v-model="title" placeholder="task title" required @keypress.enter.prevent autocomplete="off"/> 
+    <input class="endCategory" id="title" v-model="title" placeholder="task title" required @keypress.enter.prevent autocomplete="off" />
 
-    <label for="description">
-      Description
-    </label>
-    <textarea id="description" v-model="description" placeholder="task description"> </textarea>
+    <label for="description"> Description </label>
+    <textarea class="endCategory" id="description" v-model="description" placeholder="task description"> </textarea>
 
     <label for="tagsInput">
       <!-- <font-awesome-icon icon="tags" size="lg" class="icon" /> -->
       Tags
     </label>
-    <TagsInput id="tagsInput" :initTags="tags" />
+    <TagsInput class="endCategory" id="tagsInput" :initTags="tags" />
 
-    <label for="startTime"> 
+    <label for="startTime">
       <!-- <font-awesome-icon :icon="['fas', 'calendar']" size="lg" class="icon" />  -->
       Deadline Date
     </label>
-    <input type="date" v-model="deadlineDate" id="deadlineDate" name="deadline-date" required @keypress.enter.prevent autocomplete="off"/>
-    <label for="endTime"> 
-      Deadline Time
-    </label>
-    <input type="time" v-model="deadlineTime" id="deadlineTime" name="deadline-time" required @keypress.enter.prevent autocomplete="off"/>
+    <input type="date" v-model="deadlineDate" id="deadlineDate" name="deadline-date" required @keypress.enter.prevent autocomplete="off" />
+    <label for="endTime"> Deadline Time </label>
+    <input type="time" v-model="deadlineTime" id="deadlineTime" name="deadline-time" required @keypress.enter.prevent autocomplete="off" />
 
-    
-    <br>
+    <br />
     <menu>
       <li><button type="submit" class="pure-button-primary pure-button">Create Task</button></li>
-      <li><button class="btn-small pure-button" @click.prevent="emit('refreshTasks')">Cancel</button></li>
+      <li><button class="pure-button" @click.prevent="emit('refreshTasks')">Cancel</button></li>
     </menu>
   </form>
 </template>
 
 <style scoped>
-
-
-.photo{
+.photo {
   height: 50vh;
   max-width: 100%;
   border-radius: 1em;
   object-fit: scale-down;
 }
-
 
 menu {
   list-style-type: none;
@@ -106,14 +92,18 @@ menu {
   gap: 1em;
   padding: 0;
   margin: 0;
-  align-items: center
+  align-items: center;
 }
 .icon {
   width: 1em;
 }
 
 label {
-  margin-top: 1em;
+  font-weight: bold;
+}
+
+.endCategory {
+  margin-bottom: 1em;
 }
 
 form {
@@ -132,5 +122,15 @@ textarea {
   padding: 0.5em;
   border-radius: 4px;
   resize: none;
+}
+
+button {
+  background-color: var(--purple);
+  color: white;
+}
+
+button:hover {
+  background-color: var(--dark-purple);
+  color: white;
 }
 </style>
