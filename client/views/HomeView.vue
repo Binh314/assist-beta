@@ -12,10 +12,13 @@ const requestReminders = ref<Array<Record<string, string>>>([]);
 const offerReminders = ref<Array<Record<string, string>>>([]);
 
 function login() {
+  console.log(`login clicked`);
   void router.push({ name: "Login" });
 }
 
 async function signup() {
+  console.log(`register clicked`);
+
   void router.push({ name: "Register" });
 }
 
@@ -72,40 +75,79 @@ onBeforeMount(async () => {
         </div>
       </div>
 
-      <div v-else class="page">
-        <div class="content" id="content-1">
-          <img src="@/assets/images/homepage.png" />
-          <div class="text">
-            Ever needed or wanted assistance but not known which of your friends to ask? Or been concerned you'd be putting a burden on them by asking? With Assist, you can input a task, and we'll
-            help you get the help you're looking for.
+      <div v-else class="page not-login">
+        <div class="auth-container">
+          <span class="title">Welcome to Assist</span>
+          <div class="button-group">
+            <button class="btn-container" @click="signup">Sign up</button>
+            <button class="btn-container" @click="login">Login</button>
           </div>
-          <a href="#content-3">
-            <img class="icon" src="@/assets/images/scroll_down.png" />
-          </a>
-        </div>
-        <!-- <div class="content" id="content-2">
-          <img src="@/assets/images/homepage_help.png" />
-          <div class="text">^ placeholder image; insert blurb that conveys value of using Assist</div>
-          <a href="#content-3">
-            <img class="icon" id="content-2-icon" src="@/assets/images/scroll_down.png" />
-          </a>
-        </div> -->
-        <div class="content" id="content-3">
-          <img src="@/assets/images/temp_logo.png" />
-          <div>
-            <button @click="signup">Sign up</button>
-            <button @click="login">Login</button>
-          </div>
-          <a href="#top">
-            <img class="icon" id="content-3-icon" src="@/assets/images/top_of_page.png" />
-          </a>
         </div>
       </div>
+
     </section>
   </main>
 </template>
 
 <style scoped>
+.auth-container {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center items horizontally */
+  justify-content: center; /* Center items vertically if there's extra space */
+  height: 100%; /* Take full height of the parent */
+  width: 100vw;
+}
+
+.title{
+  font-size: 73px;
+  color: var(--deep-purple);
+  font-weight: 700;
+  background-color: rgb(229, 204, 244,0.5);
+  padding: 1%;
+}
+
+
+.btn-container{
+  background-color: var(--light-pink);
+  border: var(--dark-purple) solid 4px;
+  border-radius: 20px;
+  color: var(--deep-purple);
+  padding: 3%;
+  font-size: 3vh;
+  min-width: 8vw;
+  z-index: 2;
+  font-weight: 550;
+}
+
+.btn-container:hover{
+  background-color: var(--purple);
+  border: var(--deep-purple) solid 4px;
+  z-index: 2;
+}
+/* 
+.not-login::before {
+  content: '';
+  display: block;
+  position: absolute;
+  height: 91.2%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.3); 
+  z-index: 1; 
+} */
+
+.not-login{
+  background-image: url(../assets/images/background.jpeg);
+  height: 91vh;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
 .reminderPlaceholder {
   width: 30em;
   text-align: center;

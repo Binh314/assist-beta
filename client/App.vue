@@ -60,9 +60,9 @@ async function logout() {
         <li v-if="isLoggedIn" @click="logout">
           <p class="button">Logout</p>
         </li>
-        <li v-else>
+        <!-- <li v-else>
           <RouterLink v-if="currentRouteName !== 'Login'" :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
-        </li>
+        </li> -->
       </ul>
     </nav>
 
