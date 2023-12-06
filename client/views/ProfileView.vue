@@ -46,7 +46,8 @@ onMounted(async () => {
   }
 
   try {
-    const response = await fetchy(`/api/kudo/receivedCount/${username.value}`, "GET");
+    const receiverId = await fetchy(`/api/users/${username.value}`, "GET");
+    const response = await fetchy(`/api/kudo/receivedCount/${receiverId._id}`, "GET");
     kudos.value = ref(response); // assuming the response is the kudos count
   } catch (error) {
     console.error("Error fetching kudos:", error);
@@ -72,11 +73,11 @@ onMounted(async () => {
 <template>
   <div class="column">
     <ProfilePicture :pictureLink="profilePicture" />
-    <span class="username">{{ username }} 
-      <font-awesome-icon v-if="username !== currentUsername"
-      class="icon clickable messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages"/>
+    <span class="username"
+      >{{ username }}
+      <font-awesome-icon v-if="username !== currentUsername" class="icon clickable messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages" />
     </span>
-    <span class="kudos" @click = "gotoKudos" >kudos: {{ kudos }}</span>
+    <span class="kudos" @click="gotoKudos">kudos: {{ kudos }}</span>
     <div v-if="username == currentUsername" class="button-container">
       <button class="primary-button" @click="editProfile">Edit Profile</button>
     </div>

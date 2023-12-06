@@ -9,10 +9,13 @@ import { fetchy } from "../../utils/fetchy";
 const props = defineProps(["task"]);
 const emit = defineEmits(["editTask", "refreshTasks"]);
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const kudosMessage = ref("");
 
 const offeredHelp = computed(() => props.task.assisters.includes(currentUsername.value));
 const tags = ref<Array<string>>([]);
 const completing = ref(false);
+const kudosAsk = ref(false);
+const sendingKudos = ref(false);
 const assisterIndex = ref(props.task.assisters.length);
 let profile = ref<Record<string, string>>({});
 
@@ -20,10 +23,14 @@ const isOfferVisible = ref(false);
 const isRetractVisible = ref(false);
 const isDeleteVisible = ref(false);
 
-const toggleComplete = async() => {
+const toggleComplete = async () => {
   completing.value = !completing.value;
   assisterIndex.value = props.task.assisters.length;
-}
+};
+
+const toggleSend = () => {
+  kudosAsk.value = !kudosAsk.value;
+};
 
 async function goToMessages() {
   void router.push(`/messages/${props.task.requester}`);
@@ -46,7 +53,7 @@ const deleteTask = async () => {
 const offerHelp = async () => {
   if (!offeredHelp.value)
     try {
-      await fetchy(`/api/tasks/${props.task._id}/help/offer`, "PATCH", {alert: false});
+      await fetchy(`/api/tasks/${props.task._id}/help/offer`, "PATCH", { alert: false });
     } catch (_) {
       return;
     }
@@ -57,7 +64,7 @@ const offerHelp = async () => {
 const retractHelp = async () => {
   if (offeredHelp.value)
     try {
-      await fetchy(`/api/tasks/${props.task._id}/help/retract`, "PATCH", {alert: false});
+      await fetchy(`/api/tasks/${props.task._id}/help/retract`, "PATCH", { alert: false });
     } catch (_) {
       return;
     }
@@ -65,30 +72,57 @@ const retractHelp = async () => {
   emit("refreshTasks");
 };
 
-const markAssister = async(index: number) => {
+const markAssister = async (index: number) => {
   assisterIndex.value = index;
-}
+};
 
 const completeTask = async () => {
   try {
-    const assister = (assisterIndex.value !== props.task.assisters.length) ? 
-      props.task.assisters[assisterIndex.value] : null;
+    const assister = assisterIndex.value !== props.task.assisters.length ? props.task.assisters[assisterIndex.value] : null;
 
-    await fetchy(`/api/tasks/${props.task._id}/complete`, "PATCH",
-      { body : {
-        assister: assister
-      }
+    await fetchy(`/api/tasks/${props.task._id}/complete`, "PATCH", {
+      body: {
+        assister: assister,
+      },
+    });
+
+    if (assister) {
+      kudosAsk.value = true;
+    } else {
+      emit("refreshTasks");
+    }
+  } catch (_) {
+    return;
+  }
+};
+
+function sendKudos() {
+  kudosAsk.value = false;
+  sendingKudos.value = true;
+}
+
+async function sendMessage() {
+  try {
+    const assister = assisterIndex.value !== props.task.assisters.length ? props.task.assisters[assisterIndex.value] : null;
+    const assisterId = await fetchy(`/api/users/${assister}`, "GET");
+    await fetchy(`/api/kudo`, "POST", {
+      body: {
+        receiver: assisterId._id,
+        task: props.task._id,
+        message: kudosMessage.value,
+      },
     });
   } catch (_) {
     return;
   }
+  sendingKudos.value = false;
   emit("refreshTasks");
 }
 
 async function getProfile() {
   let profileResult;
   try {
-    profileResult = await fetchy(`/api/users/${props.task.requester}`, "GET")
+    profileResult = await fetchy(`/api/users/${props.task.requester}`, "GET");
   } catch (_) {
     return;
   }
@@ -119,7 +153,6 @@ const openDeleteModal = () => {
   isDeleteVisible.value = true;
 };
 
-
 onBeforeMount(async () => {
   let tagResults;
   try {
@@ -134,17 +167,16 @@ onBeforeMount(async () => {
 
 <template>
   <h2 class="requester">
-    <img v-if="profile.picture" :src="profile.picture" @click.stop="goToProfile"/>
-    <span class="profile"  @click.stop="goToProfile">
-      <span class="name"> 
+    <img v-if="profile.picture" :src="profile.picture" @click.stop="goToProfile" />
+    <span class="profile" @click.stop="goToProfile">
+      <span class="name">
         <!-- <img v-if="profile.picture" :src="profile.picture"/> -->
-        {{ props.task.requester }} 
+        {{ props.task.requester }}
       </span>
     </span>
-    <font-awesome-icon v-if="$props.task.requester !== currentUsername && isLoggedIn"
-    class="icon messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages"/>
+    <font-awesome-icon v-if="$props.task.requester !== currentUsername && isLoggedIn" class="icon messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages" />
   </h2>
-  <br>
+  <br />
   <h2 class="title">{{ props.task.title }}</h2>
 
   <p class="time"><font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" /> {{ formatTaskDate(props.task.deadline) }}</p>
@@ -165,8 +197,8 @@ onBeforeMount(async () => {
       <li><button v-if="!props.task.completed" class="btn-small pure-button" @click="emit('editTask', props.task._id)">Edit</button></li>
       <li><button class="button-error btn-small pure-button" @click="openDeleteModal">Delete</button></li>
     </menu>
-    <br>
-    <button class="pure-button pure-button-primary" @click="toggleComplete"> Mark Completed </button>
+    <br />
+    <button class="pure-button pure-button-primary" @click="toggleComplete">Mark Completed</button>
   </div>
   <div v-else-if="isLoggedIn" v-if="!props.task.completed">
     <div class="addTask">
@@ -179,22 +211,45 @@ onBeforeMount(async () => {
     <p v-else>Created on: {{ formatDate(props.task.dateCreated) }}</p>
   </div>
   <div v-if="completing" class="modal-overlay">
-    <div class = "modal-content">
-      <button @click="toggleComplete" class = "exit-btn">X</button>
-        <h1>Who helped you?</h1>
-        <div class="content">
-          <span v-for="(assister, index) in props.task.assisters.concat('I resolved it myself!')" :key="index">
-            <button :class="`pure-button assisterButton ${(index === assisterIndex) ? 'selectedAssistant' : 'unselectedAssistant'}`" @click="markAssister(index)">
-              {{ assister }}
-            </button>
-          </span>
-        </div>
-        <br>
-        <br>
-        <menu class="options">
-          <li><button class="pure-button pure-button-primary" @click="completeTask">Mark Completed</button></li>
-          <li><button class="button-error btn-small pure-button" @click="toggleComplete">Cancel</button></li>
-        </menu>
+    <div class="modal-content">
+      <button @click="toggleComplete" class="exit-btn">X</button>
+      <h1>Who helped you?</h1>
+      <div class="content">
+        <span v-for="(assister, index) in props.task.assisters.concat('I resolved it myself!')" :key="index">
+          <button :class="`pure-button assisterButton ${index === assisterIndex ? 'selectedAssistant' : 'unselectedAssistant'}`" @click="markAssister(index)">
+            {{ assister }}
+          </button>
+        </span>
+      </div>
+      <br />
+      <br />
+      <menu class="options">
+        <li><button class="pure-button pure-button-primary" @click="completeTask">Mark Completed</button></li>
+        <li><button class="button-error btn-small pure-button" @click="toggleComplete">Cancel</button></li>
+      </menu>
+    </div>
+  </div>
+  <div v-if="kudosAsk" class="modal-overlay">
+    <div class="modal-content">
+      <h1>Do you want to send kudos to your friend for their assistance on this task?</h1>
+      <menu class="options">
+        <li><button class="pure-button pure-button-primary" @click="sendKudos">Yes</button></li>
+        <li><button class="button-error btn-small pure-button" @click="toggleSend">No</button></li>
+      </menu>
+    </div>
+  </div>
+  <div v-if="sendingKudos" class="modal-overlay">
+    <div class="modal-content">
+      <h1>Compose a message to accompany your kudos!</h1>
+      <menu class="options">
+        <form class="pure-form pure-form-aligned" @submit.prevent="sendMessage">
+          <h3>Message</h3>
+          <div class="pure-control-group">
+            <input class="long-input" v-model="kudosMessage" id="aligned-name" placeholder="message" required />
+          </div>
+          <button type="submit" class="primary-button">send kudos!</button>
+        </form>
+      </menu>
     </div>
   </div>
   <div v-if="isOfferVisible" class="modal-overlay">
@@ -208,7 +263,7 @@ onBeforeMount(async () => {
         <p class="description" v-if="task.description">{{ props.task.description }}</p>
       </div>
       <menu class="confirmOptions">
-        <button @click="offerHelp" class = "pure-button-primary pure-button">Offer Help!</button>
+        <button @click="offerHelp" class="pure-button-primary pure-button">Offer Help!</button>
         <button @click="closeOfferModal" class="pure-button">Cancel</button>
       </menu>
     </div>
@@ -224,7 +279,7 @@ onBeforeMount(async () => {
         <p class="description" v-if="task.description">{{ props.task.description }}</p>
       </div>
       <menu class="confirmOptions">
-        <button @click="retractHelp" class = "pure-button button-error">Retract Help Offer</button>
+        <button @click="retractHelp" class="pure-button button-error">Retract Help Offer</button>
         <button @click="closeRetractModal" class="pure-button">Cancel</button>
       </menu>
     </div>
@@ -240,7 +295,7 @@ onBeforeMount(async () => {
         <p class="description" v-if="task.description">{{ props.task.description }}</p>
       </div>
       <menu class="confirmOptions">
-        <button @click="deleteTask" class = "pure-button button-error">Delete Task</button>
+        <button @click="deleteTask" class="pure-button button-error">Delete Task</button>
         <button @click="closeDeleteModal" class="pure-button">Cancel</button>
       </menu>
     </div>
@@ -248,7 +303,6 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
-
 .taskDesc {
   line-height: 2em;
 }
@@ -256,6 +310,14 @@ onBeforeMount(async () => {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+}
+
+.long-input {
+  width: 40em;
+  height: 3em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-left: 1em;
 }
 
 .confirmMenu {
@@ -275,7 +337,7 @@ img {
   height: 2em;
   aspect-ratio: 1;
   margin-right: 0.5em;
-  cursor:pointer;
+  cursor: pointer;
   border-radius: 1em;
 }
 
@@ -290,7 +352,6 @@ img {
 
 .selectedAssistant {
   font-weight: bold;
-
 }
 
 .assisterButton {

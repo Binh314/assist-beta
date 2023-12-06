@@ -35,7 +35,7 @@ async function register() {
   await loginUser(username.value, password.value);
   await attachTag(tag.value);
   void updateSession();
-  void router.push({ name: "Task" });
+  void router.push({ name: "Home" });
 }
 
 async function handleImageUpload(url: string) {
