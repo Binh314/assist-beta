@@ -99,6 +99,7 @@ async function logout() {
   height: 5vh; /* Adjust this value as needed */
   width: 5vh; /* Make width equal to height for a perfect circle */
   overflow: hidden; /* This will clip the corners of the image */
+  cursor: pointer;
 }
 
 .corner {
