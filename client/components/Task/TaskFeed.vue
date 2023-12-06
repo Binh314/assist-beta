@@ -24,16 +24,15 @@ const taskClasses = computed(() => {
   }
 
   for (const task of tasks.value) {
-    
     if (task.assisters.includes(currentUsername.value)) classes.set(task._id, "helpTask");
     else if (task.matched) classes.set(task._id, "matchedTask");
 
     // both matched and offered help
-    if (task.assisters.includes(currentUsername.value) && task.matched) classes.set(task._id, "matchedHelpTask")
+    if (task.assisters.includes(currentUsername.value) && task.matched) classes.set(task._id, "matchedHelpTask");
   }
 
   return classes;
-})
+});
 
 // to be implemented after task match is implemented. rn just calls getTasks
 async function getMatchedTasks(host?: string) {
@@ -80,13 +79,20 @@ onBeforeMount(async () => {
         </article>
       </div>
     </section>
-    <p v-else-if="loaded">No tasks found</p>
+    <p v-else-if="loaded">
+      <span>No tasks found</span>
+      <span v-if="!$props.requestedTasks">. <a @click="$router.push('friends')">Add Friends</a> to see their requests! </span>
+    </p>
     <p v-else>Loading...</p>
   </div>
 </template>
 
 <style scoped>
-
+a {
+  text-decoration: underline;
+  color: var(--purple);
+  cursor: pointer;
+}
 .matchedTask {
   border-style: solid;
   background-color: var(--light-pink);
