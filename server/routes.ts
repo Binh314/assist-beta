@@ -318,12 +318,12 @@ class Routes {
   }
 
   @Router.post("/kudo")
-  async sendKudo(session: WebSessionDoc, receiver: string, task: string, message: string) {
+  async sendKudo(session: WebSessionDoc, receiver: ObjectId, task: ObjectId, message: string) {
     const giver = WebSession.getUser(session);
-    const receiverId = new ObjectId(receiver);
-    const taskId = new ObjectId(task);
+    // const receiverId = new ObjectId(receiver);
+    // const taskId = new ObjectId(task);
 
-    return await Kudo.giveKudos(giver, receiverId, taskId, message);
+    return await Kudo.giveKudos(giver, receiver, task, message);
   }
 
   @Router.get("/kudo/task/:task")

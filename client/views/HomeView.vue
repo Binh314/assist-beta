@@ -8,6 +8,8 @@ import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const challenges = ref<Array<Record<string, string>>>([]);
+const progress = ref();
 const requestReminders = ref<Array<Record<string, string>>>([]);
 const offerReminders = ref<Array<Record<string, string>>>([]);
 
@@ -19,11 +21,30 @@ async function signup() {
   void router.push({ name: "Register" });
 }
 
+async function viewChallenges() {
+  void router.push({ name: "Challenges" });
+}
+
+async function getChallenges() {
+  try {
+    challenges.value = await fetchy(`/api/challenges`, "GET");
+    // for (const challenge in challenges) {
+    //   const num = await fetchy(`/api/challenges/${challenge}/progress`, "GET");
+    //   if (num) {
+    //     progress.value[challenge] = num;
+    //   }
+    // }
+  } catch (_) {
+    console.log(_);
+    return;
+  }
+}
+
 async function getTaskReminders() {
   try {
     requestReminders.value = await fetchy(`/api/reminders/all/taskRequest`, "GET");
     offerReminders.value = await fetchy(`/api/reminders/all/taskOffer`, "GET");
-  } catch(_) {
+  } catch (_) {
     console.log(_);
     return;
   }
@@ -32,7 +53,7 @@ async function getTaskReminders() {
 async function removeNotification(id: string) {
   try {
     await fetchy(`/api/reminders/${id}`, "DELETE");
-  } catch(_) {
+  } catch (_) {
     console.log(_);
     return;
   }
@@ -40,22 +61,27 @@ async function removeNotification(id: string) {
 }
 
 onBeforeMount(async () => {
+  await getChallenges();
   await getTaskReminders();
-})
-
+});
 </script>
 
 <template>
   <main>
     <section>
       <div v-if="isLoggedIn" class="page landing">
-        <img src="@/assets/images/tempChallenge.png" class="progress" />
-        <p>[challenge] - 64% complete</p>
-        <p class="link">view active challenges</p>
+        <div class="challenges">
+          <h3>Challenges:</h3>
+          <div v-for="challenge in challenges" :key="challenge._id">
+            <!-- <progress value="progress[challenge]" max="5"></progress> -->
+            <p class="challenge">{{ challenge.description }}</p>
+          </div>
+          <p class="link" @click="viewChallenges">view more details</p>
+        </div>
         <div class="notifications">
           <div class="offers" v-if="offerReminders.length > 0">
             <div v-for="reminder in offerReminders">
-              <HelpOffer :reminder="reminder" @removeNotification="removeNotification"/>
+              <HelpOffer :reminder="reminder" @removeNotification="removeNotification" />
             </div>
           </div>
           <div class="offers" v-else>
@@ -63,7 +89,7 @@ onBeforeMount(async () => {
           </div>
           <div class="requests" v-if="requestReminders.length > 0">
             <div v-for="reminder in requestReminders">
-              <HelpRequest :reminder="reminder" @removeNotification="removeNotification"/>
+              <HelpRequest :reminder="reminder" @removeNotification="removeNotification" />
             </div>
           </div>
           <div class="requests" v-else>
@@ -115,19 +141,32 @@ h1 {
   text-align: center;
 }
 
+h3 {
+  margin-top: 5em;
+}
+
 p {
   margin-top: 0.5em;
   margin-bottom: 0;
 }
 
+.challenge {
+  margin-top: 1em;
+}
+
 .link {
   color: #b7c2c8;
   background-color: white;
+  margin-top: 1.25em;
   margin-bottom: 0.5em;
 }
 
 .link:hover {
   cursor: pointer;
+}
+
+.challenges {
+  text-align: center;
 }
 
 .notifications {

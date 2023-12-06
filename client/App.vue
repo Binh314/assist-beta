@@ -46,7 +46,7 @@ async function logout() {
 <template>
   <header>
     <nav class="navigation">
-      <button v-if="isLoggedIn" class="expand" @click = "controlMenu">
+      <button v-if="isLoggedIn" class="expand" @click="controlMenu">
         <img class="expand-img" src="@/assets/images/hamburger_white.png" />
       </button>
       <div class="title">
@@ -55,7 +55,7 @@ async function logout() {
           <h1>Assist</h1>
         </RouterLink>
       </div>
-      
+
       <ul>
         <li v-if="isLoggedIn" @click="logout">
           <p class="button">Logout</p>
@@ -76,7 +76,7 @@ async function logout() {
     </RouterLink>
   </div>
   <NavMenu v-if="displayMenu" @selection="controlMenu" />
-  <RouterView :key="$route.fullPath" @click="hideMenu"/>
+  <RouterView :key="$route.fullPath" @click="hideMenu" />
 </template>
 
 <style scoped>
