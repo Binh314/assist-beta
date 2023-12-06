@@ -8,6 +8,7 @@ import EditProfileView from "../views/EditProfileView.vue";
 import RequestsView from "../views/FriendRequestsView.vue";
 import FriendsView from "../views/FriendsView.vue";
 import HomeView from "../views/HomeView.vue";
+import KudosView from "../views/KudosView.vue";
 import LoginView from "../views/LoginView.vue";
 import MessageView from "../views/MessageView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
@@ -121,7 +122,7 @@ const router = createRouter({
     {
       path: "/kudos",
       name: "Kudos",
-      component: NotFoundView,
+      component: KudosView,
       meta: { requiresAuth: true },
     },
     {
