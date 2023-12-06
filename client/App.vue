@@ -45,7 +45,7 @@ async function logout() {
 
 <template>
   <header>
-    <nav class="navigation">
+    <nav class="navigation" v-if="currentRouteName !== 'Home' && isLoggedIn">
       <button v-if="isLoggedIn" class="expand" @click="controlMenu">
         <img class="expand-img" src="@/assets/images/hamburger_white.png" />
       </button>
@@ -99,6 +99,7 @@ async function logout() {
   height: 5vh; /* Adjust this value as needed */
   width: 5vh; /* Make width equal to height for a perfect circle */
   overflow: hidden; /* This will clip the corners of the image */
+  cursor: pointer;
 }
 
 .corner {

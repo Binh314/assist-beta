@@ -30,7 +30,7 @@ function updateRoute(newRoute: string) {
 .nav-menu {
   position: fixed;
   left: 0;
-  width:  25%;
+  width: 25%;
   height: 100vh;
   background-color: var(--deep-purple);
   display: flex;
@@ -39,7 +39,7 @@ function updateRoute(newRoute: string) {
   z-index: 1000; /* Ensure it's above other content */
 }
 
-.column{
+.column {
   width: 100%;
 }
 
@@ -51,6 +51,7 @@ function updateRoute(newRoute: string) {
   font-size: 2.5vh;
   padding: 2vh;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .nav-selection:hover {
