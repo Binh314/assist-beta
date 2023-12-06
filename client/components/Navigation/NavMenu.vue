@@ -37,6 +37,7 @@ function updateRoute(newRoute: string) {
   justify-content: center;
   align-items: flex-start;
   z-index: 1000; /* Ensure it's above other content */
+  padding-top: 1em;
 }
 
 .column {
@@ -55,7 +56,7 @@ function updateRoute(newRoute: string) {
 }
 
 .nav-selection:hover {
-  background-color: var(--dark-purple);
+  background-color: var(--light-pink);
   color: white;
 }
 </style>

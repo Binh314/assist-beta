@@ -83,7 +83,7 @@ async function logout() {
 @import "./assets/toast.css";
 .navigation {
   height: 7vh;
-  padding-left: 1em;
+  padding-left: 0.5em;
   padding-right: 1em;
   padding-top: 0.5em;
   padding-bottom: 0.5em;
@@ -91,7 +91,12 @@ async function logout() {
 .expand {
   background-color: transparent;
   border: none;
-  padding: 1%;
+  margin-left: 0.25em;
+  margin-right: 0.5em;
+}
+
+.expand:hover {
+  background-color: var(--light-pink);
 }
 
 .expand-img {
