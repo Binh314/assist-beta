@@ -318,12 +318,11 @@ class Routes {
   }
 
   @Router.post("/kudo")
-  async sendKudo(session: WebSessionDoc, receiver: ObjectId, task: ObjectId, message: string) {
+  async sendKudo(session: WebSessionDoc, receiver: string, task: string, message: string) {
     const giver = WebSession.getUser(session);
-    // const receiverId = new ObjectId(receiver);
-    // const taskId = new ObjectId(task);
-
-    return await Kudo.giveKudos(giver, receiver, task, message);
+    const receiverId = new ObjectId(receiver);
+    const taskId = new ObjectId(task);
+    return await Kudo.giveKudos(giver, receiverId, taskId, message);
   }
 
   @Router.get("/kudo/task/:task")
@@ -360,7 +359,6 @@ class Routes {
 
   @Router.get("/kudo/receivedCount/:received")
   async getReceivedKudosCount(session: WebSessionDoc, receiver: string) {
-    const user = WebSession.getUser(session);
     const receiverId = new ObjectId(receiver);
 
     return await Kudo.getReceivedKudosCount(receiverId);

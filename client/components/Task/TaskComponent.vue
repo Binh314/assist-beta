@@ -86,11 +86,13 @@ const completeTask = async () => {
       },
     });
 
-    if (assister) {
-      kudosAsk.value = true;
-    } else {
-      emit("refreshTasks");
-    }
+    // TODO: uncomment this and delete line 94 (exists for testing purposes)
+    // if (assister) {
+    //   kudosAsk.value = true;
+    // } else {
+    //   emit("refreshTasks");
+    // }
+    kudosAsk.value = true;
   } catch (_) {
     return;
   }
@@ -103,12 +105,13 @@ function sendKudos() {
 
 async function sendMessage() {
   try {
+    // TODO: uncomment this and delete line 110
     // const assister = assisterIndex.value !== props.task.assisters.length ? props.task.assisters[assisterIndex.value] : null;
     const assister = assisterIndex.value !== props.task.assisters.length ? props.task.assisters[assisterIndex.value] : currentUsername.value;
     const assisterId = await fetchy(`/api/users/${assister}`, "GET");
     await fetchy(`/api/kudo`, "POST", {
       body: {
-        receiver: assisterId,
+        receiver: assisterId._id,
         task: props.task._id,
         message: kudosMessage.value,
       },
