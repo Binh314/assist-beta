@@ -10,8 +10,7 @@ const { loginUser, updateSession } = useUserStore();
 async function login() {
   await loginUser(username.value, password.value);
   void updateSession();
-  // void router.push({ name: "Home" });
-  void router.push({ name: "Task" });
+  void router.push({ name: "Home" });
 }
 </script>
 
