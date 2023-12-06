@@ -4,16 +4,19 @@ import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["kudo"]);
 
-const giver = ref("");
+const giver = ref<Record<string, string>>();
+const giverUsername = ref("");
 
 async function getGiver() {
-  giver.value = await fetchy(`/api/users/${props.kudo.giver}`, "GET");
+  giver.value = await fetchy(`/api/users/id/${props.kudo.giver}`, "GET");
+  giverUsername.value = giver.value ? giver.value.username : "";
 }
 
 onBeforeMount(async () => {
   try {
     await getGiver();
   } catch {
+    console.log("Error in getting giver of kudos");
     return;
   }
 });
@@ -21,16 +24,24 @@ onBeforeMount(async () => {
 
 <template>
   <div class="kudo">
-    <h2 class="giver">
-      <span class="name"> {{ giver }} </span>
-    </h2>
+    <h3 class="giver">
+      <span class="name"> {{ giverUsername }} </span>
+    </h3>
     <p>{{ props.kudo.message }}</p>
   </div>
 </template>
 
 <style scoped>
-.taskDesc {
-  line-height: 2em;
+.kudo {
+  padding: 1em;
+  height: 10em;
+  background-color: var(--base-bg);
+  border-radius: 1em;
+  overflow-y: auto;
+}
+
+p {
+  padding-top: 0.5em;
 }
 .confirmOptions {
   display: flex;

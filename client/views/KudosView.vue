@@ -12,14 +12,15 @@ let kudos = ref<Array<Record<string, string>>>([]);
 
 async function getKudos() {
   const receiver = await fetchy(`/api/users/${currentUsername.value}`, "GET");
+  const id = receiver._id;
   let kudosResults;
   try {
-    kudosResults = await fetchy(`/api/kudo/received/${receiver._id}`, "GET");
+    kudosResults = await fetchy(`/api/kudo/received/${id}`, "GET");
   } catch (_) {
-    console.log('This is failing get kudos');
+    console.log("This is failing to get kudos");
     return;
   }
-  kudos.value = kudosResults;
+  kudos.value = kudosResults.reverse();
 }
 
 onBeforeMount(async () => {
@@ -33,7 +34,7 @@ onBeforeMount(async () => {
     <h1>kudos</h1>
     <section class="kudos" v-if="loaded && kudos.length !== 0">
       <div v-for="kudo in kudos" :key="kudo._id">
-        <KudosComponent kudo="kudo" />
+        <KudosComponent :kudo="kudo" />
       </div>
     </section>
     <p v-else-if="loaded">No kudos found.</p>
@@ -46,10 +47,13 @@ main {
   margin-left: 1.5em;
 }
 section {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2em;
+  /* grid-auto-rows: minmax(5px, auto); */
+  width: 95%;
+  padding: 0 1em;
+  /* justify-content: center; */
 }
 
 p {
