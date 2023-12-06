@@ -16,8 +16,8 @@ function updateRoute(newRoute: string) {
   <aside class="nav-menu">
     <div class="column">
       <button class="nav-selection" @click="updateRoute('/tasks')">Tasks</button>
-      <button class="nav-selection" @click="updateRoute('/friends')">Friends</button>
       <button class="nav-selection" @click="updateRoute('/messages')">Messages</button>
+      <button class="nav-selection" @click="updateRoute('/friends')">Friends</button>
       <button class="nav-selection" @click="updateRoute('/challenges')">Challenges</button>
       <button class="nav-selection" @click="updateRoute('/kudos')">Kudos</button>
       <button class="nav-selection" @click="updateRoute(`/profile/${currentUsername}`)">Profile</button>
