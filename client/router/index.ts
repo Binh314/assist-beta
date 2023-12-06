@@ -36,7 +36,7 @@ const router = createRouter({
       path: "/tasks",
       name: "Task",
       component: TaskView,
-      // meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
     },
     {
       path: "/create",
