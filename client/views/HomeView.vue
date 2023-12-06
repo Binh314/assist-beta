@@ -77,7 +77,10 @@ onBeforeMount(async () => {
 
       <div v-else class="page not-login">
         <div class="auth-container">
-          <span class="title">Welcome to Assist</span>
+          <div class = "column title-container">
+              <span class="title">Welcome to Assist </span>
+              <span class = "description">A community of support by matching individuals who need help with those eager to offer it in their areas of expertise or interest</span>
+          </div>
           <div class="button-group">
             <button class="btn-container" @click="signup">Sign up</button>
             <button class="btn-container" @click="login">Login</button>
@@ -90,6 +93,12 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+.description{
+  font-size: 18px;
+  color: var(--deep-purple);
+  background-color: rgb(229, 204, 244,0.9);
+  padding: 1%;
+}
 .auth-container {
   display: flex;
   flex-direction: column; /* Stack items vertically */
@@ -108,6 +117,9 @@ onBeforeMount(async () => {
   padding: 1%;
 }
 
+.title-container{
+  margin-bottom: 55vh;
+}
 
 .btn-container{
   background-color: var(--light-pink);
@@ -141,7 +153,7 @@ onBeforeMount(async () => {
 
 .not-login{
   background-image: url(../assets/images/background.jpeg);
-  height: 91vh;
+  height: 100vh;
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
