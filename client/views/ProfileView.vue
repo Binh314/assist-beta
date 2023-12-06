@@ -26,6 +26,14 @@ function editProfile() {
   router.push("/profile/edit");
 }
 
+function gotoKudos() {
+  router.push("/kudos");
+}
+
+async function goToMessages() {
+  void router.push(`/messages/${username.value}`);
+}
+
 onMounted(async () => {
   if (props.user !== undefined && props.user !== currentUsername && typeof props.user === "string") {
     try {
@@ -64,8 +72,11 @@ onMounted(async () => {
 <template>
   <div class="column">
     <ProfilePicture :pictureLink="profilePicture" />
-    <span class="username">{{ username }}</span>
-    <span class="subtitle">kudos: {{ kudos }}</span>
+    <span class="username">{{ username }} 
+      <font-awesome-icon v-if="username !== currentUsername"
+      class="icon clickable messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages"/>
+    </span>
+    <span class="kudos" @click = "gotoKudos" >kudos: {{ kudos }}</span>
     <div v-if="username == currentUsername" class="button-container">
       <button class="primary-button" @click="editProfile">Edit Profile</button>
     </div>
@@ -109,6 +120,21 @@ onMounted(async () => {
   color: var(--dark-purple);
 }
 
+.kudos {
+  font-size: 2.75vh;
+  font-weight: 550;
+  color: var(--dark-purple);
+}
+
+.kudos:hover {
+  font-size: 2.75vh;
+  font-weight: 550;
+  color: var(--deep-purple);
+  background-color: var(--light-pink);
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
 .badges-container {
   display: flex;
   flex-direction: row;
@@ -117,5 +143,12 @@ onMounted(async () => {
 
 .tags {
   color: var(--deep-purple);
+}
+
+.icon {
+  width: 1em;
+}
+.messageIcon:hover {
+  cursor: pointer;
 }
 </style>

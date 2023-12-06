@@ -50,8 +50,8 @@ async function logout() {
         <img class="expand-img" src="@/assets/images/hamburger_white.png" />
       </button>
       <div class="title">
-        <img src="@/assets/images/temp_logo.png" />
-        <RouterLink :to="{ name: 'Home' }">
+        <RouterLink :to="{ name: 'Home' }" class="title">
+          <img src="@/assets/images/temp_logo.png" />
           <h1>Assist</h1>
         </RouterLink>
       </div>
@@ -76,7 +76,7 @@ async function logout() {
     </RouterLink>
   </div>
   <NavMenu v-if="displayMenu" @selection="controlMenu" />
-  <RouterView :key="$route.fullPath" />
+  <RouterView :key="$route.fullPath" @click="hideMenu"/>
 </template>
 
 <style scoped>
@@ -139,7 +139,7 @@ h1 {
 }
 
 img {
-  height: 2em;
+  height: 7vh;
 }
 
 a {

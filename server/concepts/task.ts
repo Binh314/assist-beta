@@ -42,6 +42,12 @@ export default class TaskConcept {
     return tasks;
   }
 
+  async getTaskById(_id: ObjectId) {
+    const task = await this.tasks.readOne({ _id });
+    if (!task) throw new NotFoundError("Task not found!");
+    return task;
+  }
+
   async getTasksByRequester(requester: ObjectId) {
     return await this.getTasks({ requester, completed: false });
   }
@@ -156,7 +162,7 @@ export default class TaskConcept {
       throw new NotFoundError(`Task ${_id} does not exist!`);
     }
     const assisters = task.assisters.map((e) => e.toString());
-    if (assisters.includes(assister.toString())) {
+    if (assisters.map((assister) => assister.toString()).includes(assister.toString())) {
       throw new NotAllowedError("Person is already an assister.");
     }
   }
@@ -167,7 +173,7 @@ export default class TaskConcept {
       throw new NotFoundError(`Task ${_id} does not exist!`);
     }
     const assisters = task.assisters.map((e) => e.toString());
-    if (!assisters.includes(assister.toString())) {
+    if (!assisters.map((assister) => assister.toString()).includes(assister.toString())) {
       throw new NotAllowedError("Person is not an assister.");
     }
   }

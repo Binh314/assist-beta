@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import { BadValuesError, NotAllowedError } from "./concepts/errors";
 import { Router, getExpressRouter } from "./framework/router";
 
+import schedule from "node-schedule";
 import { Badge, Challenge, Friend, Kudo, Match, Message, Post, Reminder, Tag, Task, User, WebSession } from "./app";
 import { ChallengeDoc } from "./concepts/challenge";
 import { PostDoc, PostOptions } from "./concepts/post";
@@ -11,6 +12,38 @@ import { TaskDoc } from "./concepts/task";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import Responses from "./responses";
+
+schedule.scheduleJob({ hour: 0, minute: 0, dayOfWeek: 0 }, function () {
+  void resetChallenges();
+});
+
+/**
+ * Reset challenges for the week. Should be automatically called weekly.
+ * @param helpGoal optional, default = 5. number of tasks users need to help with this week
+ * @param taskGoal optional, default = 5. number of tasks users need to complete this week
+ */
+async function resetChallenges(helpGoal = 5, taskGoal = 5) {
+  const challenges = [
+    {
+      name: "Help Friends!",
+      description: `Help with ${helpGoal} tasks this week.`,
+      goal: helpGoal,
+      reward: new ObjectId("6567e30d37085155a767d595"),
+    },
+    {
+      name: "Complete Tasks!",
+      description: `Complete ${taskGoal} tasks this week.`,
+      goal: taskGoal,
+      reward: new ObjectId("6567e42337085155a767d596"),
+    },
+  ];
+  const now = new Date();
+  const deadline = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // Add milliseconds for one week
+
+  for (const challenge of challenges) {
+    await Challenge.create(challenge.name, challenge.description, challenge.goal, deadline, challenge.reward);
+  }
+}
 
 class Routes {
   @Router.get("/session")
@@ -29,7 +62,7 @@ class Routes {
     return await User.getUserByUsername(username);
   }
 
-  @Router.get("/users/:userID")
+  @Router.get("/users/id/:userID")
   async getUsername(userID: ObjectId) {
     return await User.getUserById(userID);
   }
@@ -148,7 +181,7 @@ class Routes {
    *          "received" if you have a pending request from them, "non" if no friendship or requests
    */
   @Router.get("/friend/status/:other")
-  async getOutgoingRequests(session: WebSessionDoc, other: string) {
+  async getFriendStatus(session: WebSessionDoc, other: string) {
     const user = WebSession.getUser(session);
     const otherId = (await User.getUserByUsername(other))._id;
     return await Friend.getStatus(user, otherId);
@@ -164,13 +197,28 @@ class Routes {
   async sendFriendRequest(session: WebSessionDoc, to: string) {
     const user = WebSession.getUser(session);
     const toId = (await User.getUserByUsername(to))._id;
-    return await Friend.sendRequest(user, toId);
+
+    const username = (await User.getUserById(user)).username;
+
+    const result = await Friend.sendRequest(user, toId);
+
+    // TODO: Modify Friend reminder to fit frontend implementation
+    const requests = await Friend.getRequests(user);
+    const id = requests.filter((request) => request.to.toString() === toId.toString())[0]._id;
+    if (id) await Reminder.create(toId, `You have a friend request from ${username}!`, "friendRequest", id, 24);
+
+    return result;
   }
 
   @Router.delete("/friend/requests/:to")
   async removeFriendRequest(session: WebSessionDoc, to: string) {
     const user = WebSession.getUser(session);
     const toId = (await User.getUserByUsername(to))._id;
+
+    const requests = await Friend.getRequests(user);
+    const id = requests.filter((request) => request.to.toString() === toId.toString())[0]._id;
+    if (id) await Reminder.deleteByContent(id);
+
     return await Friend.removeRequest(user, toId);
   }
 
@@ -178,6 +226,12 @@ class Routes {
   async acceptFriendRequest(session: WebSessionDoc, from: string) {
     const user = WebSession.getUser(session);
     const fromId = (await User.getUserByUsername(from))._id;
+
+    const username = (await User.getUserById(user)).username;
+
+    // TODO: Modify Reminder to work with frontend implementation
+    await Reminder.create(fromId, `${username} accepted your friend request!`, "friendAccept", user);
+
     return await Friend.acceptRequest(fromId, user);
   }
 
@@ -320,25 +374,27 @@ class Routes {
 
   // Task
 
-  @Router.get("/tasks")
-  async getTasks(requester?: string) {
-    let tasks;
-    if (requester) {
-      const id = (await User.getUserByUsername(requester))._id;
-      tasks = await Task.getTasksByRequester(id);
-    } else {
-      tasks = await Task.getTasks({ completed: false });
-    }
-    return Responses.tasks(tasks);
-  }
+  // @Router.get("/tasks")
+  // async getTasks(requester?: string) {
+  //   let tasks;
+  //   if (requester) {
+  //     const id = (await User.getUserByUsername(requester))._id;
+  //     tasks = await Task.getTasksByRequester(id);
+  //   } else {
+  //     tasks = await Task.getTasks({ completed: false });
+  //   }
+  //   return Responses.tasks(tasks);
+  // }
 
   @Router.get("/tasks/matched")
   async getMatchedTasks(session: WebSessionDoc) {
     const user = await WebSession.getUser(session);
     const userTags = (await Tag.getTagsByItemId(user)).map((tag) => tag.name);
 
+    const friends = await Friend.getFriends(user);
+
     // other user's tasks that have not passed deadline and is not completed
-    const tasks = await Task.getTasks({ requester: { $ne: user }, deadline: { $gte: new Date() }, completed: false });
+    const tasks = await Task.getTasks({ requester: { $ne: user, $in: friends }, deadline: { $gte: new Date() }, completed: false });
 
     const matchedTasksHelped: TaskDoc[] = [];
     const matchedTasks: TaskDoc[] = [];
@@ -404,14 +460,8 @@ class Routes {
    */
   @Router.get("/tasks/id/:id")
   async getTask(id: string) {
-    let tasks;
-    if (id) {
-      const _id = new ObjectId(id);
-      tasks = await Task.getTasks({ _id });
-    } else {
-      tasks = await Task.getTasks({});
-    }
-    return Responses.tasks(tasks);
+    const _id = new ObjectId(id);
+    return Responses.task(await Task.getTaskById(_id));
   }
 
   /**
@@ -429,12 +479,15 @@ class Routes {
     const created = await Task.create(user, title, description, dl, files);
 
     // attach tags
-    if (created.task)
-      for (const tag of tags) {
-        Tag.create(created.task._id, tag);
-      }
+    if (created.task) {
+      for (const tag of tags) Tag.create(created.task._id, tag);
 
-    // TODO: REMINDER SYNC
+      const friends = await Friend.getFriends(user);
+      for (const friend of friends) {
+        const username = (await User.getUserById(user)).username;
+        await Reminder.create(friend, `Help Request from ${username} on ${created.task.title}!`, "taskRequest", created.task._id);
+      }
+    }
 
     return { msg: created.msg, task: await Responses.task(created.task) };
   }
@@ -458,6 +511,9 @@ class Routes {
   async deleteTask(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
     await Task.isRequester(user, _id);
+
+    await Reminder.deleteByContent(new ObjectId(_id.toString()));
+
     return await Task.delete(_id);
   }
 
@@ -473,22 +529,39 @@ class Routes {
 
     // requester resolved the task without any help
     if (!assister) {
-      return await Task.complete(_id);
+      const result = await Task.complete(_id);
+
+      // check "complete tasks" challenge
+      const challenges = await Challenge.getActiveChallenges();
+      for (const challenge of challenges) {
+        if (challenge.name === "Complete Tasks!" && !(await Challenge.hasCompleted(challenge._id, user))) {
+          const progress = await getChallengeProgressHelper(user, challenge);
+          const result = await Challenge.completeChallenge(challenge._id, user, progress);
+          if (result.reward) {
+            await Badge.awardBadge(result.reward, user);
+          }
+        }
+      }
+
+      return result;
     }
 
     const userId = (await User.getUserByUsername(assister))._id;
     const result = await Task.complete(_id, userId);
 
+    // TODO: Modify Kudos Reminder to fit implementation of kudos frontend
+    await Reminder.create(user, `Don't forget to give a kudos to ${assister}!`, "kudos", userId);
+
     // Check if completing this task completes any new challenges, and award badges if needed
     const challenges = await Challenge.getActiveChallenges();
     for (const challenge of challenges) {
-      if (challenge.name === "Complete Tasks!" && !Challenge.hasCompleted(challenge._id, user)) {
+      if (challenge.name === "Complete Tasks!" && !(await Challenge.hasCompleted(challenge._id, user))) {
         const progress = await getChallengeProgressHelper(user, challenge);
         const result = await Challenge.completeChallenge(challenge._id, user, progress);
         if (result.reward) {
           await Badge.awardBadge(result.reward, user);
         }
-      } else if (challenge.name === "Help Friends!" && !Challenge.hasCompleted(challenge._id, user)) {
+      } else if (challenge.name === "Help Friends!" && !(await Challenge.hasCompleted(challenge._id, userId))) {
         const progress = await getChallengeProgressHelper(userId, challenge);
         const result = await Challenge.completeChallenge(challenge._id, userId, progress);
         if (result.reward) {
@@ -503,13 +576,20 @@ class Routes {
   @Router.patch("/tasks/:_id/help/offer")
   async offerTaskHelp(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
-    // TODO: REMIND SYNC
+
+    const task = await Task.getTaskById(_id);
+    const username = (await User.getUserById(user)).username;
+
+    await Reminder.create(task.requester, `Help offer from ${username} on ${task.title}!`, "taskOffer", user);
     return await Task.offerHelp(user, _id);
   }
 
   @Router.patch("/tasks/:_id/help/retract")
   async retractTaskHelp(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
+
+    Reminder.delete({ contentId: user, type: "taskOffer" });
+
     return await Task.retractHelp(user, _id);
   }
 
@@ -517,35 +597,6 @@ class Routes {
   async viewTask(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
     return await Task.view(user, _id);
-  }
-
-  /**
-   * Reset challenges for the week. Should be automatically called weekly.
-   * @param helpGoal optional, default = 5. number of tasks users need to help with this week
-   * @param taskGoal optional, default = 5. number of tasks users need to complete this week
-   */
-  @Router.post("/challenges")
-  async resetChallenges(helpGoal = 5, taskGoal = 5) {
-    const challenges = [
-      {
-        name: "Help Friends!",
-        description: `Help with ${helpGoal} tasks this week.`,
-        goal: helpGoal,
-        reward: new ObjectId("6567e30d37085155a767d595"),
-      },
-      {
-        name: "Complete Tasks!",
-        description: `Complete ${taskGoal} tasks this week.`,
-        goal: taskGoal,
-        reward: new ObjectId("6567e42337085155a767d596"),
-      },
-    ];
-    const now = new Date();
-    const deadline = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // Add milliseconds for one week
-
-    for (const challenge of challenges) {
-      await Challenge.create(challenge.name, challenge.description, challenge.goal, deadline, challenge.reward);
-    }
   }
 
   @Router.get("/challenges")
@@ -583,18 +634,25 @@ class Routes {
 
   // Reminders
 
-  @Router.get("/reminders/new")
+  @Router.get("/reminders/new/:type")
   async getNewReminders(session: WebSessionDoc, type?: string) {
     const user = await WebSession.getUser(session);
     const reminders: ReminderDoc[] = await Reminder.getNewReminders(user, type);
     return reminders;
   }
 
-  @Router.get("/reminders")
+  @Router.get("/reminders/all/:type")
   async getReminders(session: WebSessionDoc, type?: string) {
     const user = await WebSession.getUser(session);
-    const reminders: ReminderDoc[] = await Reminder.getReminders(user, type);
+    const reminders = await Reminder.getReminders(user, type);
     return reminders;
+  }
+
+  @Router.delete("/reminders/:id")
+  async deleteReminder(session: WebSessionDoc, id: string) {
+    const user = WebSession.getUser(session);
+    await Reminder.isRecipient(user, new ObjectId(id));
+    return await Reminder.deleteById(new ObjectId(id));
   }
 }
 
