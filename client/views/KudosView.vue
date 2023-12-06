@@ -12,12 +12,11 @@ let kudos = ref<Array<Record<string, string>>>([]);
 
 async function getKudos() {
   const receiver = await fetchy(`/api/users/${currentUsername.value}`, "GET");
-  console.log(receiver._id);
   let kudosResults;
   try {
     kudosResults = await fetchy(`/api/kudo/received/${receiver._id}`, "GET");
   } catch (_) {
-    console.log(receiver);
+    console.log('This is failing get kudos');
     return;
   }
   kudos.value = kudosResults;

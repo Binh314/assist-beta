@@ -333,7 +333,7 @@ class Routes {
     return await Kudo.getKudoForTask(taskId);
   }
 
-  @Router.get("/kudo/received/:received")
+  @Router.get("/kudo/received/:receiver")
   async getReceivedKudosOfUser(session: WebSessionDoc, receiver: string) {
     const user = WebSession.getUser(session);
     const receiverId = new ObjectId(receiver);
@@ -341,7 +341,7 @@ class Routes {
     return await Kudo.getReceivedKudosOfUser(receiverId);
   }
 
-  @Router.get("/kudo/given/:given")
+  @Router.get("/kudo/given/:giver")
   async getGivenKudosOfUser(session: WebSessionDoc, giver: string) {
     const user = WebSession.getUser(session);
     const giverId = new ObjectId(giver);
@@ -349,7 +349,7 @@ class Routes {
     return await Kudo.getGivenKudosOfUser(giverId);
   }
 
-  @Router.get("/kudo/givenCount/:given")
+  @Router.get("/kudo/givenCount/:giver")
   async getGivenKudosCount(session: WebSessionDoc, giver: string) {
     const user = WebSession.getUser(session);
     const giverId = new ObjectId(giver);
@@ -357,7 +357,7 @@ class Routes {
     return await Kudo.getGivenKudosCount(giverId);
   }
 
-  @Router.get("/kudo/receivedCount/:received")
+  @Router.get("/kudo/receivedCount/:receiver")
   async getReceivedKudosCount(session: WebSessionDoc, receiver: string) {
     const receiverId = new ObjectId(receiver);
 
