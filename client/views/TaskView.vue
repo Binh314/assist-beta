@@ -10,12 +10,13 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
   <main>
     <section>
       <div class="taskFeed">
-        <h1>my tasks</h1>
+        <h1>
+          my tasks
+          <div class="create" @click="$router.push({ name: 'Create' })">
+            <span class="material-symbols-outlined" style="font-size: 1em">add_circle</span>
+          </div>
+        </h1>
         <TaskFeed :requestedTasks="true" />
-        <div class="create" @click="$router.push({ name: 'Create' })">
-          <span class="material-symbols-outlined" style="font-size: 2em">add_circle</span>
-          <h3>Create New Task</h3>
-        </div>
       </div>
       <div class="taskFeed">
         <h1>requests from friends <font-awesome-icon :icon="['fas', 'shuffle']" size="sm" class="icon" /></h1>
@@ -51,8 +52,7 @@ h1 {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 1em;
-  margin: 1em 0.5em;
+  margin-left: 0.25em;
 }
 
 .create:hover {

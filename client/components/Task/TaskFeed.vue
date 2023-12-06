@@ -81,7 +81,7 @@ onBeforeMount(async () => {
     </section>
     <p v-else-if="loaded">
       <span>No tasks found</span>
-      <span v-if="!$props.requestedTasks">. <a @click="$router.push('friends')">Add Friends</a> to see their requests! </span>
+      <span v-if="!$props.requestedTasks">. <a @click="$router.push('friends')">Add friends</a> to see their requests! </span>
     </p>
     <p v-else>Loading...</p>
   </div>
