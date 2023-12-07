@@ -305,6 +305,7 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+
 .taskDesc {
   line-height: 2em;
 }

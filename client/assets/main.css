@@ -49,6 +49,10 @@ a.button {
   height: 5vh;
 }
 
+.pure-button-primary .pure-button{
+  background-color: var(--purple) !important;
+}
+
 .primary-button{
   background-color: var(--purple);
   border: none;
@@ -64,6 +68,22 @@ a.button {
 
 .primary-button:hover{
   background-color: var(--dark-purple);
+}
+
+.pure-button-primary{
+  background-color: var(--purple) !important;
+}
+
+.pure-button{
+  background-color: var(--purple) !important;
+}
+
+.pure-button-primary:hover{
+  background-color: var(--dark-purple) !important;
+}
+
+.pure-button:hover{
+  background-color: var(--dark-purple) !important;
 }
 
 .ProfilePicture {
