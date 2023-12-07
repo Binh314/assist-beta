@@ -70,8 +70,8 @@ onBeforeMount(async () => {
   <button v-else-if="status == 'friends'" class="button-error pure-button theme" @click="removeFriend">Remove Friend</button>
   <button v-else-if="status == 'sent'" class="button-error pure-button theme" @click="removeRequest">Unsend Friend Request</button>
   <div v-else-if="status == 'received'">
-    <button class="pure-button-primary pure-button" @click="acceptRequest">Accept Friend Request</button>
-    <button class="button-error pure-button" @click="rejectRequest">Reject Friend Request</button>
+    <button class="pure-button-primary pure-button theme space" @click="acceptRequest">Accept Friend Request</button>
+    <button class="button-error pure-button theme space" @click="rejectRequest">Reject Friend Request</button>
   </div>
 </template>
 
@@ -85,5 +85,10 @@ button {
 
 .theme:hover {
   background-color: var(--light-pink);
+}
+
+.space {
+  margin-left: 1em;
+  margin-right: 1em;
 }
 </style>
