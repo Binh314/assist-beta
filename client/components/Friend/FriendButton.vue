@@ -24,6 +24,7 @@ async function removeFriend() {
     return;
   }
   await getStatus();
+  closeDeleteModal();
 }
 
 async function acceptRequest() {
