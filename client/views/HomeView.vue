@@ -103,6 +103,7 @@ onBeforeMount(async () => {
           </div>
           <p class="link" @click="viewChallenges">view more details</p>
         </div>
+        <hr/>
         <div class="notifications">
           <div class="offers" v-if="offerReminders.length > 0">
             <div v-for="reminder in offerReminders">
@@ -148,6 +149,12 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+hr{
+  width: 90%;
+  color: var(--light-pink);
+  margin-top: 5vh;
+  margin-bottom: 5vh;
+}
 
 .closeButton {
   display: flex;
@@ -252,13 +259,17 @@ p {
 }
 
 .link {
-  color: #b7c2c8;
+  color: (--purple);
   background-color: white;
-  margin-top: 1.25em;
-  margin-bottom: 0.5em;
+  /* margin-top: 1.25em;
+  margin-bottom: 0.5em; */
+  padding: .5em;
+  border-radius: 5px;
 }
 
 .link:hover {
+  color: --deep-purple;
+  background-color: var(--light-pink);
   cursor: pointer;
 }
 
