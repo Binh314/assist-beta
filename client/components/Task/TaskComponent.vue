@@ -206,7 +206,7 @@ onBeforeMount(async () => {
   <div v-else-if="isLoggedIn" v-if="!props.task.completed">
     <div class="addTask">
       <button v-if="!offeredHelp" class="pure-button pure-button-primary" @click="openHelpModal">Offer Help!</button>
-      <button v-else class="pure-button button-error" @click="openRetractModal">Retract Help Offer</button>
+      <button v-else class="pure-button" @click="openRetractModal">Retract Help Offer</button>
     </div>
   </div>
   <!-- <div class="timestamp">
@@ -266,7 +266,7 @@ onBeforeMount(async () => {
       </div>
       <menu class="confirmOptions">
         <button @click="offerHelp" class="pure-button-primary pure-button">Offer Help!</button>
-        <button @click="closeOfferModal" class="pure-button">Cancel</button>
+        <button @click="closeOfferModal" class="pure-button button-error">Cancel</button>
       </menu>
     </div>
   </div>
@@ -281,8 +281,8 @@ onBeforeMount(async () => {
         <p class="description" v-if="task.description">{{ props.task.description }}</p>
       </div>
       <menu class="confirmOptions">
-        <button @click="retractHelp" class="pure-button button-error">Retract Help Offer</button>
-        <button @click="closeRetractModal" class="pure-button">Cancel</button>
+        <button @click="retractHelp" class="pure-button">Retract Help Offer</button>
+        <button @click="closeRetractModal" class="pure-button button-error">Cancel</button>
       </menu>
     </div>
   </div>
@@ -305,7 +305,6 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
-
 .taskDesc {
   line-height: 2em;
 }

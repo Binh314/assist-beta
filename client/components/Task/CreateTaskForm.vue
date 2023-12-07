@@ -37,7 +37,7 @@ const emptyForm = () => {
   title.value = "";
   location.value = "";
   description.value = "";
-  deadlineDate.value = formatDatepick(new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)));
+  deadlineDate.value = formatDatepick(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
 
   // set to the nearest future hour, or the hour after that if the time is past :30
   const nextHour = new Date();
@@ -53,7 +53,6 @@ const emptyForm = () => {
 onBeforeMount(async () => {
   emptyForm();
 });
-
 </script>
 
 <!-- Source for Preventing Submission on Enter:
@@ -84,7 +83,7 @@ onBeforeMount(async () => {
     <br />
     <menu>
       <li><button type="submit" class="pure-button-primary pure-button">Create Task</button></li>
-      <li><button class="pure-button" @click.prevent="emit('refreshTasks')">Cancel</button></li>
+      <li><button class="pure-button button-error" @click.prevent="emit('refreshTasks')">Cancel</button></li>
     </menu>
   </form>
 </template>
