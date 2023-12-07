@@ -39,7 +39,9 @@ async function updateUsername() {
 <template>
     <div v-if="isVisible" class="modal-overlay">
       <div class="modal-content">
-        <button @click="closeModal" class = "exit-btn">X</button>
+        <button @click="closeModal" class = "exit-btn">
+          <font-awesome-icon :icon="['fas', 'x']" size="lg"/>
+        </button>
         <form  @submit.prevent="updateUsername">
             <h1>Update Username</h1>
             <fieldset class = "column">
@@ -66,5 +68,10 @@ async function updateUsername() {
   fieldset{
     border: none;
   }
+
+  .exit-btn:hover {
+    cursor: pointer;
+  }
+
   </style>
   

@@ -45,8 +45,8 @@ async function logout() {
 
 <template>
   <header>
-    <nav class="navigation" v-if="currentRouteName !== 'Home' || isLoggedIn">
-      <button v-if="isLoggedIn" class="expand" @click="controlMenu">
+    <nav class="navigation" v-if="currentRouteName !== 'Home' || isLoggedIn" @click="hideMenu">
+      <button v-if="isLoggedIn" class="expand" @click.stop="controlMenu">
         <img class="expand-img" src="@/assets/images/hamburger_white.png" />
       </button>
       <div class="title">
