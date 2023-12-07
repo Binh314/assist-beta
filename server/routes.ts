@@ -14,7 +14,7 @@ import { WebSessionDoc } from "./concepts/websession";
 import Responses from "./responses";
 
 schedule.scheduleJob({ hour: 0, minute: 0, dayOfWeek: 0 }, function () {
-  void resetChallenges();
+  void resetChallenges(2, 2);
 });
 
 /**
