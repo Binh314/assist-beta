@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TagsInput from "@/components/Tag/TagsInput.vue";
 import { formatDatepick, formatTimepick, toDateString } from "@/utils/formatDate";
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const title = ref("");
@@ -37,11 +37,23 @@ const emptyForm = () => {
   title.value = "";
   location.value = "";
   description.value = "";
-  deadlineDate.value = formatDatepick(new Date());
-  deadlineTime.value = formatTimepick(new Date());
+  deadlineDate.value = formatDatepick(new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)));
+
+  // set to the nearest future hour, or the hour after that if the time is past :30
+  const nextHour = new Date();
+  nextHour.setMinutes(nextHour.getMinutes() + 30);
+  nextHour.setHours(nextHour.getHours() + 1);
+  nextHour.setMinutes(0, 0, 0);
+  deadlineTime.value = formatTimepick(nextHour);
+
   tags.value.length = 0;
   files.value.length = 0;
 };
+
+onBeforeMount(async () => {
+  emptyForm();
+});
+
 </script>
 
 <!-- Source for Preventing Submission on Enter:

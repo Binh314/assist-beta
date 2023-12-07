@@ -35,7 +35,9 @@ async function Logout() {
 <template>
     <div v-if="isVisible" class="modal-overlay">
       <div class="modal-content">
-        <button @click="closeModal" class = "exit-btn">X</button>
+        <button @click="closeModal" class = "exit-btn">
+          <font-awesome-icon :icon="['fas', 'x']" size="lg"/>
+        </button>
         <form  @submit.prevent="Logout">
             <h1>Log Out</h1>
             <div class = "btn-container">
@@ -68,6 +70,10 @@ async function Logout() {
 
   fieldset{
     border: none;
+  }
+
+  .exit-btn:hover {
+    cursor: pointer;
   }
 
   </style>

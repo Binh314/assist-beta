@@ -1,12 +1,12 @@
 <script setup lang="ts">
 // import { ref } from "vue";
-import router from "@/router";
 
 const props = defineProps(["reminder"]);
-const emit = defineEmits(["removeNotification"]);
+const emit = defineEmits(["removeNotification", "showTask"]);
 
 async function goToTask() {
-  router.push(`/task/${props.reminder.contentId}`);
+  // router.push(`/task/${props.reminder.contentId}`);
+  emit('showTask', props.reminder.contentId);
 }
 </script>
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import router from "@/router";
 import { useUserStore } from "@/stores/user";
-import { formatDate, formatTaskDate } from "@/utils/formatDate";
+import { formatTaskDate } from "@/utils/formatDate";
 import { storeToRefs } from "pinia";
 import { computed, onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
@@ -192,7 +192,10 @@ onBeforeMount(async () => {
   <p class="description" v-if="task.description">{{ props.task.description }}</p>
 
   <br />
-  <div v-if="props.task.requester == currentUsername">
+
+  <h2 class="completed" v-if="task.completed"><font-awesome-icon :icon="['fas', 'square-check']" size="lg" class="icon" /> This task has been completed.</h2>
+
+  <div v-if="props.task.requester == currentUsername && !task.completed">
     <menu class="options">
       <li><button v-if="!props.task.completed" class="btn-small pure-button" @click="emit('editTask', props.task._id)">Edit</button></li>
       <li><button class="button-error btn-small pure-button" @click="openDeleteModal">Delete</button></li>
@@ -206,13 +209,12 @@ onBeforeMount(async () => {
       <button v-else class="pure-button button-error" @click="openRetractModal">Retract Help Offer</button>
     </div>
   </div>
-  <div class="timestamp">
+  <!-- <div class="timestamp">
     <p v-if="props.task.dateCreated !== props.task.dateUpdated">Edited on: {{ formatDate(props.task.dateUpdated) }}</p>
     <p v-else>Created on: {{ formatDate(props.task.dateCreated) }}</p>
-  </div>
+  </div> -->
   <div v-if="completing" class="modal-overlay">
     <div class="modal-content">
-      <button @click="toggleComplete" class="exit-btn">X</button>
       <h1>Who helped you?</h1>
       <div class="content">
         <span v-for="(assister, index) in props.task.assisters.concat('I resolved it myself!')" :key="index">
@@ -223,18 +225,18 @@ onBeforeMount(async () => {
       </div>
       <br />
       <br />
-      <menu class="options">
+      <menu class="confirmOptions">
         <li><button class="pure-button pure-button-primary" @click="completeTask">Mark Completed</button></li>
-        <li><button class="button-error btn-small pure-button" @click="toggleComplete">Cancel</button></li>
+        <li><button class="button-error pure-button" @click="toggleComplete">Cancel</button></li>
       </menu>
     </div>
   </div>
   <div v-if="kudosAsk" class="modal-overlay">
     <div class="modal-content">
-      <h1>Do you want to send kudos to your friend for their assistance on this task?</h1>
-      <menu class="options">
+      <h1>Do you want to send kudos to {{ $props.task.assisters[assisterIndex] }}?</h1>
+      <menu class="confirmOptions">
         <li><button class="pure-button pure-button-primary" @click="sendKudos">Yes</button></li>
-        <li><button class="button-error btn-small pure-button" @click="toggleSend">No</button></li>
+        <li><button class="button-error pure-button" @click="toggleSend">No</button></li>
       </menu>
     </div>
   </div>
@@ -303,6 +305,7 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+
 .taskDesc {
   line-height: 2em;
 }

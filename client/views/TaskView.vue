@@ -11,7 +11,7 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
     <section>
       <div class="taskFeed">
         <h1>
-          my tasks
+          My Tasks
           <div class="create" @click="$router.push({ name: 'Create' })">
             <span class="material-symbols-outlined" style="font-size: 1em">add_circle</span>
           </div>
@@ -19,7 +19,7 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
         <TaskFeed :requestedTasks="true" />
       </div>
       <div class="taskFeed">
-        <h1>requests from friends <font-awesome-icon :icon="['fas', 'shuffle']" size="sm" class="icon" /></h1>
+        <h1>Requests from Friends <font-awesome-icon :icon="['fas', 'shuffle']" size="sm" class="icon" /></h1>
         <TaskFeed :requestedTasks="false" />
       </div>
     </section>

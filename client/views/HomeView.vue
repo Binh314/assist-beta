@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import HelpOffer from "@/components/Task/HelpOffer.vue";
 import HelpRequest from "@/components/Task/HelpRequest.vue";
+import TaskComponent from "@/components/Task/TaskComponent.vue";
 import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
@@ -12,6 +13,9 @@ const challenges = ref<Array<Record<string, string>>>([]);
 const progress = ref();
 const requestReminders = ref<Array<Record<string, string>>>([]);
 const offerReminders = ref<Array<Record<string, string>>>([]);
+
+const task = ref<Record<string, string>>();
+const showingTask = ref(false);
 
 function login() {
   console.log(`login clicked`);
@@ -63,6 +67,24 @@ async function removeNotification(id: string) {
   await getTaskReminders();
 }
 
+async function showTask(id: string) {
+  try {
+    task.value = await fetchy(`/api/tasks/id/${id}`, "GET");
+    showingTask.value = true;
+  } catch(_) {
+    return;
+  }
+}
+
+async function refreshTask() {
+  if (task.value)
+    showTask(task.value._id);
+}
+
+async function closeShowTask() {
+  showingTask.value = false;
+}
+
 onBeforeMount(async () => {
   await getChallenges();
   await getTaskReminders();
@@ -81,6 +103,7 @@ onBeforeMount(async () => {
           </div>
           <p class="link" @click="viewChallenges">view more details</p>
         </div>
+        <hr/>
         <div class="notifications">
           <div class="offers" v-if="offerReminders.length > 0">
             <div v-for="reminder in offerReminders">
@@ -92,7 +115,7 @@ onBeforeMount(async () => {
           </div>
           <div class="requests" v-if="requestReminders.length > 0">
             <div v-for="reminder in requestReminders">
-              <HelpRequest :reminder="reminder" @removeNotification="removeNotification" />
+              <HelpRequest :reminder="reminder" @removeNotification="removeNotification" @showTask="showTask" />
             </div>
           </div>
           <div class="requests" v-else>
@@ -113,12 +136,39 @@ onBeforeMount(async () => {
           </div>
         </div>
       </div>
+    <div v-if="showingTask" class="modal-overlay">
+      <div class="modal-content task">
+        <div class="closeButton">
+          <font-awesome-icon :icon="['fas', 'x']" @click="closeShowTask" size="lg"/>
+        </div>
+        <TaskComponent :task="task" @refreshTasks="refreshTask"/>
+      </div>
+    </div>
     </section>
   </main>
 </template>
 
 <style scoped>
-.description {
+hr{
+  width: 90%;
+  color: var(--light-pink);
+  margin-top: 5vh;
+  margin-bottom: 5vh;
+}
+
+.closeButton {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.closeButton:hover {
+  cursor: pointer;
+}
+
+.task {
+  line-height: 2em;
+}
+.description{
   font-size: 18px;
   color: var(--deep-purple);
   background-color: rgb(229, 204, 244, 0.9);
@@ -209,13 +259,17 @@ p {
 }
 
 .link {
-  color: #b7c2c8;
+  color: (--purple);
   background-color: white;
-  margin-top: 1.25em;
-  margin-bottom: 0.5em;
+  /* margin-top: 1.25em;
+  margin-bottom: 0.5em; */
+  padding: .5em;
+  border-radius: 5px;
 }
 
 .link:hover {
+  color: --deep-purple;
+  background-color: var(--light-pink);
   cursor: pointer;
 }
 
