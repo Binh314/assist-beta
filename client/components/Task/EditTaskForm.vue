@@ -65,7 +65,7 @@ const editTask = async (title: string, description: string, deadlineDate: string
     <br>
     <menu>
       <li><button type="submit" class="btn-small pure-button-primary pure-button">Save</button></li>
-      <li><button class="btn-small pure-button" @click.prevent="emit('editTask')">Cancel</button></li>
+      <li><button class="btn-small pure-button button-error" @click.prevent="emit('editTask')">Cancel</button></li>
     </menu>
   </form>
 </template>

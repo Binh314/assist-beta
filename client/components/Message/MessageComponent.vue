@@ -109,7 +109,7 @@ const emptyForm = () => {
     </section>
     <form v-if="loaded && isFriend" @submit.prevent="sendMessage(text)">
       <input id="text" v-model="text" placeholder="Enter text." autocomplete="off"/>
-      <button type="submit" class="pure-button-primary pure-button">Send</button>
+      <button type="submit" class="pure-button-primary pure-button sendButton">Send</button>
     </form>
     <form v-else-if="loaded && !isFriend" @submit.prevent="goToProfile">
       <input id="text" v-model="text" placeholder="You must be friends to message." autocomplete="off" disabled/>
@@ -120,6 +120,10 @@ const emptyForm = () => {
 </template>
 
 <style scoped>
+
+.sendButton {
+  background-color: var(--dark-purple) !important;
+}
 
 h2 {
   text-align: center;
