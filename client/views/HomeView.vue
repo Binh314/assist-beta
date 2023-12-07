@@ -60,7 +60,7 @@ async function removeNotification(id: string) {
     console.log(_);
     return;
   }
-  getTaskReminders();
+  await getTaskReminders();
 }
 
 onBeforeMount(async () => {
@@ -103,9 +103,9 @@ onBeforeMount(async () => {
 
       <div v-else class="page not-login">
         <div class="auth-container">
-          <div class = "column title-container">
-              <span class="title">Welcome to Assist </span>
-              <span class = "description">A community of support by matching individuals who need help with those eager to offer it in their areas of expertise or interest</span>
+          <div class="column title-container">
+            <span class="title">Welcome to Assist </span>
+            <span class="description">A community of support by matching individuals who need help with those eager to offer it in their areas of expertise or interest</span>
           </div>
           <div class="button-group">
             <button class="btn-container" @click="signup">Sign up</button>
@@ -113,16 +113,15 @@ onBeforeMount(async () => {
           </div>
         </div>
       </div>
-
     </section>
   </main>
 </template>
 
 <style scoped>
-.description{
+.description {
   font-size: 18px;
   color: var(--deep-purple);
-  background-color: rgb(229, 204, 244,0.9);
+  background-color: rgb(229, 204, 244, 0.9);
   padding: 1%;
 }
 .auth-container {
@@ -134,20 +133,20 @@ onBeforeMount(async () => {
   width: 100vw;
 }
 
-.title{
+.title {
   font-size: 73px;
   color: var(--deep-purple);
   font-weight: 700;
-  background-color: rgb(229, 204, 244,0.9);
+  background-color: rgb(229, 204, 244, 0.9);
   border-radius: 10px;
   padding: 1%;
 }
 
-.title-container{
+.title-container {
   margin-bottom: 55vh;
 }
 
-.btn-container{
+.btn-container {
   background-color: var(--light-pink);
   border: var(--dark-purple) solid 4px;
   border-radius: 20px;
@@ -159,7 +158,7 @@ onBeforeMount(async () => {
   font-weight: 550;
 }
 
-.btn-container:hover{
+.btn-container:hover {
   background-color: var(--purple);
   border: var(--deep-purple) solid 4px;
   z-index: 2;
@@ -177,7 +176,7 @@ onBeforeMount(async () => {
   z-index: 1; 
 } */
 
-.not-login{
+.not-login {
   background-image: url(../assets/images/background.jpeg);
   height: 100vh;
   background-repeat: no-repeat;
@@ -304,5 +303,18 @@ button {
   margin-left: 2em;
   margin-right: 2em;
   margin-top: 1em;
+}
+
+.taskNotification {
+  position: relative;
+  display: flex;
+  width: 30em;
+  height: 5em;
+  background-color: #a080e3;
+  color: white;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5em;
 }
 </style>
