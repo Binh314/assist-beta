@@ -67,18 +67,22 @@ a.button {
 }
 
 .primary-button:hover{
+  color: white !important;
   background-color: var(--dark-purple);
 }
 
 .pure-button-primary{
+  color: white !important;
   background-color: var(--purple) !important;
 }
 
 .pure-button{
+  color: white !important;
   background-color: var(--purple) !important;
 }
 
 .pure-button-primary:hover{
+  color: white !important;
   background-color: var(--dark-purple) !important;
 }
 
