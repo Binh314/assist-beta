@@ -303,8 +303,8 @@ onBeforeMount(async () => {
         <p class="description" v-if="task.description">{{ props.task.description }}</p>
       </div>
       <menu class="confirmOptions">
-        <button @click="deleteTask" class="pure-button button-error">Delete Task</button>
-        <button @click="closeDeleteModal" class="pure-button">Cancel</button>
+        <button @click="deleteTask" class="pure-button">Delete Task</button>
+        <button @click="closeDeleteModal" class="pure-button button-error">Cancel</button>
       </menu>
     </div>
   </div>
