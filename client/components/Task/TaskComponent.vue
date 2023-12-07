@@ -212,7 +212,7 @@ onBeforeMount(async () => {
   <div v-else-if="isLoggedIn" v-if="!props.task.completed">
     <div class="addTask">
       <button v-if="!offeredHelp" class="pure-button pure-button-primary" @click="openHelpModal">Offer Help!</button>
-      <button v-else class="pure-button" @click="openRetractModal">Retract Help Offer</button>
+      <button v-else class="pure-button redButton" @click="openRetractModal">Retract Help Offer</button>
     </div>
   </div>
   <!-- <div class="timestamp">
@@ -287,7 +287,7 @@ onBeforeMount(async () => {
         <p class="description" v-if="task.description">{{ props.task.description }}</p>
       </div>
       <menu class="confirmOptions">
-        <button @click="retractHelp" class="pure-button">Retract Help Offer</button>
+        <button @click="retractHelp" class="pure-button redButton">Retract Help Offer</button>
         <button @click="closeRetractModal" class="pure-button button-error">Cancel</button>
       </menu>
     </div>
@@ -303,7 +303,7 @@ onBeforeMount(async () => {
         <p class="description" v-if="task.description">{{ props.task.description }}</p>
       </div>
       <menu class="confirmOptions">
-        <button @click="deleteTask" class="pure-button">Delete Task</button>
+        <button @click="deleteTask" class="pure-button redButton">Delete Task</button>
         <button @click="closeDeleteModal" class="pure-button button-error">Cancel</button>
       </menu>
     </div>
@@ -311,7 +311,9 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
-
+.redButton {
+  background-color: var(--red) !important;
+}
 .assisters {
   font-size: x-large;
 }

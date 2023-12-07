@@ -94,7 +94,7 @@ onBeforeMount(async () => {
         <FriendComponent class="friendProfile" :username="friend" :picture="picture"/>
       </div>
       <menu class="confirmOptions">
-        <button @click="removeFriend" class="pure-button">Remove Friend</button>
+        <button @click="removeFriend" class="pure-button redButton">Remove Friend</button>
         <button @click="closeDeleteModal" class="pure-button button-error">Cancel</button>
       </menu>
     </div>
@@ -102,6 +102,10 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+
+.redButton {
+  background-color: var(--red) !important;
+}
 .friendInfo {
   display: flex;
   flex-direction: column;

@@ -67,7 +67,7 @@ async function checkProfile() {
       validUsername.value = true;
 
       const friends = await fetchy(`/api/friends`, "GET", {alert: false});
-      isFriend.value = friends.includes(username);
+      isFriend.value = friends.map((friend: Record<string, string>) => friend.username).includes(username.value);
 
       await getMessages();
     } catch (_) {
@@ -141,24 +141,20 @@ const emptyForm = () => {
     </form> -->
     <form v-if="validUsername && isFriend" @submit.prevent="sendMessage(text)">
       <input id="text" v-model="text" placeholder="Enter text." autocomplete="off"/>
-      <button type="submit" class="pure-button-primary pure-button">Send</button>
+      <button type="submit" class="pure-button-primary pure-button sendButton">Send</button>
     </form>
     <form v-else-if="validUsername && !isFriend" @submit.prevent="goToProfile">
       <input id="text" v-model="text" placeholder="You must be friends to message." autocomplete="off" disabled/>
-      <button type="submit" class="pure-button-primary pure-button">See Profile</button>
+      <button type="submit" class="pure-button-primary pure-button sendButton">See Profile</button>
     </form>
   </div>
 </template>
 
 <style scoped>
 
-/* .searchbar {
-  display: flex;
-  justify-content: center;
-  gap: 0.5em;
-  margin: 1em 0 0 0;
-  align-items: center;
-} */
+.sendButton {
+  background-color: var(--dark-purple) !important;
+}
 .searchresults {
   position: absolute;
   width: 40%;
