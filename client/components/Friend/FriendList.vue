@@ -24,7 +24,7 @@ onBeforeMount(async () => {
 
 <template>
   <div v-if="loaded" class="section">
-    <p v-if="friends.length === 0">No friends yet!</p>
+    <p v-if="friends.length === 0">No friends yet; use the search bar above to search for friends!</p>
     <div v-for="friend in friends" :key="friend._id">
       <FriendComponent :username="friend.username" :picture="friend.picture" />
     </div>
@@ -38,6 +38,5 @@ onBeforeMount(async () => {
   flex-wrap: wrap;
   flex-direction: row;
   gap: 2em;
-  padding: 2em;
 }
 </style>

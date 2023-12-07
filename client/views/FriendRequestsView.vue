@@ -41,7 +41,11 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <h1 v-if="requesters.length === 0">No requests!</h1>
+  <h2 v-if="requesters.length === 0">No pending friend requests!</h2>
+  <div class="link">
+    <a @click="$router.push('friends')">return to previous page</a>
+  </div>
+
   <div class="section">
     <div v-for="user in requesters" :key="user._id">
       <FriendComponent :username="user.username" :picture="user.picture" />
@@ -54,8 +58,22 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
-h1 {
+h2 {
   text-align: center;
+  margin-top: 2em;
+}
+
+.link {
+  text-align: center;
+  background-color: white;
+}
+
+a {
+  cursor: pointer;
+}
+
+a:hover {
+  background-color: var(--light-pink);
 }
 
 .section {

@@ -37,10 +37,15 @@ h1 {
   text-align: center;
 }
 
+span {
+  margin-right: 0.5em;
+}
+
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 2em;
 }
 
 .requests {
@@ -50,10 +55,12 @@ h1 {
   cursor: pointer;
   gap: 1em;
   padding: 0.5em;
-  margin: 1.5em;
+  margin-top: 1em;
 }
 
-.requests:hover {
-  background-color: var(--light-pink);
+button {
+  cursor: pointer;
+  background-color: var(--purple);
+  color: white;
 }
 </style>
