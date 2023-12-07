@@ -195,13 +195,12 @@ onBeforeMount(async () => {
 
   <h2 class="completed" v-if="task.completed"><font-awesome-icon :icon="['fas', 'square-check']" size="lg" class="icon" /> This task has been completed.</h2>
 
-  <div v-if="props.task.requester == currentUsername && !task.completed">
-    <menu class="options">
+  <div v-if="props.task.requester == currentUsername && !task.completed" class="requesterOptions">
+    <button class="pure-button pure-button-primary" @click="toggleComplete">Mark Completed</button>
+    <menu class="editOptions">
       <li><button v-if="!props.task.completed" class="btn-small pure-button" @click="emit('editTask', props.task._id)">Edit</button></li>
       <li><button class="button-error btn-small pure-button" @click="openDeleteModal">Delete</button></li>
     </menu>
-    <br />
-    <button class="pure-button pure-button-primary" @click="toggleComplete">Mark Completed</button>
   </div>
   <div v-else-if="isLoggedIn" v-if="!props.task.completed">
     <div class="addTask">
@@ -403,9 +402,15 @@ p {
   font-weight: bold;
 }
 
-.options {
+.editOptions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.requesterOptions {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 menu {
