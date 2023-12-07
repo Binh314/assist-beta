@@ -22,9 +22,11 @@ async function getMatchingUsers(prefix: string) {
 
 <template>
   <section>
-    <div class="searchbar">
-      <span class="material-symbols-outlined">search</span>
-      <input id="username" type="text" v-model="username" @input="getMatchingUsers(username)" placeholder="Search by username" autocomplete="off"/>
+    <div class="search">
+      <div class="searchbar">
+        <input id="username" type="text" v-model="username" @input="getMatchingUsers(username)" placeholder="Search by username" autocomplete="off" />
+        <span class="material-symbols-outlined" @click="$router.push(`/profile/${username}`)">search</span>
+      </div>
     </div>
     <div class="searchresults" v-if="matchingUsers.length > 0">
       <div v-for="user in matchingUsers" :key="user._id">
@@ -55,12 +57,12 @@ input {
 }
 
 .searchresults {
-  position: absolute;
-  width: 40%;
+  /* position: absolute; */
+  width: 100%;
   margin: 0 auto;
-  background-color: lightgray;
+  background-color: var(--base-bg);
   border: 1px solid #ccc;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px var(--base-bg);
   z-index: 1; /* Ensure the results are above other content */
 }
 
@@ -70,6 +72,10 @@ input {
 }
 
 .resultentry:hover {
-  background-color: gray;
+  background-color: var(--light-pink);
+}
+
+.material-symbols-outlined:hover {
+  cursor: pointer;
 }
 </style>
