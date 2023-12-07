@@ -73,13 +73,15 @@ onMounted(async () => {
 <template>
   <div class="column">
     <ProfilePicture :pictureLink="profilePicture" />
-    <span class="username"
-      >{{ username }}
-      <font-awesome-icon v-if="username !== currentUsername" class="icon clickable messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages" />
+    <span class="username cursor" v-if="username !== currentUsername" @click.stop="goToMessages" title="send message">
+      {{ username }}
     </span>
-    <span class="kudos" @click="gotoKudos">kudos: {{ kudos }}</span>
+    <span class="username" v-else>
+      {{ username }}
+    </span>
+    <span class="kudos">kudos: {{ kudos }}</span>
     <div v-if="username == currentUsername" class="button-container">
-      <button class="primary-button" @click="editProfile">Edit Profile</button>
+      <button class="pure-button-primary pure-button theme" @click="editProfile">Edit Profile</button>
     </div>
     <div v-else>
       <FriendButton :friend="username" />
@@ -102,11 +104,19 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.column {
+  margin: 1em 0;
+}
+
+ul {
+  margin: 0;
+}
 .button-container {
   width: 20%;
   height: 4.5vh;
   display: flex;
   justify-content: center;
+  margin-top: 1em;
 }
 
 .username {
@@ -115,25 +125,21 @@ onMounted(async () => {
   color: var(--deep-purple);
 }
 
+.cursor {
+  cursor: pointer;
+}
+
 .subtitle {
   font-size: 2.75vh;
   font-weight: 550;
   color: var(--dark-purple);
+  margin-top: 1em;
 }
 
 .kudos {
   font-size: 2.75vh;
   font-weight: 550;
   color: var(--dark-purple);
-}
-
-.kudos:hover {
-  font-size: 2.75vh;
-  font-weight: 550;
-  color: var(--deep-purple);
-  background-color: var(--light-pink);
-  padding-left: 5%;
-  padding-right: 5%;
 }
 
 .badges-container {
@@ -151,5 +157,13 @@ onMounted(async () => {
 }
 .messageIcon:hover {
   cursor: pointer;
+}
+
+.theme {
+  background-color: var(--purple);
+}
+
+.theme:hover {
+  background-color: var(--light-pink);
 }
 </style>

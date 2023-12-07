@@ -4,19 +4,6 @@
 const props = defineProps(["reminder"]);
 const emit = defineEmits(["removeNotification", "showTask"]);
 
-// let username = ref<Array<Record<string, string>>>([]);
-
-// async function getUsername() {
-//   try {
-//     username.value = await fetchy(`/api/users/${props.task.requester}`, "GET", {});
-//   } catch (_) {
-//     return;
-//   }
-// }
-
-// onBeforeMount(async () => {
-//   await getUsername();
-// });
 async function goToTask() {
   // router.push(`/task/${props.reminder.contentId}`);
   emit('showTask', props.reminder.contentId);
@@ -24,13 +11,19 @@ async function goToTask() {
 </script>
 
 <template>
-  <div class="taskNotification" @click="goToTask">
+  <div class="taskNotification" @click="goToTask" title="click to view task">
     <font-awesome-icon icon="x" size="lg" class="icon" @click.stop="emit('removeNotification', props.reminder._id)" />
     <p>{{ props.reminder.message }}</p>
   </div>
 </template>
 
 <style scoped>
+.link {
+  margin-top: 1em;
+  text-align: center;
+  background-color: white;
+}
+
 .icon {
   color: white;
   position: absolute;
