@@ -76,6 +76,11 @@ async function showTask(id: string) {
   }
 }
 
+async function refreshTask() {
+  if (task.value)
+    showTask(task.value._id);
+}
+
 async function closeShowTask() {
   showingTask.value = false;
 }
@@ -135,7 +140,7 @@ onBeforeMount(async () => {
         <div class="closeButton">
           <font-awesome-icon :icon="['fas', 'x']" @click="closeShowTask" size="lg"/>
         </div>
-        <TaskComponent :task="task"/>
+        <TaskComponent :task="task" @refreshTasks="refreshTask"/>
       </div>
     </div>
     </section>
