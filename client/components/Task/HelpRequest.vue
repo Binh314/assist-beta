@@ -1,9 +1,8 @@
 <script setup lang="ts">
 // import { ref } from "vue";
-import router from "@/router";
 
 const props = defineProps(["reminder"]);
-const emit = defineEmits(["removeNotification"]);
+const emit = defineEmits(["removeNotification", "showTask"]);
 
 // let username = ref<Array<Record<string, string>>>([]);
 
@@ -19,14 +18,15 @@ const emit = defineEmits(["removeNotification"]);
 //   await getUsername();
 // });
 async function goToTask() {
-  router.push(`/task/${props.reminder.contentId}`);
+  // router.push(`/task/${props.reminder.contentId}`);
+  emit('showTask', props.reminder.contentId);
 }
 </script>
 
 <template>
   <div class="taskNotification" @click="goToTask">
     <font-awesome-icon icon="x" size="lg" class="icon" @click.stop="emit('removeNotification', props.reminder._id)" />
-    <p>Help request from [username] on [task]!</p>
+    <p>{{ props.reminder.message }}</p>
   </div>
 </template>
 

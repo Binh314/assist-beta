@@ -41,7 +41,9 @@ async function deleteAccount() {
 <template>
     <div v-if="isVisible" class="modal-overlay">
       <div class="modal-content">
-        <button @click="closeModal" class = "exit-btn">X</button>
+        <button @click="closeModal" class = "exit-btn">
+          <font-awesome-icon :icon="['fas', 'x']" size="lg"/>
+        </button>
         <form  @submit.prevent="deleteAccount">
             <h1>Delete Account</h1>
             <p>Are you sure you want to delete your account? This action is permanent and irreversable, all your badges and kudos will be lost</p>
@@ -70,6 +72,10 @@ async function deleteAccount() {
 
   fieldset{
     border: none;
+  }
+
+  .exit-btn:hover {
+    cursor: pointer;
   }
 
 
