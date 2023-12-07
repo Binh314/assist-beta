@@ -1,11 +1,10 @@
  
 <script setup lang="ts">
+import { ObjectId } from "mongodb";
 import { defineEmits, onMounted, ref, watch } from 'vue';
 import { useUserStore } from '../../stores/user';
-import ImageUploader from '../ImageUploader.vue';
 import { fetchy } from '../../utils/fetchy';
 import TagsInput from "../Tag/TagsInput.vue";
-import { ObjectId } from "mongodb";
 
 
 const props = defineProps({
@@ -107,7 +106,9 @@ onMounted(async()=>{
 <template>
     <div v-if="isVisible" class="modal-overlay">
         <div class = "modal-content">
-            <button @click="closeModal" class = "exit-btn">X</button>
+            <button @click="closeModal" class = "exit-btn">
+                <font-awesome-icon :icon="['fas', 'x']" size="lg"/>
+            </button>
                 <h1>Update Tag</h1>
             <div class="content">
                 <TagsInput id="tagsInput" :initTags="userTags" @updateTags="(updatedTag)=>{handleUpdate(updatedTag)}"/>
@@ -124,5 +125,8 @@ onMounted(async()=>{
     flex-direction: column; /* Stack children vertically */
     align-items: center; /* Align items in the center horizontally */
     gap: 10px; /* Space between items */
+}
+.exit-btn:hover {
+    cursor: pointer;
 }
 </style>

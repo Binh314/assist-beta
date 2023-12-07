@@ -32,8 +32,8 @@ const toggleSend = () => {
   kudosAsk.value = !kudosAsk.value;
 };
 
-async function goToMessages() {
-  void router.push(`/messages/${props.task.requester}`);
+async function goToMessages(user: string) {
+  void router.push(`/messages/${user}`);
 }
 
 async function goToProfile() {
@@ -174,23 +174,30 @@ onBeforeMount(async () => {
         {{ props.task.requester }}
       </span>
     </span>
-    <font-awesome-icon v-if="$props.task.requester !== currentUsername && isLoggedIn" class="icon messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages" />
+    <font-awesome-icon v-if="$props.task.requester !== currentUsername && isLoggedIn" class="icon messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages(props.task.requester)" />
   </h2>
   <br />
   <h2 class="title">{{ props.task.title }}</h2>
 
-  <p class="time"><font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" /> {{ formatTaskDate(props.task.deadline) }}</p>
+  <p class="time"><font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" />&nbsp; {{ formatTaskDate(props.task.deadline) }}</p>
 
-  <p id="tags" class="tags" v-if="tags.length > 0"><font-awesome-icon icon="tags" size="lg" class="icon" /> {{ tags.join(", ") }}</p>
+  <p id="tags" class="tags" v-if="tags.length > 0"><font-awesome-icon icon="tags" size="lg" class="icon" />&nbsp; {{ tags.join(", ") }}</p>
 
-  <h3 id="assisters" class="assisters" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0">
-    <br />
-    <font-awesome-icon :icon="['fas', 'handshake']" size="2xl" class="icon" /> {{ props.task.assisters.join(", ") }}
-  </h3>
 
   <label for="description" v-if="task.description"><b>Description</b></label>
   <p class="description" v-if="task.description">{{ props.task.description }}</p>
 
+  <p id="assisters" class="assisters" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0">
+    <br />
+    <font-awesome-icon :icon="['fas', 'handshake']" size="2xl" class="icon assistIcon" /> 
+    <span v-for="(assister, index) in props.task.assisters">
+      <span class="assister" @click="goToMessages(assister)">
+        <font-awesome-icon class="icon" :icon="['far', 'envelope']" size="lg"/>
+        {{assister}}
+      </span>
+      <span v-if="index+1 < props.task.assisters.length">, </span>
+    </span>
+  </p>
   <br />
 
   <h2 class="completed" v-if="task.completed"><font-awesome-icon :icon="['fas', 'square-check']" size="lg" class="icon" /> This task has been completed.</h2>
@@ -304,6 +311,23 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+
+.assisters {
+  font-size: x-large;
+}
+.assister:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.assister {
+  margin-left: 0.5em;
+}
+
+.assistIcon {
+  margin-right: 0.25em;
+}
+
 .taskDesc {
   line-height: 2em;
 }
@@ -353,6 +377,15 @@ img {
 
 .selectedAssistant {
   font-weight: bold;
+}
+
+.unselectedAssistant {
+  background-color: lightgray !important;
+  color: black !important;
+}
+
+.unselectedAssistant:hover {
+  background-color: gray !important;
 }
 
 .assisterButton {
