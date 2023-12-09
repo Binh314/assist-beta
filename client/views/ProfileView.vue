@@ -16,7 +16,7 @@ interface Badge {
 
 const props = defineProps(["user"]);
 const { currentUsername, currentProfilePicture } = useUserStore();
-const kudos = ref(0);
+const kudos = ref("0");
 const tags = ref([]);
 const badges = ref<Badge[]>([]);
 const username = ref(currentUsername);
@@ -48,7 +48,7 @@ onMounted(async () => {
   try {
     const receiverId = await fetchy(`/api/users/${username.value}`, "GET");
     const response = await fetchy(`/api/kudo/receivedCount/${receiverId._id}`, "GET");
-    kudos.value = ref(response); // assuming the response is the kudos count
+    kudos.value = response; // assuming the response is the kudos count
   } catch (error) {
     console.error("Error fetching kudos:", error);
   }
