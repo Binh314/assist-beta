@@ -30,6 +30,7 @@ const toggleComplete = async () => {
 
 const toggleSend = () => {
   kudosAsk.value = !kudosAsk.value;
+  emit("refreshTasks");
 };
 
 async function goToMessages(user: string) {
@@ -87,6 +88,7 @@ const completeTask = async () => {
     });
 
     if (assister) {
+      completing.value = false;
       kudosAsk.value = true;
     } else {
       emit("refreshTasks");
@@ -183,19 +185,18 @@ onBeforeMount(async () => {
 
   <p id="tags" class="tags" v-if="tags.length > 0"><font-awesome-icon icon="tags" size="lg" class="icon" />&nbsp; {{ tags.join(", ") }}</p>
 
-
   <label for="description" v-if="task.description"><b>Description</b></label>
   <p class="description" v-if="task.description">{{ props.task.description }}</p>
 
   <p id="assisters" class="assisters" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0">
     <br />
-    <font-awesome-icon :icon="['fas', 'handshake']" size="2xl" class="icon assistIcon" /> 
+    <font-awesome-icon :icon="['fas', 'handshake']" size="2xl" class="icon assistIcon" />
     <span v-for="(assister, index) in props.task.assisters">
       <span class="assister" @click="goToMessages(assister)">
-        <font-awesome-icon class="icon" :icon="['far', 'envelope']" size="lg"/>
-        {{assister}}
+        <font-awesome-icon class="icon" :icon="['far', 'envelope']" size="lg" />
+        {{ assister }}
       </span>
-      <span v-if="index+1 < props.task.assisters.length">, </span>
+      <span v-if="index + 1 < props.task.assisters.length">, </span>
     </span>
   </p>
   <br />
