@@ -93,8 +93,10 @@ export default class UserConcept {
   }
 
   private async canCreate(username: string, password: string, picture: string) {
-    if (!username || !password || !picture) {
+    if (!username || !password) {
       throw new BadValuesError("Username and password must be non-empty!");
+    } else if (!picture) {
+      throw new BadValuesError("Must upload a profile picture!");
     }
     await this.isUsernameUnique(username);
   }
