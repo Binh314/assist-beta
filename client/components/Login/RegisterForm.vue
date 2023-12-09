@@ -95,6 +95,7 @@ async function handleTagChange(newTag: string[]) {
 <style scoped>
 .tag-container {
   padding: 10%;
+  width: 50vw;
 }
 
 hr {

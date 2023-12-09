@@ -63,7 +63,7 @@ function triggerInput() {
        </div>
       <br />
       <input type="file" id="fileInput" class="hidden-file-input" @change="handleFileChange" style = "display:none">
-      <button class="primary-button" @click="triggerInput">Choose File</button>
+      <button class="primary-button" @click="triggerInput">Choose Your Image</button>
       <br />
     </div>
 </template>
