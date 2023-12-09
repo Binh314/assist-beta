@@ -117,7 +117,7 @@ form {
 .form-content {
   display: flex;
   justify-content: space-between;
-  align-items: space-between; /* Aligns items at the bottom */
+  align-items: space-between;
   width: 100%;
   margin-bottom: 10%;
 }
