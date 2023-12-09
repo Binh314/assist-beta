@@ -21,6 +21,7 @@ const tags = ref([]);
 const badges = ref<Badge[]>([]);
 const username = ref(currentUsername);
 const profilePicture = ref(currentProfilePicture);
+const displayTags = ref(false);
 
 function editProfile() {
   router.push("/profile/edit");
@@ -86,9 +87,12 @@ onMounted(async () => {
     </div>
     <span class="subtitle">Tags:</span>
     <div class="tags" v-if="tags.length > 0">
-      <ul>
+      <ul v-if = "!displayTags">
         <li v-for="(tag, index) in tags.slice(0, 3)" :key="index">{{ tag }}</li>
-        <span v-if="tags.length > 3">...</span>
+        <span class = "expand" v-if="tags.length > 3" @click = "displayTags = true">...</span>
+      </ul>
+      <ul v-else>
+        <li v-for="(tag, index) in tags" :key="index">{{ tag }}</li>
       </ul>
     </div>
     <div v-else-if="username == currentUsername">You have not selected any tag yet. <router-link to="/profile/edit">Select here</router-link></div>
@@ -102,6 +106,16 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.expand{
+  border-bottom:1px solid #000;
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.expand:hover{
+  background-color: var(--blue-gray);
+}
+
 .button-container {
   width: 20%;
   height: 4.5vh;
