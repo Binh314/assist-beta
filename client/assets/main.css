@@ -19,8 +19,13 @@ button.btn-small {
 }
 
 button.button-error {
-  color: white;
-  background: var(--red);
+  color: black !important;
+  background: lightgrey !important;
+}
+
+button.button-error:hover {
+  color: black !important;
+  background: gray !important;
 }
 
 a.button {

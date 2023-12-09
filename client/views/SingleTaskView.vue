@@ -16,28 +16,29 @@ let searchRequester = ref("");
 
 onBeforeMount(async () => {
   await getTask();
-})
-
+});
 
 async function getTask() {
   loaded.value = false;
   try {
     task.value = await fetchy(`/api/tasks/id/${props.id}`, "GET");
-  } catch(_) {
+  } catch (_) {
     return;
   }
   loaded.value = true;
 }
 
-
 function updateEditing(id: string) {
   editing.value = id;
 }
-
 </script>
 
 <template>
-  <div>
+  <h2>Task</h2>
+  <div class="link">
+    <a @click="$router.push('/')">return to previous page</a>
+  </div>
+  <div class="content">
     <section class="task" v-if="loaded">
       <div v-if="task">
         <article>
@@ -45,13 +46,34 @@ function updateEditing(id: string) {
           <EditTaskForm v-else :task="task" @refreshTasks="getTask" @editTask="updateEditing" />
         </article>
       </div>
+      <p v-else>No tasks found</p>
     </section>
-    <p v-else-if="loaded">No tasks found</p>
     <p v-else>Loading...</p>
   </div>
 </template>
 
 <style scoped>
+template,
+h2 {
+  text-align: center;
+}
+.link {
+  margin-top: 1em;
+  text-align: center;
+  background-color: white;
+}
+
+.content {
+  margin-top: 3em;
+}
+
+a {
+  cursor: pointer;
+}
+
+a:hover {
+  background-color: var(--light-pink);
+}
 
 .matchedTask {
   border-style: solid;
@@ -112,4 +134,3 @@ article {
   padding: 1em;
 }
 </style>
-

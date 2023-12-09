@@ -42,17 +42,20 @@ onBeforeMount(async () => {
 
 <template>
   <h2 v-if="requesters.length === 0">No pending friend requests!</h2>
+  <h2 v-else>Friend Requests</h2>
   <div class="link">
     <a @click="$router.push('friends')">return to previous page</a>
   </div>
 
   <div class="section">
     <div v-for="user in requesters" :key="user._id">
-      <FriendComponent :username="user.username" :picture="user.picture" />
-      <span>
-        <button @click="acceptRequest(user.username)" class="pure-button-primary pure-button">Accept</button>
-        <button @click="rejectRequest(user.username)" class="button-error pure-button">Reject</button>
-      </span>
+      <div class="user">
+        <FriendComponent :username="user.username" :picture="user.picture" />
+        <span>
+          <button @click="acceptRequest(user.username)" class="pure-button-primary pure-button theme">Accept</button>
+          <button @click="rejectRequest(user.username)" class="button-error pure-button theme">Reject</button>
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -61,11 +64,20 @@ onBeforeMount(async () => {
 h2 {
   text-align: center;
   margin-top: 2em;
+  margin-bottom: 0;
 }
 
 .link {
+  margin-top: 1em;
   text-align: center;
   background-color: white;
+}
+
+.user {
+  padding: 2em 0;
+}
+.user:hover {
+  background-color: var(--base-bg);
 }
 
 a {
@@ -77,8 +89,20 @@ a:hover {
 }
 
 .section {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2em;
   padding: 2em;
+  text-align: center;
+}
+
+.theme {
+  margin-left: 0.25em;
+  margin-right: 0.25em;
+  background-color: var(--purple);
+}
+
+.theme:hover {
+  background-color: var(--dark-purple);
 }
 </style>

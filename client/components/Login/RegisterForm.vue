@@ -17,11 +17,13 @@ const { createUser, loginUser, updateSession } = useUserStore();
 
 async function attachTag(tags: string[]) {
   const userID = (await fetchy(`/api/users/${username.value}`, "GET"))._id;
-  for (const t of tags.slice(0, -1)) {
-    try {
-      const response = await fetchy("/api/tag", "POST", { body: { i: userID, n: t } });
-    } catch {
-      return new Error(`Fail to attached tag - ${t}`);
+  for (const t of tags) {
+    if (t) {
+      try {
+        const response = await fetchy("/api/tag", "POST", { body: { i: userID, n: t } });
+      } catch {
+        return new Error(`Fail to attached tag - ${t}`);
+      }
     }
   }
 }
@@ -54,7 +56,8 @@ async function handleTagChange(newTag: string[]) {
       <h1>Register User</h1>
       <div class="form-content">
         <div class="image-uploader-wrapper column">
-          <span v-if="!uploaded">No image chosen</span>
+          <h3>Profile Picture</h3>
+          <p v-if="!uploaded">No image chosen</p>
           <ImageUploader @update:imageSrc="(url) => handleImageUpload(url)" />
         </div>
         <fieldset class="column">
@@ -114,14 +117,13 @@ form {
 .form-content {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end; /* Aligns items at the bottom */
+  align-items: space-between;
   width: 100%;
   margin-bottom: 10%;
 }
 
 .image-uploader-wrapper {
   flex: 1;
-  margin-right: 20%;
   width: 100%;
   text-align: center;
 }

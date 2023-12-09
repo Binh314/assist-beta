@@ -20,6 +20,7 @@ const taskClasses = computed(() => {
   for (const task of tasks.value) classes.set(task._id, "");
 
   if (props.requestedTasks) {
+    for (const task of tasks.value) classes.set(task._id, "ownTask");
     return classes;
   }
 
@@ -105,6 +106,10 @@ a {
 .matchedHelpTask {
   background-color: var(--blue-gray);
   border-style: solid;
+}
+
+.ownTask {
+  border-style: dashed;
 }
 
 section {

@@ -16,10 +16,6 @@ const props = defineProps(["username", "picture"]);
   cursor: pointer;
 }
 
-.friend:hover {
-  border-style: solid;
-  border-color: var(--dark-purple);
-}
 .circular-image {
   border-radius: 50%; /* This creates the circular shape */
   object-fit: cover; /* Ensures the image covers the area without distorting */

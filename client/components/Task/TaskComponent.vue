@@ -30,10 +30,11 @@ const toggleComplete = async () => {
 
 const toggleSend = () => {
   kudosAsk.value = !kudosAsk.value;
+  emit("refreshTasks");
 };
 
-async function goToMessages() {
-  void router.push(`/messages/${props.task.requester}`);
+async function goToMessages(user: string) {
+  void router.push(`/messages/${user}`);
 }
 
 async function goToProfile() {
@@ -87,6 +88,7 @@ const completeTask = async () => {
     });
 
     if (assister) {
+      completing.value = false;
       kudosAsk.value = true;
     } else {
       emit("refreshTasks");
@@ -174,39 +176,44 @@ onBeforeMount(async () => {
         {{ props.task.requester }}
       </span>
     </span>
-    <font-awesome-icon v-if="$props.task.requester !== currentUsername && isLoggedIn" class="icon messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages" />
+    <font-awesome-icon v-if="$props.task.requester !== currentUsername && isLoggedIn" class="icon messageIcon" :icon="['far', 'envelope']" size="lg" @click.stop="goToMessages(props.task.requester)" />
   </h2>
   <br />
   <h2 class="title">{{ props.task.title }}</h2>
 
-  <p class="time"><font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" /> {{ formatTaskDate(props.task.deadline) }}</p>
+  <p class="time"><font-awesome-icon :icon="['fas', 'clock']" class="icon" size="lg" />&nbsp; {{ formatTaskDate(props.task.deadline) }}</p>
 
-  <p id="tags" class="tags" v-if="tags.length > 0"><font-awesome-icon icon="tags" size="lg" class="icon" /> {{ tags.join(", ") }}</p>
-
-  <h3 id="assisters" class="assisters" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0">
-    <br />
-    <font-awesome-icon :icon="['fas', 'handshake']" size="2xl" class="icon" /> {{ props.task.assisters.join(", ") }}
-  </h3>
+  <p id="tags" class="tags" v-if="tags.length > 0"><font-awesome-icon icon="tags" size="lg" class="icon" />&nbsp; {{ tags.join(", ") }}</p>
 
   <label for="description" v-if="task.description"><b>Description</b></label>
   <p class="description" v-if="task.description">{{ props.task.description }}</p>
 
+  <p id="assisters" class="assisters" v-if="props.task.requester == currentUsername && props.task.assisters.length > 0">
+    <br />
+    <font-awesome-icon :icon="['fas', 'handshake']" size="2xl" class="icon assistIcon" />
+    <span v-for="(assister, index) in props.task.assisters">
+      <span class="assister" @click="goToMessages(assister)">
+        <font-awesome-icon class="icon" :icon="['far', 'envelope']" size="lg" />
+        {{ assister }}
+      </span>
+      <span v-if="index + 1 < props.task.assisters.length">, </span>
+    </span>
+  </p>
   <br />
 
   <h2 class="completed" v-if="task.completed"><font-awesome-icon :icon="['fas', 'square-check']" size="lg" class="icon" /> This task has been completed.</h2>
 
-  <div v-if="props.task.requester == currentUsername && !task.completed">
-    <menu class="options">
+  <div v-if="props.task.requester == currentUsername && !task.completed" class="requesterOptions">
+    <button class="pure-button pure-button-primary" @click="toggleComplete">Mark Completed</button>
+    <menu class="editOptions">
       <li><button v-if="!props.task.completed" class="btn-small pure-button" @click="emit('editTask', props.task._id)">Edit</button></li>
       <li><button class="button-error btn-small pure-button" @click="openDeleteModal">Delete</button></li>
     </menu>
-    <br />
-    <button class="pure-button pure-button-primary" @click="toggleComplete">Mark Completed</button>
   </div>
   <div v-else-if="isLoggedIn" v-if="!props.task.completed">
     <div class="addTask">
       <button v-if="!offeredHelp" class="pure-button pure-button-primary" @click="openHelpModal">Offer Help!</button>
-      <button v-else class="pure-button button-error" @click="openRetractModal">Retract Help Offer</button>
+      <button v-else class="pure-button redButton" @click="openRetractModal">Retract Help Offer</button>
     </div>
   </div>
   <!-- <div class="timestamp">
@@ -266,7 +273,7 @@ onBeforeMount(async () => {
       </div>
       <menu class="confirmOptions">
         <button @click="offerHelp" class="pure-button-primary pure-button">Offer Help!</button>
-        <button @click="closeOfferModal" class="pure-button">Cancel</button>
+        <button @click="closeOfferModal" class="pure-button button-error">Cancel</button>
       </menu>
     </div>
   </div>
@@ -281,8 +288,8 @@ onBeforeMount(async () => {
         <p class="description" v-if="task.description">{{ props.task.description }}</p>
       </div>
       <menu class="confirmOptions">
-        <button @click="retractHelp" class="pure-button button-error">Retract Help Offer</button>
-        <button @click="closeRetractModal" class="pure-button">Cancel</button>
+        <button @click="retractHelp" class="pure-button redButton">Retract Help Offer</button>
+        <button @click="closeRetractModal" class="pure-button button-error">Cancel</button>
       </menu>
     </div>
   </div>
@@ -297,14 +304,32 @@ onBeforeMount(async () => {
         <p class="description" v-if="task.description">{{ props.task.description }}</p>
       </div>
       <menu class="confirmOptions">
-        <button @click="deleteTask" class="pure-button button-error">Delete Task</button>
-        <button @click="closeDeleteModal" class="pure-button">Cancel</button>
+        <button @click="deleteTask" class="pure-button redButton">Delete Task</button>
+        <button @click="closeDeleteModal" class="pure-button button-error">Cancel</button>
       </menu>
     </div>
   </div>
 </template>
 
 <style scoped>
+.redButton {
+  background-color: var(--red) !important;
+}
+.assisters {
+  font-size: x-large;
+}
+.assister:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.assister {
+  margin-left: 0.5em;
+}
+
+.assistIcon {
+  margin-right: 0.25em;
+}
 
 .taskDesc {
   line-height: 2em;
@@ -357,6 +382,15 @@ img {
   font-weight: bold;
 }
 
+.unselectedAssistant {
+  background-color: lightgray !important;
+  color: black !important;
+}
+
+.unselectedAssistant:hover {
+  background-color: gray !important;
+}
+
 .assisterButton {
   margin-right: 1em;
 }
@@ -404,9 +438,15 @@ p {
   font-weight: bold;
 }
 
-.options {
+.editOptions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.requesterOptions {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 menu {

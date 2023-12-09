@@ -7,28 +7,14 @@ import { fetchy } from "../../utils/fetchy";
 const props = defineProps(["reminder"]);
 const emit = defineEmits(["removeNotification"]);
 
-// let username = ref<Array<Record<string, string>>>([]);
-
-// async function getUsername() {
-//   try {
-//     username.value = await fetchy(`/api/users/${props.task.assisters[-1]}`, "GET", {});
-//   } catch (_) {
-//     return;
-//   }
-// }
-
-// onBeforeMount(async () => {
-//   await getUsername();
-// });
 async function goToMessage() {
   const username = (await fetchy(`/api/users/id/${props.reminder.contentId}`, "GET")).username;
   router.push(`/messages/${username}`);
 }
-
 </script>
 
 <template>
-  <div class="taskNotification" @click="goToMessage">
+  <div class="taskNotification" @click="goToMessage" title="click to send message">
     <font-awesome-icon icon="x" size="lg" class="icon" @click.stop="emit('removeNotification', props.reminder._id)" />
     <p>{{ props.reminder.message }}</p>
   </div>
