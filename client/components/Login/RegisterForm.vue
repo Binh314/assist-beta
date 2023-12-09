@@ -17,12 +17,13 @@ const { createUser, loginUser, updateSession } = useUserStore();
 
 async function attachTag(tags: string[]) {
   const userID = (await fetchy(`/api/users/${username.value}`, "GET"))._id;
-  for (const t of tags.slice(0, -1)) {
-    try {
-      const response = await fetchy("/api/tag", "POST", { body: { i: userID, n: t } });
-    } catch {
-      return new Error(`Fail to attached tag - ${t}`);
-    }
+  for (const t of tags) {
+    if (t)
+      try {
+        const response = await fetchy("/api/tag", "POST", { body: { i: userID, n: t } });
+      } catch {
+        return new Error(`Fail to attached tag - ${t}`);
+      }
   }
 }
 
