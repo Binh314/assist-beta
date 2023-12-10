@@ -30,6 +30,7 @@ function updateRoute(newRoute: string) {
 .nav-menu {
   position: fixed;
   left: 0;
+  top: 0;
   width: 25%;
   height: 100vh;
   background-color: var(--deep-purple);
@@ -37,7 +38,7 @@ function updateRoute(newRoute: string) {
   justify-content: center;
   align-items: flex-start;
   z-index: 1000; /* Ensure it's above other content */
-  padding-top: 1em;
+  padding-top: calc(7vh + 2em);
 }
 
 .column {

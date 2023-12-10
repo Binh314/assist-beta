@@ -82,6 +82,8 @@ async function logout() {
 <style scoped>
 @import "./assets/toast.css";
 .navigation {
+  position: relative;
+  z-index: 1001;
   height: 7vh;
   padding-left: 0.5em;
   padding-right: 1em;
