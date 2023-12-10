@@ -28,7 +28,7 @@ onBeforeMount(async () => {
     <div v-for="badge in badges" :key="badge._id">
       <div class="tool-tip">
         <!-- <div v-if="badge.count != '0'" class="tool-tip"> -->
-        <span class="badge">
+        <span class="badge" @click="$router.push('/tasks')">
           <img v-bind:src="badge.icon" />
           <span class="count">{{ badge.count }}</span>
           <p>{{ badge.name }}</p>
@@ -51,6 +51,11 @@ onBeforeMount(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  cursor: pointer;
+}
+
+.badge:hover {
+  background-color: var(--base-bg);
 }
 
 .count {

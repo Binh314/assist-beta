@@ -13,8 +13,9 @@ import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import Responses from "./responses";
 
-schedule.scheduleJob({ hour: 0, minute: 0, dayOfWeek: 0 }, function () {
-  void resetChallenges(2, 2);
+// Reset Saturdays at 7pm in EST (Sunday 12am in UTC)
+schedule.scheduleJob({ hour: 19, minute: 0, dayOfWeek: 6 }, async function () {
+  await resetChallenges(2, 2);
 });
 
 /**
@@ -26,13 +27,13 @@ async function resetChallenges(helpGoal = 5, taskGoal = 5) {
   const challenges = [
     {
       name: "Help Friends!",
-      description: `Help with ${helpGoal} tasks this week.`,
+      description: `Help with ${helpGoal} tasks this week. Challenge progress is made after your friend completes a task and selects you as the assister.`,
       goal: helpGoal,
       reward: new ObjectId("6567e30d37085155a767d595"),
     },
     {
       name: "Complete Tasks!",
-      description: `Complete ${taskGoal} tasks this week.`,
+      description: `Complete ${taskGoal} tasks this week. Challenge progress is made after you mark a task as completed.`,
       goal: taskGoal,
       reward: new ObjectId("6567e42337085155a767d596"),
     },
