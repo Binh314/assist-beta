@@ -89,9 +89,9 @@ onMounted(async () => {
     </div>
     <span class="subtitle">Tags:</span>
     <div class="tags" v-if="tags.length > 0">
-      <ul v-if = "!displayTags">
+      <ul v-if="!displayTags">
         <li v-for="(tag, index) in tags.slice(0, 3)" :key="index">{{ tag }}</li>
-        <span class = "expand" v-if="tags.length > 3" @click = "displayTags = true">...</span>
+        <span class="expand" v-if="tags.length > 3" @click="displayTags = true">...</span>
       </ul>
       <ul v-else>
         <li v-for="(tag, index) in tags" :key="index">{{ tag }}</li>
@@ -108,13 +108,13 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.expand{
-  border-bottom:1px solid #000;
+.expand {
+  border-bottom: 1px solid #000;
   padding-left: 5%;
   padding-right: 5%;
 }
 
-.expand:hover{
+.expand:hover {
   background-color: var(--blue-gray);
 }
 
@@ -127,7 +127,6 @@ ul {
 }
 .button-container {
   width: 20%;
-  height: 4.5vh;
   display: flex;
   justify-content: center;
   margin-top: 1em;
