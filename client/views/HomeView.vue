@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AboutComponent from "@/components/Landing/AboutComponent.vue";
 import HelpOffer from "@/components/Task/HelpOffer.vue";
 import HelpRequest from "@/components/Task/HelpRequest.vue";
 import TaskComponent from "@/components/Task/TaskComponent.vue";
@@ -71,14 +72,13 @@ async function showTask(id: string) {
   try {
     task.value = await fetchy(`/api/tasks/id/${id}`, "GET");
     showingTask.value = true;
-  } catch(_) {
+  } catch (_) {
     return;
   }
 }
 
 async function refreshTask() {
-  if (task.value)
-    showTask(task.value._id);
+  if (task.value) showTask(task.value._id);
 }
 
 async function closeShowTask() {
@@ -95,15 +95,17 @@ onBeforeMount(async () => {
   <main>
     <section>
       <div v-if="isLoggedIn" class="page landing">
+        <AboutComponent />
+        <hr />
         <div class="challenges">
-          <h3>Challenges:</h3>
+          <h3 style="margin-top: 0">Challenges:</h3>
           <div v-for="challenge in challenges" :key="challenge._id">
             <!-- <progress value="progress[challenge]" max="5"></progress> -->
             <p class="challenge">{{ challenge.description }}</p>
           </div>
           <p class="link" @click="viewChallenges">view more details</p>
         </div>
-        <hr/>
+        <hr />
         <div class="notifications">
           <div class="offers" v-if="offerReminders.length > 0">
             <div v-for="reminder in offerReminders">
@@ -136,20 +138,20 @@ onBeforeMount(async () => {
           </div>
         </div>
       </div>
-    <div v-if="showingTask" class="modal-overlay">
-      <div class="modal-content task">
-        <div class="closeButton">
-          <font-awesome-icon :icon="['fas', 'x']" @click="closeShowTask" size="lg"/>
+      <div v-if="showingTask" class="modal-overlay">
+        <div class="modal-content task">
+          <div class="closeButton">
+            <font-awesome-icon :icon="['fas', 'x']" @click="closeShowTask" size="lg" />
+          </div>
+          <TaskComponent :task="task" @refreshTasks="refreshTask" />
         </div>
-        <TaskComponent :task="task" @refreshTasks="refreshTask"/>
       </div>
-    </div>
     </section>
   </main>
 </template>
 
 <style scoped>
-hr{
+hr {
   width: 90%;
   color: var(--light-pink);
   margin-top: 5vh;
@@ -168,7 +170,7 @@ hr{
 .task {
   line-height: 2em;
 }
-.description{
+.description {
   font-size: 18px;
   color: var(--deep-purple);
   background-color: rgb(229, 204, 244, 0.9);
@@ -263,7 +265,7 @@ p {
   background-color: white;
   /* margin-top: 1.25em;
   margin-bottom: 0.5em; */
-  padding: .5em;
+  padding: 0.5em;
   border-radius: 5px;
 }
 
