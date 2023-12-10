@@ -24,13 +24,22 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div>
-    <h3>{{ props.challenge.description }}</h3>
-    <p>Expires on: {{ formatDate(props.challenge.endTime) }}</p>
-    <p v-if="progress < props.challenge.goal">Progress: {{ progress }} / {{ props.challenge.goal }}</p>
-    <p v-else>Progress: Complete! Badge Awarded!</p>
-    <hr />
+  <div class="container">
+    <div>
+      <h3>{{ props.challenge.description }}</h3>
+      <p><b>Expires on:</b> {{ formatDate(props.challenge.endTime) }}</p>
+      <p v-if="progress < props.challenge.goal"><b>Progress:</b> {{ progress }} / {{ props.challenge.goal }}</p>
+      <p v-else><b>Progress:</b> Complete! Badge Awarded!</p>
+    </div>
+    <button class="pure-button" @click="$router.push('/tasks')">{{ $props.challenge.name }}</button>
   </div>
+  <hr />
 </template>
 
-<style scoped></style>
+<style scoped>
+.container {
+  max-width: 50em;
+  display: flex;
+  align-items: center;
+}
+</style>
