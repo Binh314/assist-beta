@@ -86,8 +86,10 @@ async function closeShowTask() {
 }
 
 onBeforeMount(async () => {
-  await getChallenges();
-  await getTaskReminders();
+  if (isLoggedIn.value) {
+    await getChallenges();
+    await getTaskReminders();
+  }
 });
 </script>
 
