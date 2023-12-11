@@ -29,7 +29,7 @@ h1 {
 }
 
 .content {
-  width: 80%;
+  width: 50%;
   margin-bottom: 3em;
 }
 </style>
