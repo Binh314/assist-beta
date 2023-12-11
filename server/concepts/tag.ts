@@ -67,17 +67,11 @@ export default class TagConcept {
 
   async getTagByName(n: string) {
     const tag = await this.tags.readOne({ name: n });
-    if (!tag) {
-      throw new NotFoundError("Tag not found");
-    }
     return tag;
   }
 
   async getTagById(id: ObjectId) {
     const tag = await this.tags.readOne({ _id: id });
-    if (!tag) {
-      throw new NotFoundError("Tag not found");
-    }
     return tag;
   }
 

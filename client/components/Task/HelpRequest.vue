@@ -45,9 +45,11 @@ async function goToTask() {
   align-items: center;
   justify-content: center;
   margin-bottom: 1.5em;
+  border-radius: 20px;
 }
 
 .taskNotification:hover {
   cursor: pointer;
+  background-color: var(--dark-purple);
 }
 </style>
