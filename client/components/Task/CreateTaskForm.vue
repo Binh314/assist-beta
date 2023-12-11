@@ -76,9 +76,11 @@ onBeforeMount(async () => {
       <!-- <font-awesome-icon :icon="['fas', 'calendar']" size="lg" class="icon" />  -->
       Deadline Date
     </label>
-    <input type="date" v-model="deadlineDate" id="deadlineDate" name="deadline-date" required @keypress.enter.prevent autocomplete="off" />
+    <input class="dateTimeInput" type="date" v-model="deadlineDate" id="deadlineDate" 
+      name="deadline-date" required @keypress.enter.prevent autocomplete="off" />
     <label for="endTime"> Deadline Time </label>
-    <input type="time" v-model="deadlineTime" id="deadlineTime" name="deadline-time" required @keypress.enter.prevent autocomplete="off" />
+    <input class="dateTimeInput" type="time" v-model="deadlineTime" id="deadlineTime" 
+      name="deadline-time" required @keypress.enter.prevent autocomplete="off" />
 
     <br />
     <menu>
@@ -89,6 +91,10 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+
+.dateTimeInput {
+  width:10em;
+}
 .photo {
   height: 50vh;
   max-width: 100%;
