@@ -45,10 +45,10 @@ async function attachTag(name:string){
     console.log(`Trying to attach: `,name)
     try{
         const currentTag = await fetchy(`/api/tag/name/${name}`,"GET");
-        console.log("found current tag");
         const response = await fetchy(`/api/tag/attach`,"PATCH",{body:{tagId: currentTag._id, itemId: userID}})
     }
-    catch{
+    catch(e){
+        console.log('Fail to fetch tag')
         const response = await fetchy(`/api/tag`,"POST",{body:{i:userID,n:name}})
     }
 }
