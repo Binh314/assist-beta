@@ -58,13 +58,13 @@ async function uploadNewTag(){
 
     console.log(`old: ${userTags.value}, new: ${newTags.value}`)
     for(const tag of newTags.value){
-        if (!userTags.value.includes(tag)) {
+        if (tag && !userTags.value.includes(tag)) {
             await attachTag(tag);
         }
     }
 
     for(const tag of userTags.value){
-        if (!newTags.value.includes(tag)) {
+        if (tag && !newTags.value.includes(tag)) {
             await detachTag(tag);
         }
     }
