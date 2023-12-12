@@ -75,7 +75,7 @@ async function handleTagChange(newTag: string[]) {
       <hr />
       <div class="tag-container">
         <h2>Select Tags</h2>
-        <p>Please indicate area you are interested in giving help in</p>
+        <p>Please add areas in which you would be willing to help (e.g. math, art, physical, etc.).</p>
         <TagsInput
           :initTags="tag"
           @updateTags="
