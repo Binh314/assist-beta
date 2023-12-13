@@ -132,7 +132,7 @@ onBeforeMount(async () => {
         <div class="auth-container">
           <div class="column title-container">
             <span class="title">Welcome to Assist </span>
-            <span class="description">A community of support by matching individuals who need help with those eager to offer it in their areas of expertise or interest</span>
+            <span class="description">A supportive community that matches individuals who need help with those eager to offer it in their areas of expertise or interest.</span>
           </div>
           <div class="button-group">
             <button class="btn-container" @click="signup">Sign up</button>
